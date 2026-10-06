@@ -80,14 +80,19 @@ class ApiService {
   Future<User?> getMe() async {
     try {
       final response = await _dio.get(ApiConstants.getMe);
-      if (response.data['user'] != null) {
-        return User.fromJson(response.data['user']);
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        if (data.containsKey('user') && data['user'] is Map<String, dynamic>) {
+          return User.fromJson(data['user']);
+        }
+        return User.fromJson(data);
       }
       return null;
-    } catch (_) {
+    } catch (e) {
       return null;
     }
   }
+
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();

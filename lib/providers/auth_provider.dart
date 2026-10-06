@@ -43,12 +43,26 @@ class AuthProvider extends ChangeNotifier {
       final res = await apiService.login(username, password);
       if (res['access_token'] != null) {
         _user = await apiService.getMe();
+        // Fallback tạo user tạm thời nếu getMe chưa kịp trả về
+        _user ??= User(
+          id: 'user_id',
+          username: username,
+          email: '',
+          fullName: username,
+        );
+        notifyListeners();
         return true;
       }
       _errorMessage = 'Đăng nhập không thành công.';
       return false;
     } catch (e) {
-      _errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác.';
+      if (e.toString().contains('401')) {
+        _errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác.';
+      } else if (e.toString().contains('422')) {
+        _errorMessage = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.';
+      } else {
+        _errorMessage = 'Lỗi kết nối máy chủ ($e). Vui lòng kiểm tra lại backend.';
+      }
       return false;
     } finally {
       _isLoading = false;
