@@ -16,12 +16,12 @@ Giao diện ứng dụng được thiết kế theo phong cách **Terminal / CLI
 Bạn có thể tải file cài đặt APK mới nhất trực tiếp về điện thoại Android theo các liên kết bên dưới:
 
 * 📦 **Tải bản phát hành mới nhất (Mọi phiên bản):**  
-  👉 **[GitHub Releases - Music App Releases](https://github.com/SutieXuXi203/music-storage-ui-mobile/releases)**
+  👉 **[GitHub Releases - Sutorage App Releases](https://github.com/SutieXuXi203/music-storage-ui-mobile/releases)**
 * 📥 **Tải trực tiếp file APK (Direct Download):**  
-  👉 **[Download app-release.apk](https://github.com/SutieXuXi203/music-storage-ui-mobile/releases/latest/download/app-release.apk)**
+  👉 **[Download sutorage.apk](https://github.com/SutieXuXi203/music-storage-ui-mobile/releases/latest/download/sutorage.apk)**
 
 ### Hướng dẫn cài đặt trên điện thoại Android:
-1. Nhấn vào liên kết trên để tải file **`app-release.apk`** về máy.
+1. Nhấn vào liên kết trên để tải file **`sutorage.apk`** về máy.
 2. Mở file vừa tải về trong mục **Tệp đã tải xuống** (Downloads).
 3. Nếu điện thoại hiển thị cảnh báo *"Cài đặt ứng dụng không rõ nguồn gốc"*, chọn **Cài đặt (Settings)** ➔ Bật **Cho phép nguồn này (Allow from this source)**.
 4. Nhấn **Cài đặt (Install)** và mở ứng dụng để trải nghiệm nghe nhạc!
