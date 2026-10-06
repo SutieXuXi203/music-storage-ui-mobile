@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 
 class ApiConstants {
-  // Tự động nhận diện host phù hợp:
-  // - Android Emulator: 10.0.2.2
-  // - iOS Simulator / Desktop / Web: localhost
+  // Tự động nhận diện host phù hợp hoặc cấu hình qua --dart-define=API_BASE_URL=...
   static String get baseUrl {
+    const String envUrl = String.fromEnvironment('API_BASE_URL');
+    if (envUrl.isNotEmpty) return envUrl;
+
     if (kIsWeb) return 'http://localhost:8000/api';
     if (defaultTargetPlatform == TargetPlatform.android) return 'http://10.0.2.2:8000/api';
     return 'http://localhost:8000/api';
