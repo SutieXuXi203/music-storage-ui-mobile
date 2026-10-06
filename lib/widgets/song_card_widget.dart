@@ -7,6 +7,7 @@ import 're_icon.dart';
 class SongCardWidget extends StatefulWidget {
   final int index;
   final Song song;
+  final bool isCurrent;
   final bool isPlaying;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
@@ -15,6 +16,7 @@ class SongCardWidget extends StatefulWidget {
     super.key,
     required this.index,
     required this.song,
+    required this.isCurrent,
     required this.isPlaying,
     required this.onTap,
     this.onDelete,
@@ -31,10 +33,10 @@ class _SongCardWidgetState extends State<SongCardWidget> {
   Widget build(BuildContext context) {
     final indexStr = (widget.index + 1).toString().padLeft(2, '0');
 
-    // Đường viền đổi màu khi hover, tuyệt đối không đổi màu nền và không bo góc
-    final borderColor = widget.isPlaying
-        ? AppTheme.textPrimary
-        : (_isHovered ? const Color(0xFF666666) : AppTheme.border);
+    // Đường viền đổi màu khi hover hoặc khi bài hát đang chọn/phát
+    final borderColor = widget.isCurrent
+        ? (widget.isPlaying ? AppTheme.terminalGreen : const Color(0xFF666666))
+        : (_isHovered ? const Color(0xFF888888) : AppTheme.border);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -42,11 +44,11 @@ class _SongCardWidgetState extends State<SongCardWidget> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
         decoration: BoxDecoration(
-          color: widget.isPlaying ? AppTheme.surfaceLight : AppTheme.surface,
+          color: widget.isCurrent ? AppTheme.surfaceLight : AppTheme.surface,
           borderRadius: BorderRadius.zero, // Bỏ bo tròn hoàn toàn
           border: Border.all(
             color: borderColor,
-            width: widget.isPlaying ? 1.2 : 1.0,
+            width: widget.isCurrent ? 1.2 : 1.0,
           ),
         ),
         child: Material(
@@ -61,16 +63,22 @@ class _SongCardWidgetState extends State<SongCardWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  // Số thứ tự hoặc icon đang phát dạng Terminal Reicon
+                  // Số thứ tự hoặc icon trạng thái: Đang phát (musicPlay) hoặc Dừng (pause)
                   Container(
                     width: 28,
                     alignment: Alignment.centerLeft,
-                    child: widget.isPlaying
-                        ? ReIcon(
-                            Reicon.outline.musicPlay,
-                            size: 16,
-                            color: AppTheme.terminalGreen,
-                          )
+                    child: widget.isCurrent
+                        ? (widget.isPlaying
+                            ? ReIcon(
+                                Reicon.outline.musicPlay,
+                                size: 16,
+                                color: AppTheme.terminalGreen,
+                              )
+                            : ReIcon(
+                                Reicon.outline.pause,
+                                size: 16,
+                                color: AppTheme.terminalGreen,
+                              ))
                         : Text(
                             indexStr,
                             style: const TextStyle(
@@ -140,8 +148,8 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: widget.isPlaying ? FontWeight.bold : FontWeight.w600,
-                            color: widget.isPlaying
+                            fontWeight: widget.isCurrent ? FontWeight.bold : FontWeight.w600,
+                            color: widget.isCurrent
                                 ? AppTheme.terminalGreen
                                 : (_isHovered ? AppTheme.textPrimary : const Color(0xFFDDDDDD)),
                             letterSpacing: 0.3,
@@ -181,10 +189,10 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                   TerminalActionBtn(
                     onTap: widget.onTap,
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    defaultColor: widget.isPlaying ? AppTheme.terminalGreen : AppTheme.textPrimary,
+                    defaultColor: widget.isCurrent ? AppTheme.terminalGreen : AppTheme.textPrimary,
                     hoverColor: AppTheme.terminalGreen,
                     icon: ReIcon(
-                      widget.isPlaying ? Reicon.outline.pause : Reicon.outline.play,
+                      (widget.isCurrent && widget.isPlaying) ? Reicon.outline.pause : Reicon.outline.play,
                       size: 15,
                     ),
                   ),

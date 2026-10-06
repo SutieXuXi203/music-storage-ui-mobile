@@ -83,48 +83,88 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
 
+                // Username
+                const Text(
+                  '> USERNAME:',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.terminalGreen,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _usernameController,
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
                   decoration: const InputDecoration(
-                    prefixText: '> username: ',
-                    prefixStyle: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary),
-                    hintText: 'user_01',
+                    hintText: 'Nhập tên đăng nhập...',
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
+                // Email
+                const Text(
+                  '> EMAIL:',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.terminalGreen,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
                   decoration: const InputDecoration(
-                    prefixText: '> email: ',
-                    prefixStyle: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary),
                     hintText: 'user@example.com',
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
+                // Full Name
+                const Text(
+                  '> FULL_NAME (DRIVE FOLDER):',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.terminalGreen,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _fullNameController,
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
                   decoration: const InputDecoration(
-                    prefixText: '> full_name: ',
-                    prefixStyle: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary),
-                    hintText: 'Nguyen Van A (Drive Folder Name)',
+                    hintText: 'Nguyen Van A (tên thư mục Drive)',
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
+                // Password
+                const Text(
+                  '> PASSWORD:',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.terminalGreen,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
                   decoration: InputDecoration(
-                    prefixText: '> password: ',
-                    prefixStyle: const TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary),
-                    hintText: 'min 6 chars',
+                    hintText: 'Tối thiểu 6 ký tự...',
                     suffixIcon: Padding(
                       padding: const EdgeInsets.only(right: 6),
                       child: TerminalActionBtn(
@@ -164,7 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               fullName: fullName.isNotEmpty ? fullName : null,
                             );
 
-                            if (!mounted) return;
+                            if (!context.mounted) return;
                             if (success) {
                               Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(builder: (_) => const HomeScreen()),

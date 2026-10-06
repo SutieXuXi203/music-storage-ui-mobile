@@ -116,15 +116,15 @@ class AppTheme {
         contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: border, width: 1),
+          borderSide: BorderSide(color: Color(0xFF3A3A3A), width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: border, width: 1),
+          borderSide: BorderSide(color: Color(0xFF3A3A3A), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: textPrimary, width: 1.2),
+          borderSide: BorderSide(color: terminalGreen, width: 1.2),
         ),
       ),
     );

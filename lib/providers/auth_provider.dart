@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
+import '../services/audio_player_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   User? _user;
@@ -99,6 +100,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    await audioPlayerService.stopAndReset();
     await apiService.logout();
     _user = null;
     notifyListeners();

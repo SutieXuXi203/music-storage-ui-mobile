@@ -84,27 +84,45 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                // Input user
+                // Label & Input username
+                const Text(
+                  '> USERNAME:',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.terminalGreen,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _usernameController,
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
                   decoration: const InputDecoration(
-                    prefixText: '> username: ',
-                    prefixStyle: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary),
-                    hintText: 'sutie',
+                    hintText: 'Nhập tên đăng nhập (ví dụ: sutie)...',
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
-                // Input password
+                // Label & Input password
+                const Text(
+                  '> PASSWORD:',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.terminalGreen,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
                   decoration: InputDecoration(
-                    prefixText: '> password: ',
-                    prefixStyle: const TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary),
-                    hintText: '••••••••',
+                    hintText: 'Nhập mật khẩu...',
                     suffixIcon: Padding(
                       padding: const EdgeInsets.only(right: 6),
                       child: TerminalActionBtn(
@@ -136,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (username.isEmpty || password.isEmpty) return;
 
                             final success = await authProvider.login(username, password);
-                            if (!mounted) return;
+                            if (!context.mounted) return;
                             if (success) {
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(builder: (_) => const HomeScreen()),

@@ -12,35 +12,38 @@ class MiniPlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final song = playerService.currentSong;
-    if (song == null) return const SizedBox.shrink();
+    return ListenableBuilder(
+      listenable: playerService,
+      builder: (context, _) {
+        final song = playerService.currentSong;
+        if (song == null) return const SizedBox.shrink();
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder: (context, anim, secAnim) => NowPlayingScreen(playerService: playerService),
-            transitionsBuilder: (context, anim, secAnim, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 1),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-                child: child,
-              );
-            },
-          ),
-        );
-      },
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.zero, // Bỏ bo tròn hoàn toàn
-          border: Border(
-            top: BorderSide(color: AppTheme.borderHighlight, width: 1.0),
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (context, anim, secAnim) => NowPlayingScreen(playerService: playerService),
+                transitionsBuilder: (context, anim, secAnim, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 1),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
+          child: Container(
+            decoration: const BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.zero, // Bỏ bo tròn hoàn toàn
+              border: Border(
+                top: BorderSide(color: AppTheme.borderHighlight, width: 1.0),
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         child: SafeArea(
           top: false,
           child: Column(
@@ -173,12 +176,44 @@ class MiniPlayerWidget extends StatelessWidget {
                       size: 16,
                     ),
                   ),
+                  const SizedBox(width: 6),
+
+                  // Nút mở rộng trình phát toàn màn hình (giao diện thu phóng)
+                  TerminalActionBtn(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder: (context, anim, secAnim) => NowPlayingScreen(playerService: playerService),
+                          transitionsBuilder: (context, anim, secAnim, child) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 1),
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    defaultColor: AppTheme.terminalGreen,
+                    hoverColor: Colors.white,
+                    defaultBorderColor: AppTheme.border,
+                    hoverBorderColor: AppTheme.terminalGreen,
+                    icon: ReIcon(
+                      Reicon.outline.arrowUp2,
+                      size: 15,
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

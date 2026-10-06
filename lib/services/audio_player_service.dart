@@ -99,6 +99,19 @@ class AudioPlayerService extends ChangeNotifier {
     await _player.seek(position);
   }
 
+  Future<void> stopAndReset() async {
+    try {
+      await _player.pause();
+      await _player.stop();
+    } catch (e) {
+      debugPrint('[AudioPlayer] Lỗi dừng phát: $e');
+    }
+    _currentIndex = -1;
+    _playlist.clear();
+    _isLoading = false;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _player.dispose();
