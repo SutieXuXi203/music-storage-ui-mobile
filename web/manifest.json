@@ -1,6 +1,6 @@
 {
-    "name": "mobile_ui",
-    "short_name": "mobile_ui",
+    "name": "Sutorage",
+    "short_name": "Sutorage",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

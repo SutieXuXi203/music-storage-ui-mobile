@@ -46,10 +46,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.0
-          name: Sutorage App Release v1.0.0
+          tag_name: v1.0.1
+          name: Sutorage App Release v1.0.1
           body: |
             ## Sutorage Music App Android Release
+            - Tên hiển thị trên điện thoại: **Sutorage**
             - Tự động kết nối với Fly.io Backend: `https://music-storage-backend.fly.dev/api`
             - Tải file `sutorage.apk` bên dưới về điện thoại và cài đặt.
           files: build/app/outputs/flutter-apk/sutorage.apk
