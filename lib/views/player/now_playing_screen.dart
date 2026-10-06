@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:reicon_flutter/reicon_flutter.dart';
 import '../../services/audio_player_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../providers/settings_provider.dart';
+import '../../widgets/music_wave_widget.dart';
 import '../../widgets/re_icon.dart';
 
 class NowPlayingScreen extends StatelessWidget {
@@ -56,12 +59,30 @@ class NowPlayingScreen extends StatelessWidget {
               style: TextStyle(fontFamily: 'monospace', fontSize: 13, letterSpacing: 1.2),
             ),
             centerTitle: true,
+            actions: [
+              // Nút cấu hình kiểu sóng nhạc (Wave Settings)
+              Center(
+                child: TerminalActionBtn(
+                  onTap: () => showWaveSettingsDialog(context),
+                  hasBorder: true,
+                  defaultBorderColor: const Color(0xFF444444),
+                  hoverBorderColor: AppTheme.terminalGreen,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  defaultColor: AppTheme.textSecondary,
+                  hoverColor: AppTheme.terminalGreen,
+                  icon: ReIcon(Reicon.outline.setting2, size: 14),
+                  label: 'WAVE_FX',
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
           ),
           body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Status Bar
                   Container(
@@ -95,46 +116,50 @@ class NowPlayingScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 18),
 
                   // Cover Art vuông vức viền trắng đơn sắc
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    height: MediaQuery.of(context).size.width * 0.7,
-                    decoration: const BoxDecoration(
-                      color: AppTheme.surface,
-                      borderRadius: BorderRadius.zero, // Bỏ bo tròn hoàn toàn
-                      border: Border.fromBorderSide(BorderSide(color: AppTheme.borderHighlight, width: 1.5)),
-                    ),
-                    child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                        ? Image.network(
-                            song.coverUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              final coverId = song.coverDriveFileId ?? song.thumbnailDriveFileId;
-                              if (coverId != null && !song.coverUrl!.contains('googleusercontent')) {
-                                return Image.network(
-                                  'https://lh3.googleusercontent.com/d/$coverId',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Center(
-                                    child: Text('[ NO_COVER ]', style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textMuted)),
-                                  ),
+                  Center(
+                    child: Container(
+                      width: 220,
+                      height: 220,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.surface,
+                        borderRadius: BorderRadius.zero,
+                        border: Border.fromBorderSide(BorderSide(color: AppTheme.borderHighlight, width: 1.5)),
+                      ),
+                      child: song.coverUrl != null && song.coverUrl!.isNotEmpty
+                          ? Image.network(
+                              song.coverUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                final coverId = song.coverDriveFileId ?? song.thumbnailDriveFileId;
+                                if (coverId != null && !song.coverUrl!.contains('googleusercontent')) {
+                                  return Image.network(
+                                    'https://lh3.googleusercontent.com/d/$coverId',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const Center(
+                                      child: Text('[ NO_COVER ]', style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textMuted)),
+                                    ),
+                                  );
+                                }
+                                return const Center(
+                                  child: Text('[ NO_COVER ]', style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textMuted)),
                                 );
-                              }
-                              return const Center(
-                                child: Text('[ NO_COVER ]', style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textMuted)),
-                              );
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: Text('> LOADING_ART...', style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textMuted)),
-                              );
-                            },
-                          )
-                        : const Center(
-                            child: Text('[ NO_COVER ]', style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textMuted)),
-                          ),
+                              },
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                  child: Text('> LOADING_ART...', style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textMuted)),
+                                );
+                              },
+                            )
+                          : const Center(
+                              child: Text('[ NO_COVER ]', style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textMuted)),
+                            ),
+                    ),
                   ),
+                  const SizedBox(height: 16),
 
                   // Metadata Text
                   Column(
@@ -146,35 +171,107 @@ class NowPlayingScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontFamily: 'monospace',
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Text(
                         '> ARTIST: ${song.artist}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontFamily: 'monospace',
-                          fontSize: 13,
+                          fontSize: 12,
                           color: AppTheme.textSecondary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
                         '> CLOUD_ID: ${song.driveFileId ?? "LOCAL"}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontFamily: 'monospace',
-                          fontSize: 11,
+                          fontSize: 10,
                           color: AppTheme.textMuted,
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 14),
+
+                  // Khung sóng nhạc Real-time Wave Visualizer
+                  Consumer<SettingsProvider>(
+                    builder: (context, settings, _) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: const BoxDecoration(
+                          color: AppTheme.surface,
+                          borderRadius: BorderRadius.zero,
+                          border: Border.fromBorderSide(BorderSide(color: Color(0xFF333333), width: 1.0)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header thông tin sóng & nút chuyển đổi nhanh
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 6,
+                                      height: 6,
+                                      color: playerService.isPlaying ? AppTheme.terminalGreen : AppTheme.textMuted,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '// WAVE_DSP: ${settings.waveType.label}',
+                                      style: const TextStyle(
+                                        fontFamily: 'monospace',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppTheme.textSecondary,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                TerminalActionBtn(
+                                  onTap: () => showWaveSettingsDialog(context),
+                                  hasBorder: false,
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  defaultColor: AppTheme.textMuted,
+                                  hoverColor: AppTheme.terminalGreen,
+                                  icon: ReIcon(Reicon.outline.setting2, size: 12),
+                                  label: 'CONFIG',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Dải sóng nhạc chuyển động theo nhạc (Chạm vào để đổi nhanh kiểu sóng)
+                            GestureDetector(
+                              onTap: settings.cycleWaveType,
+                              child: Container(
+                                height: 46,
+                                width: double.infinity,
+                                color: Colors.black,
+                                alignment: Alignment.bottomCenter,
+                                child: MusicWaveWidget(
+                                  isPlaying: playerService.isPlaying,
+                                  height: 46,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 14),
 
                   // Timeline Slider tối giản
                   Column(
@@ -186,7 +283,7 @@ class NowPlayingScreen extends StatelessWidget {
                           activeTrackColor: AppTheme.terminalGreen,
                           inactiveTrackColor: AppTheme.border,
                           thumbColor: AppTheme.terminalGreen,
-                          overlayShape: SliderComponentShape.noOverlay, // Bỏ quầng hover tròn
+                          overlayShape: SliderComponentShape.noOverlay,
                         ),
                         child: Slider(
                           value: position.inSeconds.toDouble().clamp(0.0, duration.inSeconds.toDouble()),
@@ -208,6 +305,7 @@ class NowPlayingScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
 
                   // Playback Command Controls dùng Reicon và TerminalActionBtn
                   Row(
@@ -244,6 +342,7 @@ class NowPlayingScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),

@@ -7,6 +7,7 @@ import '../../providers/song_provider.dart';
 import '../../services/audio_player_service.dart';
 import '../../widgets/song_card_widget.dart';
 import '../../widgets/mini_player_widget.dart';
+import '../../widgets/music_wave_widget.dart';
 import '../../widgets/re_icon.dart';
 import '../auth/login_screen.dart';
 
@@ -156,6 +157,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          // Nút Cài đặt sóng nhạc
+          Center(
+            child: TerminalActionBtn(
+              onTap: () => showWaveSettingsDialog(context),
+              hasBorder: true,
+              defaultBorderColor: const Color(0xFF444444),
+              hoverBorderColor: AppTheme.terminalGreen,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              defaultColor: AppTheme.textSecondary,
+              hoverColor: AppTheme.terminalGreen,
+              icon: ReIcon(Reicon.outline.setting2, size: 13),
+              label: 'WAVE',
+            ),
+          ),
+          const SizedBox(width: 8),
+
           // Nút thêm nhạc YouTube với Reicon
           Center(
             child: TerminalActionBtn(
