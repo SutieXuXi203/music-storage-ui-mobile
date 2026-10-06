@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:reicon_flutter/reicon_flutter.dart';
 import '../models/song_model.dart';
 import '../core/theme/app_theme.dart';
+import 're_icon.dart';
 
-class SongCardWidget extends StatelessWidget {
+class SongCardWidget extends StatefulWidget {
+  final int index;
   final Song song;
   final bool isPlaying;
   final VoidCallback onTap;
@@ -11,6 +13,7 @@ class SongCardWidget extends StatelessWidget {
 
   const SongCardWidget({
     super.key,
+    required this.index,
     required this.song,
     required this.isPlaying,
     required this.onTap,
@@ -18,90 +21,193 @@ class SongCardWidget extends StatelessWidget {
   });
 
   @override
+  State<SongCardWidget> createState() => _SongCardWidgetState();
+}
+
+class _SongCardWidgetState extends State<SongCardWidget> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: isPlaying ? AppTheme.surfaceLight : AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: isPlaying ? Border.all(color: AppTheme.primary, width: 1.5) : null,
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: 52,
-            height: 52,
-            color: AppTheme.surfaceLight,
-            child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: song.coverUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const Icon(
-                      Icons.music_note,
-                      color: AppTheme.textSecondary,
-                    ),
-                    errorWidget: (context, url, error) => const Icon(
-                      Icons.music_note,
-                      color: AppTheme.textSecondary,
-                    ),
-                  )
-                : const Icon(Icons.music_note, color: AppTheme.textSecondary),
+    final indexStr = (widget.index + 1).toString().padLeft(2, '0');
+
+    // Đường viền đổi màu khi hover, tuyệt đối không đổi màu nền và không bo góc
+    final borderColor = widget.isPlaying
+        ? AppTheme.textPrimary
+        : (_isHovered ? const Color(0xFF666666) : AppTheme.border);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+        decoration: BoxDecoration(
+          color: widget.isPlaying ? AppTheme.surfaceLight : AppTheme.surface,
+          borderRadius: BorderRadius.zero, // Bỏ bo tròn hoàn toàn
+          border: Border.all(
+            color: borderColor,
+            width: widget.isPlaying ? 1.2 : 1.0,
           ),
         ),
-        title: Text(
-          song.title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
-            color: isPlaying ? AppTheme.primaryLight : AppTheme.textPrimary,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            hoverColor: Colors.transparent, // Không hiển thị màu hình nền hover
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            borderRadius: BorderRadius.zero,
+            onTap: widget.onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  // Số thứ tự hoặc icon đang phát dạng Terminal Reicon
+                  Container(
+                    width: 28,
+                    alignment: Alignment.centerLeft,
+                    child: widget.isPlaying
+                        ? ReIcon(
+                            Reicon.outline.musicPlay,
+                            size: 16,
+                            color: AppTheme.terminalGreen,
+                          )
+                        : Text(
+                            indexStr,
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: AppTheme.textMuted,
+                            ),
+                          ),
+                  ),
+
+                  // Ảnh Cover Art vuông vức viền mảnh chuẩn Terminal
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.background,
+                      borderRadius: BorderRadius.zero, // Bỏ bo tròn
+                      border: Border.fromBorderSide(BorderSide(color: AppTheme.border, width: 1)),
+                    ),
+                    child: widget.song.coverUrl != null && widget.song.coverUrl!.isNotEmpty
+                        ? Image.network(
+                            widget.song.coverUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              final coverId = widget.song.coverDriveFileId ?? widget.song.thumbnailDriveFileId;
+                              if (coverId != null && !widget.song.coverUrl!.contains('googleusercontent')) {
+                                return Image.network(
+                                  'https://lh3.googleusercontent.com/d/$coverId',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Center(
+                                    child: ReIcon(Reicon.outline.musicNote, size: 16, color: AppTheme.textMuted),
+                                  ),
+                                );
+                              }
+                              return Center(
+                                child: ReIcon(Reicon.outline.musicNote, size: 16, color: AppTheme.textMuted),
+                              );
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(strokeWidth: 1.2, color: AppTheme.textMuted),
+                                ),
+                              );
+                            },
+                          )
+                        : Center(
+                            child: ReIcon(Reicon.outline.musicNote, size: 16, color: AppTheme.textMuted),
+                          ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // Tiêu đề & Nghệ sĩ
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          widget.song.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: widget.isPlaying ? FontWeight.bold : FontWeight.w600,
+                            color: widget.isPlaying
+                                ? AppTheme.terminalGreen
+                                : (_isHovered ? AppTheme.textPrimary : const Color(0xFFDDDDDD)),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.song.artist,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              widget.song.formattedDuration,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppTheme.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // Nút Play / Pause dùng Reicon
+                  TerminalActionBtn(
+                    onTap: widget.onTap,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    defaultColor: widget.isPlaying ? AppTheme.terminalGreen : AppTheme.textPrimary,
+                    hoverColor: AppTheme.terminalGreen,
+                    icon: ReIcon(
+                      widget.isPlaying ? Reicon.outline.pause : Reicon.outline.play,
+                      size: 15,
+                    ),
+                  ),
+
+                  if (widget.onDelete != null) ...[
+                    const SizedBox(width: 6),
+                    TerminalActionBtn(
+                      onTap: widget.onDelete,
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                      defaultColor: AppTheme.textMuted,
+                      hoverColor: AppTheme.error, // Di chuột vào đổi màu đỏ cảnh báo xoá
+                      hoverBorderColor: AppTheme.error,
+                      icon: ReIcon(
+                        Reicon.outline.trash,
+                        size: 15,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
-        subtitle: Row(
-          children: [
-            Expanded(
-              child: Text(
-                song.artist,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              song.formattedDuration,
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(
-                isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                color: isPlaying ? AppTheme.primary : Colors.white,
-                size: 32,
-              ),
-              onPressed: onTap,
-            ),
-            if (onDelete != null)
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: AppTheme.error, size: 20),
-                onPressed: onDelete,
-              ),
-          ],
-        ),
-        onTap: onTap,
       ),
     );
   }

@@ -64,7 +64,6 @@ class AudioPlayerService extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      await _player.stop();
       await _player.setUrl(streamUrl);
       await _player.play();
     } catch (e) {

@@ -1,3 +1,5 @@
+import '../core/constants/api_constants.dart';
+
 class Song {
   final String id;
   final String title;
@@ -8,6 +10,7 @@ class Song {
   final String format;
   final int fileSize;
   final String? driveFileId;
+  final String? coverDriveFileId;
   final String? thumbnailDriveFileId;
   final String? streamUrl;
   final String? downloadUrl;
@@ -27,6 +30,7 @@ class Song {
     this.format = 'mp3',
     this.fileSize = 0,
     this.driveFileId,
+    this.coverDriveFileId,
     this.thumbnailDriveFileId,
     this.streamUrl,
     this.downloadUrl,
@@ -38,8 +42,17 @@ class Song {
   });
 
   factory Song.fromJson(Map<String, dynamic> json) {
+    final songId = json['id'] ?? json['_id'] ?? '';
+    // Luôn ưu tiên dùng backend stream proxy để phát nhạc mượt mà trên mọi nền tảng (Web/Mobile) không lỗi CORS
+    final proxyStreamUrl = songId.isNotEmpty ? '${ApiConstants.baseUrl}/songs/$songId/stream' : null;
+
+    final coverDriveId = json['cover_drive_file_id'] ?? json['thumbnail_drive_file_id'];
+    final proxyCoverUrl = songId.isNotEmpty && coverDriveId != null
+        ? '${ApiConstants.baseUrl}/songs/$songId/cover'
+        : (coverDriveId != null ? 'https://lh3.googleusercontent.com/d/$coverDriveId' : null);
+
     return Song(
-      id: json['id'] ?? json['_id'] ?? '',
+      id: songId,
       title: json['title'] ?? 'Bài hát không tên',
       artist: json['artist'] ?? 'Chưa rõ nghệ sĩ',
       album: json['album'] ?? 'Single',
@@ -48,15 +61,17 @@ class Song {
       format: json['format'] ?? 'mp3',
       fileSize: (json['file_size'] as num?)?.toInt() ?? 0,
       driveFileId: json['drive_file_id'],
-      thumbnailDriveFileId: json['thumbnail_drive_file_id'],
-      streamUrl: json['stream_url'] ?? json['download_url'],
+      coverDriveFileId: coverDriveId,
+      thumbnailDriveFileId: coverDriveId,
+      streamUrl: proxyStreamUrl ?? json['stream_url'] ?? json['download_url'],
       downloadUrl: json['download_url'],
-      coverUrl: json['cover_url'],
+      coverUrl: proxyCoverUrl ?? json['cover_url'],
       webViewLink: json['web_view_link'],
       userId: json['user_id'],
       userUsername: json['user_username'],
       createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
     );
+
   }
 
   Map<String, dynamic> toJson() {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:reicon_flutter/reicon_flutter.dart';
 import '../services/audio_player_service.dart';
-
 import '../core/theme/app_theme.dart';
 import '../views/player/now_playing_screen.dart';
+import 're_icon.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   final AudioPlayerService playerService;
@@ -33,79 +33,150 @@ class MiniPlayerWidget extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceLight.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-          border: Border.all(color: AppTheme.primary.withOpacity(0.3), width: 1),
+        decoration: const BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.zero, // Bỏ bo tròn hoàn toàn
+          border: Border(
+            top: BorderSide(color: AppTheme.borderHighlight, width: 1.0),
+          ),
         ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                width: 48,
-                height: 48,
-                color: AppTheme.surface,
-                child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: song.coverUrl!,
-                        fit: BoxFit.cover,
-                        errorWidget: (c, u, e) => const Icon(Icons.music_note, color: AppTheme.primaryLight),
-                      )
-                    : const Icon(Icons.music_note, color: AppTheme.primaryLight),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Thanh tiến trình chạy cực mỏng, không bo góc
+              StreamBuilder<Duration>(
+                stream: playerService.player.positionStream,
+                builder: (context, snapshot) {
+                  final position = snapshot.data ?? Duration.zero;
+                  final duration = playerService.player.duration ?? Duration(seconds: song.duration);
+                  final progress = duration.inMilliseconds > 0
+                      ? (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0)
+                      : 0.0;
+
+                  return Container(
+                    height: 2,
+                    width: double.infinity,
+                    color: AppTheme.border,
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: progress,
+                      child: Container(color: AppTheme.terminalGreen),
+                    ),
+                  );
+                },
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 6),
+
+              Row(
                 children: [
-                  Text(
-                    song.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                  // Dấu prompt terminal
+                  const Text(
+                    '> ',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
                       fontWeight: FontWeight.bold,
+                      color: AppTheme.terminalGreen,
                       fontSize: 14,
-                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    song.artist,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textSecondary,
+
+                  // Cover Art thu nhỏ vuông vức viền mảnh
+                  Container(
+                    width: 38,
+                    height: 38,
+                    margin: const EdgeInsets.only(right: 10),
+                    decoration: const BoxDecoration(
+                      color: AppTheme.background,
+                      borderRadius: BorderRadius.zero, // Bỏ bo tròn
+                      border: Border.fromBorderSide(BorderSide(color: AppTheme.border, width: 1)),
+                    ),
+                    child: song.coverUrl != null && song.coverUrl!.isNotEmpty
+                        ? Image.network(
+                            song.coverUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              final coverId = song.coverDriveFileId ?? song.thumbnailDriveFileId;
+                              if (coverId != null && !song.coverUrl!.contains('googleusercontent')) {
+                                return Image.network(
+                                  'https://lh3.googleusercontent.com/d/$coverId',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Center(
+                                    child: ReIcon(Reicon.outline.musicNote, size: 14, color: AppTheme.textMuted),
+                                  ),
+                                );
+                              }
+                              return Center(
+                                child: ReIcon(Reicon.outline.musicNote, size: 14, color: AppTheme.textMuted),
+                              );
+                            },
+                          )
+                        : Center(
+                            child: ReIcon(Reicon.outline.musicNote, size: 14, color: AppTheme.textMuted),
+                          ),
+                  ),
+
+                  // Tên bài hát & ca sĩ
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          song.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          '${song.artist} // ${song.format.toUpperCase()}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 10,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Nút Play / Pause dùng Reicon
+                  TerminalActionBtn(
+                    onTap: playerService.togglePlayPause,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    defaultColor: playerService.isPlaying ? AppTheme.terminalGreen : AppTheme.textPrimary,
+                    hoverColor: AppTheme.terminalGreen,
+                    icon: ReIcon(
+                      playerService.isPlaying ? Reicon.outline.pause : Reicon.outline.play,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+
+                  // Nút Next dùng Reicon
+                  TerminalActionBtn(
+                    onTap: playerService.next,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    defaultColor: AppTheme.textSecondary,
+                    hoverColor: AppTheme.terminalGreen,
+                    icon: ReIcon(
+                      Reicon.outline.skipNext,
+                      size: 16,
                     ),
                   ),
                 ],
               ),
-            ),
-            IconButton(
-              icon: Icon(
-                playerService.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                color: Colors.white,
-                size: 30,
-              ),
-              onPressed: playerService.togglePlayPause,
-            ),
-            IconButton(
-              icon: const Icon(Icons.skip_next_rounded, color: Colors.white, size: 28),
-              onPressed: playerService.next,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
