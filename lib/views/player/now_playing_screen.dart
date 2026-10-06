@@ -262,6 +262,7 @@ class NowPlayingScreen extends StatelessWidget {
                                 alignment: Alignment.bottomCenter,
                                 child: MusicWaveWidget(
                                   isPlaying: playerService.isPlaying,
+                                  position: position,
                                   height: 46,
                                 ),
                               ),
