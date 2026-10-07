@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:reicon_flutter/reicon_flutter.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/theme/app_theme.dart';
-import '../../widgets/re_icon.dart';
 import '../home/home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -19,6 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _fullNameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -29,202 +28,237 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  Future<void> _handleRegister(AuthProvider authProvider) async {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final fullName = _fullNameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập tên đăng nhập và mật khẩu')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final success = await authProvider.register(
+      username: username,
+      password: password,
+      email: email.isNotEmpty ? email : '$username@drive.local',
+      fullName: fullName.isNotEmpty ? fullName : null,
+    );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (success) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.getBg(context),
       appBar: AppBar(
-        title: const Text('// USER_REGISTRATION', style: TextStyle(fontFamily: 'monospace', fontSize: 13)),
-        leading: Center(
-          child: TerminalActionBtn(
-            onTap: () => Navigator.pop(context),
-            hasBorder: false,
-            padding: const EdgeInsets.all(6),
-            defaultColor: AppTheme.textSecondary,
-            hoverColor: AppTheme.terminalGreen,
-            icon: ReIcon(Reicon.outline.arrowLeft, size: 16),
-            label: 'BACK',
+        backgroundColor: AppTheme.getBg(context),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.getText(context), size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Tạo tài khoản',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.getText(context),
           ),
         ),
-        leadingWidth: 70,
       ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'CREATE_USER_PROFILE',
-                  style: TextStyle(fontFamily: 'monospace', fontSize: 18, fontWeight: FontWeight.bold),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 32.0,
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  '> System will auto-create dedicated Google Drive folder based on full_name.',
-                  style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textSecondary),
-                ),
-                const SizedBox(height: 24),
-
-                if (authProvider.errorMessage != null)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 14),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: const BoxDecoration(
-                      border: Border.fromBorderSide(BorderSide(color: AppTheme.error, width: 1)),
-                      borderRadius: BorderRadius.zero,
-                      color: AppTheme.surface,
-                    ),
-                    child: Text(
-                      '> ERROR: ${authProvider.errorMessage!}',
-                      style: const TextStyle(fontFamily: 'monospace', color: AppTheme.error, fontSize: 12),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 360),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                  Text(
+                    'Đăng ký thành viên',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.getText(context),
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Tạo tài khoản để đồng bộ nhạc cá nhân qua Google Drive.',
+                    style: TextStyle(fontSize: 12, color: AppTheme.getTextSecondary(context)),
+                  ),
+                  const SizedBox(height: 20),
 
-                // Username
-                const Text(
-                  '> USERNAME:',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.terminalGreen,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: _usernameController,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                  decoration: const InputDecoration(
-                    hintText: 'Nhập tên đăng nhập...',
-                  ),
-                ),
-                const SizedBox(height: 14),
-
-                // Email
-                const Text(
-                  '> EMAIL:',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.terminalGreen,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                  decoration: const InputDecoration(
-                    hintText: 'user@example.com',
-                  ),
-                ),
-                const SizedBox(height: 14),
-
-                // Full Name
-                const Text(
-                  '> FULL_NAME (DRIVE FOLDER):',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.terminalGreen,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: _fullNameController,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                  decoration: const InputDecoration(
-                    hintText: 'Nguyen Van A (tên thư mục Drive)',
-                  ),
-                ),
-                const SizedBox(height: 14),
-
-                // Password
-                const Text(
-                  '> PASSWORD:',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.terminalGreen,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                  decoration: InputDecoration(
-                    hintText: 'Tối thiểu 6 ký tự...',
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: TerminalActionBtn(
-                        hasBorder: false,
-                        padding: const EdgeInsets.all(6),
-                        defaultColor: AppTheme.textMuted,
-                        hoverColor: AppTheme.textPrimary,
-                        icon: ReIcon(
-                          _obscurePassword ? Reicon.outline.eyeClosed : Reicon.outline.eye,
-                          size: 16,
-                        ),
-                        onTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                  if (authProvider.errorMessage != null)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppTheme.getDanger(context), width: 1.0),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        color: AppTheme.getSurface(context),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline, size: 15, color: AppTheme.getDanger(context)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              authProvider.errorMessage!,
+                              style: TextStyle(color: AppTheme.getDanger(context), fontSize: 11.5),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+
+                  _buildInputField(
+                    context,
+                    controller: _fullNameController,
+                    hint: 'Họ và tên (ví dụ: Mạnh Đình)',
+                    icon: Icons.badge_outlined,
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 10),
 
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: TerminalActionBtn(
-                    onTap: authProvider.isLoading
-                        ? null
-                        : () async {
-                            final username = _usernameController.text.trim();
-                            final email = _emailController.text.trim();
-                            final fullName = _fullNameController.text.trim();
-                            final password = _passwordController.text.trim();
-
-                            if (username.isEmpty || email.isEmpty || password.isEmpty) return;
-
-                            final success = await authProvider.register(
-                              username: username,
-                              email: email,
-                              password: password,
-                              fullName: fullName.isNotEmpty ? fullName : null,
-                            );
-
-                            if (!context.mounted) return;
-                            if (success) {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(builder: (_) => const HomeScreen()),
-                                (route) => false,
-                              );
-                            }
-                          },
-                    defaultColor: AppTheme.textPrimary,
-                    hoverColor: AppTheme.terminalGreen,
-                    defaultBorderColor: AppTheme.textPrimary,
-                    hoverBorderColor: AppTheme.terminalGreen,
-                    icon: authProvider.isLoading
-                        ? null
-                        : ReIcon(Reicon.outline.plus, size: 16),
-                    label: authProvider.isLoading ? '>>> CREATING ACCOUNT...' : 'INITIALIZE_ACCOUNT',
+                  _buildInputField(
+                    context,
+                    controller: _usernameController,
+                    hint: 'Username (viết liền)',
+                    icon: Icons.person_outline,
                   ),
+                  const SizedBox(height: 10),
+
+                  _buildInputField(
+                    context,
+                    controller: _emailController,
+                    hint: 'Email (ví dụ: user@example.com)',
+                    icon: Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 10),
+
+                  _buildInputField(
+                    context,
+                    controller: _passwordController,
+                    hint: 'Mật khẩu',
+                    icon: Icons.lock_outline,
+                    obscureText: _obscurePassword,
+                    suffixIcon: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        size: 18,
+                        color: AppTheme.getTextMuted(context),
+                      ),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.getAction(context),
+                        foregroundColor: AppTheme.getActionText(context),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        ),
+                      ),
+                      onPressed: _isLoading ? null : () => _handleRegister(authProvider),
+                      child: _isLoading
+                          ? SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.8,
+                                color: AppTheme.getActionText(context),
+                              ),
+                            )
+                          : Text(
+                              'ĐĂNG KÝ',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                                color: AppTheme.getActionText(context),
+                              ),
+                            ),
+                    ),
+                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
+        );
+      },
+    ),
+  ),
+);
+  }
+
+  Widget _buildInputField(
+    BuildContext context, {
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    Widget? suffixIcon,
+  }) {
+    return Container(
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppTheme.getSurface(context),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        textAlignVertical: TextAlignVertical.center,
+        style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: hint,
+          hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+          prefixIcon: Icon(icon, size: 18, color: AppTheme.getTextSecondary(context)),
+          prefixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+          suffixIcon: suffixIcon,
+          suffixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.only(right: 12),
         ),
       ),
     );

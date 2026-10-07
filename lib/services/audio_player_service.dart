@@ -13,11 +13,30 @@ class AudioPlayerService extends ChangeNotifier {
   List<Song> get playlist => _playlist;
   int get currentIndex => _currentIndex;
   Song? get currentSong => _currentIndex >= 0 && _currentIndex < _playlist.length ? _playlist[_currentIndex] : null;
+  Song? get nextSong => (_currentIndex >= 0 && _currentIndex + 1 < _playlist.length)
+      ? _playlist[_currentIndex + 1]
+      : (_playlist.isNotEmpty ? _playlist.first : null);
   bool get isLoading =>
       _isLoading ||
       _player.processingState == ProcessingState.buffering ||
       _player.processingState == ProcessingState.loading;
+  bool get isBuffering => isLoading;
   bool get isPlaying => _player.playing;
+  bool _isShuffle = false;
+  bool get isShuffle => _isShuffle;
+  bool _isLoop = false;
+  bool get isLoop => _isLoop;
+
+  void toggleShuffle() {
+    _isShuffle = !_isShuffle;
+    notifyListeners();
+  }
+
+  void toggleLoop() {
+    _isLoop = !_isLoop;
+    _player.setLoopMode(_isLoop ? LoopMode.one : LoopMode.off);
+    notifyListeners();
+  }
 
   AudioPlayerService() {
     _initStreams();
@@ -75,6 +94,21 @@ class AudioPlayerService extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> pause() async {
+    await _player.pause();
+    notifyListeners();
+  }
+
+  Future<void> resume() async {
+    await _player.play();
+    notifyListeners();
+  }
+
+  Future<void> play() async {
+    await _player.play();
+    notifyListeners();
   }
 
   Future<void> togglePlayPause() async {

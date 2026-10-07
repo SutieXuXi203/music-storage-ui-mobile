@@ -35,6 +35,8 @@ class SongProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> ingestYouTube(String url) => downloadFromYouTube(url);
+
   Future<bool> downloadFromYouTube(String url) async {
     _isDownloading = true;
     _errorMessage = null;

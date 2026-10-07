@@ -1,10 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:reicon_flutter/reicon_flutter.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/theme/app_theme.dart';
-import '../../widgets/re_icon.dart';
+import '../../widgets/isometric_cubes_widget.dart';
 import '../home/home_screen.dart';
 import 'register_screen.dart';
 
@@ -20,34 +19,24 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoggingIn = false;
-  bool _loginSuccess = false;
 
   late AnimationController _entryController;
   late AnimationController _shakeController;
-  late AnimationController _cursorBlinkController;
   String? _lastErrorMessage;
 
   @override
   void initState() {
     super.initState();
-    // Animation xuất hiện mượt mà đồng bộ kiểu Apple/macOS
     _entryController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-    _entryController.forward();
-
-    // Animation rung lắc (shake) nhẹ khi gặp lỗi đăng nhập
-    _shakeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
+    _entryController.forward();
 
-    // Con trỏ nhấp nháy phong cách terminal
-    _cursorBlinkController = AnimationController(
+    _shakeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 550),
-    )..repeat(reverse: true);
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
   @override
@@ -56,7 +45,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     _passwordController.dispose();
     _entryController.dispose();
     _shakeController.dispose();
-    _cursorBlinkController.dispose();
     super.dispose();
   }
 
@@ -68,54 +56,33 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       return;
     }
 
-    setState(() {
-      _isLoggingIn = true;
-      _loginSuccess = false;
-    });
+    setState(() => _isLoggingIn = true);
 
     final success = await authProvider.login(username, password);
     if (!mounted) return;
 
     if (success) {
-      setState(() {
-        _isLoggingIn = false;
-        _loginSuccess = true;
-      });
-
-      // Cho phép người dùng trải nghiệm xác thực thành công ACCESS_GRANTED mượt mà
-      await Future.delayed(const Duration(milliseconds: 380));
-      if (!mounted) return;
-
+      setState(() => _isLoggingIn = false);
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 600),
+          transitionDuration: const Duration(milliseconds: 300),
           pageBuilder: (_, anim, __) => const HomeScreen(),
           transitionsBuilder: (_, anim, __, child) {
-            final curve = CurvedAnimation(parent: anim, curve: Curves.easeInOutCubic);
-            return FadeTransition(
-              opacity: curve,
-              child: ScaleTransition(
-                scale: Tween<double>(begin: 0.95, end: 1.0).animate(curve),
-                child: child,
-              ),
-            );
+            return FadeTransition(opacity: anim, child: child);
           },
         ),
       );
     } else {
-      setState(() {
-        _isLoggingIn = false;
-        _loginSuccess = false;
-      });
+      setState(() => _isLoggingIn = false);
       _shakeController.forward(from: 0.0);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final authProvider = Provider.of<AuthProvider>(context);
 
-    // Kích hoạt hiệu ứng rung lắc nếu có thông báo lỗi mới
     if (authProvider.errorMessage != null && authProvider.errorMessage != _lastErrorMessage) {
       _lastErrorMessage = authProvider.errorMessage;
       _shakeController.forward(from: 0.0);
@@ -123,256 +90,265 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       _lastErrorMessage = null;
     }
 
-    final pageFadeAnim = CurvedAnimation(
-      parent: _entryController,
-      curve: Curves.easeOut,
-    );
-    final pageSlideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entryController,
-      curve: Curves.easeOutQuart,
-    ));
-
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.getBg(context),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28.0),
-            child: FadeTransition(
-              opacity: pageFadeAnim,
-              child: SlideTransition(
-                position: pageSlideAnim,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 1. Header Terminal ASCII Style
-                    const Text(
-                      '// TERMINAL_AUTH_v1.0',
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                        color: AppTheme.terminalGreen,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'MUSIC_STORAGE',
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                        color: AppTheme.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      '> System authorization required to access Drive audio storage.',
-                      style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textSecondary),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Error box với hiệu ứng mở rộng mượt mà & rung lắc nhẹ (Decaying Sine Shake)
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeOutCubic,
-                      child: authProvider.errorMessage == null
-                          ? const SizedBox.shrink()
-                          : AnimatedBuilder(
-                              animation: _shakeController,
-                              builder: (context, child) {
-                                final decay = 1.0 - _shakeController.value;
-                                final offset = math.sin(_shakeController.value * math.pi * 5) * 6 * decay;
-                                return Transform.translate(
-                                  offset: Offset(offset, 0),
-                                  child: child,
-                                );
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                decoration: const BoxDecoration(
-                                  border: Border.fromBorderSide(BorderSide(color: AppTheme.error, width: 1)),
-                                  borderRadius: BorderRadius.zero,
-                                  color: AppTheme.surface,
-                                ),
-                                child: Row(
-                                  children: [
-                                    ReIcon(Reicon.outline.infoCircle, size: 14, color: AppTheme.error),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        '> ERROR: ${authProvider.errorMessage!}',
-                                        style: const TextStyle(fontFamily: 'monospace', color: AppTheme.error, fontSize: 12),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                    ),
-
-                    // Label & Input username
-                    const Text(
-                      '> USERNAME:',
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.terminalGreen,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: _usernameController,
-                      style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                      decoration: const InputDecoration(
-                        hintText: 'Nhập tên đăng nhập (ví dụ: sutie)...',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Label & Input password
-                    const Text(
-                      '> PASSWORD:',
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.terminalGreen,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                      decoration: InputDecoration(
-                        hintText: 'Nhập mật khẩu...',
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: TerminalActionBtn(
-                            hasBorder: false,
-                            padding: const EdgeInsets.all(6),
-                            defaultColor: AppTheme.textMuted,
-                            hoverColor: AppTheme.textPrimary,
-                            icon: ReIcon(
-                              _obscurePassword ? Reicon.outline.eyeClosed : Reicon.outline.eye,
-                              size: 16,
-                            ),
-                            onTap: () => setState(() => _obscurePassword = !_obscurePassword),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: math.max(0, constraints.maxHeight - 40.0),
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 360),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Code comment syntax & Brand
+                        Text(
+                          '///',
+                          style: AppTheme.monoStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.getTextMuted(context),
+                            letterSpacing: 2.0,
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
+                        const SizedBox(height: 2),
+                        Text(
+                          'MUSIC_STORAGE',
+                          style: AppTheme.monoStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.0,
+                            color: AppTheme.getText(context),
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'Your music. Your drive.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.getTextSecondary(context),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
 
-                    // Submit Button với phản hồi hoạt ảnh mượt mà
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46,
-                      child: AnimatedBuilder(
-                        animation: _cursorBlinkController,
-                        builder: (context, _) {
-                          final cursorVisible = _cursorBlinkController.value > 0.4;
-                          final isBusy = _isLoggingIn || authProvider.isLoading;
+                        const SizedBox(height: 22),
 
-                          Widget iconWidget;
-                          String labelText;
-                          Color btnColor;
-                          Color borderColor;
+                        // Isometric 3D Wireframe Cubes (compact ~105px)
+                        IsometricCubesWidget(
+                          size: 105,
+                          isDark: isDark,
+                        ),
 
-                          if (_loginSuccess) {
-                            iconWidget = ReIcon(Reicon.outline.tickCircle, size: 16, color: AppTheme.terminalGreen);
-                            labelText = '>>> [ ACCESS_GRANTED ] // DECRYPTING...';
-                            btnColor = AppTheme.terminalGreen;
-                            borderColor = AppTheme.terminalGreen;
-                          } else if (isBusy) {
-                            iconWidget = const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 1.6, color: AppTheme.terminalGreen),
+                        const SizedBox(height: 16),
+
+                        // Tech system authorization notice
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: AppTheme.getSurface(context),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '◈',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppTheme.getTextSecondary(context),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'System authorization required to access Drive audio storage.',
+                                  textAlign: TextAlign.center,
+                                  style: AppTheme.monoStyle(
+                                    fontSize: 9.5,
+                                    color: AppTheme.getTextSecondary(context),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Error Message
+                        if (authProvider.errorMessage != null)
+                          AnimatedBuilder(
+                            animation: _shakeController,
+                            builder: (context, child) {
+                              final decay = 1.0 - _shakeController.value;
+                              final offset = math.sin(_shakeController.value * math.pi * 4) * 4 * decay;
+                              return Transform.translate(
+                                offset: Offset(offset, 0),
+                                child: child,
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 14),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: AppTheme.getDanger(context), width: 1.0),
+                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                color: AppTheme.getSurface(context),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.error_outline, size: 15, color: AppTheme.getDanger(context)),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      authProvider.errorMessage!,
+                                      style: TextStyle(color: AppTheme.getDanger(context), fontSize: 11.5),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                        // Username / Email input (compact 44px)
+                        Container(
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppTheme.getSurface(context),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                          ),
+                          child: TextField(
+                            controller: _usernameController,
+                            textAlignVertical: TextAlignVertical.center,
+                            style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              hintText: 'Username or email',
+                              hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                              prefixIcon: Icon(Icons.person_outline, size: 18, color: AppTheme.getTextSecondary(context)),
+                              prefixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: const EdgeInsets.only(right: 12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // Password input (compact 44px)
+                        Container(
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppTheme.getSurface(context),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                          ),
+                          child: TextField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            textAlignVertical: TextAlignVertical.center,
+                            style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              hintText: 'Password',
+                              hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                              prefixIcon: Icon(Icons.lock_outline, size: 18, color: AppTheme.getTextSecondary(context)),
+                              prefixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+                              suffixIcon: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  size: 18,
+                                  color: AppTheme.getTextMuted(context),
+                                ),
+                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                              ),
+                              suffixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        // Action Button: → ENTER_SYSTEM (44px)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 44,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.getAction(context),
+                              foregroundColor: AppTheme.getActionText(context),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                              ),
+                            ),
+                            onPressed: _isLoggingIn ? null : () => _handleLogin(authProvider),
+                            child: _isLoggingIn
+                                ? SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.8,
+                                      color: AppTheme.getActionText(context),
+                                    ),
+                                  )
+                                : Text(
+                                    '→ ENTER_SYSTEM',
+                                    style: AppTheme.monoStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.8,
+                                      color: AppTheme.getActionText(context),
+                                    ),
+                                  ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Secondary: + CREATE_NEW_ACCOUNT
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const RegisterScreen()),
                             );
-                            labelText = cursorVisible ? '>>> AUTHENTICATING [ █ ]' : '>>> AUTHENTICATING [   ]';
-                            btnColor = AppTheme.terminalGreen;
-                            borderColor = AppTheme.terminalGreen;
-                          } else {
-                            iconWidget = ReIcon(Reicon.outline.arrowRight, size: 16);
-                            labelText = 'ENTER_SYSTEM';
-                            btnColor = AppTheme.textPrimary;
-                            borderColor = AppTheme.textPrimary;
-                          }
-
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeOutCubic,
-                            decoration: BoxDecoration(
-                              boxShadow: _loginSuccess
-                                  ? [
-                                      BoxShadow(
-                                        color: AppTheme.terminalGreen.withValues(alpha: 0.25),
-                                        blurRadius: 14,
-                                        spreadRadius: 1,
-                                      )
-                                    ]
-                                  : null,
+                          },
+                          child: Text(
+                            '+ CREATE_NEW_ACCOUNT',
+                            style: AppTheme.monoStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                              color: AppTheme.getTextSecondary(context),
                             ),
-                            child: TerminalActionBtn(
-                              onTap: (isBusy || _loginSuccess)
-                                  ? null
-                                  : () => _handleLogin(authProvider),
-                              defaultColor: btnColor,
-                              hoverColor: AppTheme.terminalGreen,
-                              defaultBorderColor: borderColor,
-                              hoverBorderColor: AppTheme.terminalGreen,
-                              icon: iconWidget,
-                              label: labelText,
-                            ),
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // Link đăng ký
-                    Center(
-                      child: TerminalActionBtn(
-                        hasBorder: false,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              transitionDuration: const Duration(milliseconds: 350),
-                              pageBuilder: (_, __, ___) => const RegisterScreen(),
-                              transitionsBuilder: (_, anim, __, child) {
-                                return SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: const Offset(1.0, 0.0),
-                                    end: Offset.zero,
-                                  ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        defaultColor: AppTheme.textSecondary,
-                        hoverColor: AppTheme.terminalGreen,
-                        icon: ReIcon(Reicon.outline.plus, size: 14),
-                        label: 'CREATE_NEW_ACCOUNT [REGISTER]',
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

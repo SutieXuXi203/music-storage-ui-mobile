@@ -99,6 +99,37 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshProfile() async {
+    try {
+      final updated = await apiService.getMe();
+      if (updated != null) {
+        _user = updated;
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
+
+  Future<bool> updateProfile({String? fullName, String? email}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final ok = await apiService.updateProfile(fullName: fullName, email: email);
+      if (ok) {
+        await refreshProfile();
+        return true;
+      }
+      _errorMessage = 'Cập nhật thông tin không thành công';
+      return false;
+    } catch (e) {
+      _errorMessage = 'Lỗi cập nhật: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> logout() async {
     await audioPlayerService.stopAndReset();
     await apiService.logout();

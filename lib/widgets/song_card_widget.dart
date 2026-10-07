@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:reicon_flutter/reicon_flutter.dart';
 import '../models/song_model.dart';
 import '../core/theme/app_theme.dart';
+import '../views/details/song_detail_screen.dart';
 import 'mini_equalizer_widget.dart';
-import 're_icon.dart';
 
 class SongCardWidget extends StatefulWidget {
   final int index;
@@ -11,6 +10,7 @@ class SongCardWidget extends StatefulWidget {
   final bool isCurrent;
   final bool isPlaying;
   final bool isBuffering;
+  final bool showTrackNumber;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
 
@@ -21,6 +21,7 @@ class SongCardWidget extends StatefulWidget {
     required this.isCurrent,
     required this.isPlaying,
     this.isBuffering = false,
+    this.showTrackNumber = false,
     required this.onTap,
     this.onDelete,
   });
@@ -30,236 +31,299 @@ class SongCardWidget extends StatefulWidget {
 }
 
 class _SongCardWidgetState extends State<SongCardWidget> {
-  bool _isHovered = false;
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final indexStr = (widget.index + 1).toString().padLeft(2, '0');
-
-    // Đường viền đổi màu mượt mà khi hover hoặc khi bài hát đang chọn/phát/buffering
-    final borderColor = widget.isCurrent
-        ? ((widget.isPlaying || widget.isBuffering) ? AppTheme.terminalGreen : const Color(0xFF666666))
-        : (_isHovered ? const Color(0xFF888888) : AppTheme.border);
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedScale(
-        scale: _isPressed ? 0.985 : 1.0,
-        duration: const Duration(milliseconds: 140),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 260),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
-          decoration: BoxDecoration(
-            color: widget.isCurrent ? AppTheme.surfaceLight : AppTheme.surface,
-            borderRadius: BorderRadius.zero,
-            border: Border.all(
-              color: borderColor,
-              width: widget.isCurrent ? 1.2 : 1.0,
-            ),
-            boxShadow: (widget.isCurrent && widget.isPlaying)
-                ? [
-                    BoxShadow(
-                      color: AppTheme.terminalGreen.withValues(alpha: 0.08),
-                      blurRadius: 10,
-                      offset: const Offset(0, 1),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              hoverColor: Colors.transparent,
-              splashColor: AppTheme.terminalGreen.withValues(alpha: 0.12),
-              highlightColor: AppTheme.terminalGreen.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.zero,
-              onTapDown: (_) => setState(() => _isPressed = true),
-              onTapUp: (_) => setState(() => _isPressed = false),
-              onTapCancel: () => setState(() => _isPressed = false),
-              onTap: widget.onTap,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  child: Row(
-                    children: [
-                    // Số thứ tự hoặc Equalizer động khi bài hát đang phát
+  void _showOptionsModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.getSurfaceElevated(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top handle
+                Container(
+                  width: 32,
+                  height: 3,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                // Header track preview
+                Row(
+                  children: [
                     Container(
-                      width: 28,
-                      alignment: Alignment.centerLeft,
-                      child: widget.isCurrent
-                          ? (widget.isBuffering
-                              ? const SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child: CircularProgressIndicator(strokeWidth: 1.6, color: AppTheme.terminalGreen),
-                                )
-                              : (widget.isPlaying
-                                  ? const MiniEqualizerWidget(
-                                      isPlaying: true,
-                                      height: 14,
-                                      width: 16,
-                                      barCount: 4,
-                                      color: AppTheme.terminalGreen,
-                                    )
-                                  : ReIcon(
-                                      Reicon.outline.pause,
-                                      size: 16,
-                                      color: AppTheme.terminalGreen,
-                                    )))
-                          : Text(
-                              indexStr,
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: AppTheme.textMuted,
-                              ),
-                            ),
-                    ),
-
-                    // Ảnh Cover Art vuông vức viền mảnh chuẩn Terminal
-                    Container(
-                      width: 44,
-                      height: 44,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: AppTheme.background,
-                        borderRadius: BorderRadius.zero,
-                        border: Border.all(
-                          color: (widget.isCurrent && widget.isPlaying)
-                              ? AppTheme.terminalGreen.withValues(alpha: 0.6)
-                              : AppTheme.border,
-                          width: 1,
-                        ),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
                       ),
+                      clipBehavior: Clip.antiAlias,
                       child: widget.song.coverUrl != null && widget.song.coverUrl!.isNotEmpty
                           ? Image.network(
                               widget.song.coverUrl!,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                final coverId = widget.song.coverDriveFileId ?? widget.song.thumbnailDriveFileId;
-                                if (coverId != null && !widget.song.coverUrl!.contains('googleusercontent')) {
-                                  return Image.network(
-                                    'https://lh3.googleusercontent.com/d/$coverId',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Center(
-                                      child: ReIcon(Reicon.outline.musicNote, size: 16, color: AppTheme.textMuted),
-                                    ),
-                                  );
-                                }
-                                return Center(
-                                  child: ReIcon(Reicon.outline.musicNote, size: 16, color: AppTheme.textMuted),
-                                );
-                              },
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: SizedBox(
-                                    width: 12,
-                                    height: 12,
-                                    child: CircularProgressIndicator(strokeWidth: 1.2, color: AppTheme.textMuted),
-                                  ),
-                                );
-                              },
+                              errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
                             )
-                          : Center(
-                              child: ReIcon(Reicon.outline.musicNote, size: 16, color: AppTheme.textMuted),
-                            ),
+                          : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
                     ),
-
                     const SizedBox(width: 12),
-
-                    // Tiêu đề & Nghệ sĩ
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             widget.song.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: widget.isCurrent ? FontWeight.bold : FontWeight.w600,
-                              color: widget.isCurrent
-                                  ? AppTheme.terminalGreen
-                                  : (_isHovered ? AppTheme.textPrimary : const Color(0xFFDDDDDD)),
-                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: AppTheme.getText(context),
                             ),
                           ),
-                          const SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  widget.song.artist,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppTheme.textSecondary,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                widget.song.formattedDuration,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppTheme.textMuted,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(height: 2),
+                          Text(
+                            '${widget.song.artist} • ${widget.song.formattedDuration}',
+                            style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
                           ),
                         ],
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Divider(color: AppTheme.getBorder(context), height: 1),
+                const SizedBox(height: 4),
 
-                    const SizedBox(width: 8),
+                // Options list (compact)
+                ListTile(
+                  dense: true,
+                  leading: Icon(Icons.play_arrow_outlined, color: AppTheme.getText(context), size: 20),
+                  title: Text('Phát bài hát', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    widget.onTap();
+                  },
+                ),
+                ListTile(
+                  dense: true,
+                  leading: Icon(Icons.info_outline, color: AppTheme.getText(context), size: 20),
+                  title: Text('Xem chi tiết bài hát', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SongDetailScreen(song: widget.song),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  dense: true,
+                  leading: Icon(Icons.playlist_add, color: AppTheme.getText(context), size: 20),
+                  title: Text('Thêm vào Playlist', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Đã thêm "${widget.song.title}" vào danh sách phát!'),
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+                  },
+                ),
+                if (widget.onDelete != null)
+                  ListTile(
+                    dense: true,
+                    leading: Icon(Icons.delete_outline, color: AppTheme.getDanger(context), size: 20),
+                    title: Text('Xoá khỏi kho nhạc', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getDanger(context))),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      widget.onDelete!();
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
-                    // Nút Play / Pause dùng Reicon
-                    TerminalActionBtn(
-                      onTap: widget.onTap,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                      defaultColor: widget.isCurrent ? AppTheme.terminalGreen : AppTheme.textPrimary,
-                      hoverColor: AppTheme.terminalGreen,
-                      icon: widget.isBuffering
-                          ? const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 1.6, color: AppTheme.terminalGreen),
-                            )
-                          : AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 180),
-                              transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-                              child: ReIcon(
-                                (widget.isCurrent && widget.isPlaying) ? Reicon.outline.pause : Reicon.outline.play,
-                                key: ValueKey(widget.isCurrent && widget.isPlaying),
-                                size: 15,
+  @override
+  Widget build(BuildContext context) {
+    final trackNum = widget.index + 1;
+
+    final cardBg = widget.isCurrent
+        ? AppTheme.getSurfaceSubtle(context)
+        : AppTheme.getSurface(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: widget.isCurrent ? AppTheme.getText(context).withValues(alpha: 0.3) : AppTheme.getBorder(context),
+          width: 0.8,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          onTap: widget.onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                // Track number (if enabled)
+                if (widget.showTrackNumber) ...[
+                  SizedBox(
+                    width: 22,
+                    child: Text(
+                      '$trackNum',
+                      style: AppTheme.monoStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: widget.isCurrent ? AppTheme.getText(context) : AppTheme.getTextMuted(context),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                ],
+
+                // Thumbnail (38x38, compact, radius 8)
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: AppTheme.getSurfaceSubtle(context),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        border: Border.all(
+                          color: AppTheme.getBorder(context),
+                          width: 0.8,
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: widget.song.coverUrl != null && widget.song.coverUrl!.isNotEmpty
+                          ? Image.network(
+                              widget.song.coverUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.music_note,
+                                color: AppTheme.getTextMuted(context),
+                                size: 18,
                               ),
+                            )
+                          : Icon(
+                              Icons.music_note,
+                              color: AppTheme.getTextMuted(context),
+                              size: 18,
                             ),
                     ),
-
-                    if (widget.onDelete != null) ...[
-                      const SizedBox(width: 6),
-                      TerminalActionBtn(
-                        onTap: widget.onDelete,
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                        defaultColor: AppTheme.textMuted,
-                        hoverColor: AppTheme.error,
-                        hoverBorderColor: AppTheme.error,
-                        icon: ReIcon(
-                          Reicon.outline.trash,
-                          size: 15,
+                    if (widget.isCurrent) ...[
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        ),
+                        child: Center(
+                          child: widget.isBuffering
+                              ? const SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.white),
+                                )
+                              : (widget.isPlaying
+                                  ? const MiniEqualizerWidget(
+                                      isPlaying: true,
+                                      height: 12,
+                                      width: 12,
+                                      barCount: 3,
+                                      color: Colors.white,
+                                    )
+                                  : const Icon(Icons.pause, color: Colors.white, size: 16)),
                         ),
                       ),
                     ],
                   ],
                 ),
-              ),
+
+                const SizedBox(width: 10),
+
+                // Title & Artist
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.song.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: widget.isCurrent ? FontWeight.w700 : FontWeight.w600,
+                          color: AppTheme.getText(context),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              widget.song.artist,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w400,
+                                color: AppTheme.getTextSecondary(context),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            widget.song.formattedDuration,
+                            style: AppTheme.monoStyle(
+                              fontSize: 10,
+                              color: AppTheme.getTextMuted(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 4),
+
+                // Compact options 3-dots
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  icon: Icon(
+                    Icons.more_vert,
+                    size: 18,
+                    color: AppTheme.getTextSecondary(context),
+                  ),
+                  onPressed: () => _showOptionsModal(context),
+                ),
+              ],
             ),
           ),
         ),

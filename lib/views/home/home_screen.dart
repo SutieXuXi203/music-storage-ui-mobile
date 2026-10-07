@@ -1,14 +1,13 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:reicon_flutter/reicon_flutter.dart';
 import '../../core/theme/app_theme.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/song_provider.dart';
 import '../../services/audio_player_service.dart';
-import '../../widgets/song_card_widget.dart';
+import '../../providers/song_provider.dart';
 import '../../widgets/mini_player_widget.dart';
-import '../../widgets/re_icon.dart';
-import '../auth/login_screen.dart';
+import 'tabs/home_tab.dart';
+import 'tabs/search_tab.dart';
+import 'tabs/library_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,114 +17,104 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _searchController = TextEditingController();
+  int _currentIndex = 0;
+  late final List<Widget> _tabs;
 
   @override
   void initState() {
     super.initState();
+    _tabs = [
+      HomeTab(
+        onNavigateToSearch: () => _onTabTapped(1),
+        onNavigateToLibrary: () => _onTabTapped(2),
+      ),
+      const SearchTab(),
+      const LibraryTab(),
+    ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SongProvider>(context, listen: false).fetchSongs();
     });
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void _onTabTapped(int index) {
+    if (_currentIndex == index) return;
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
-  void _showYouTubeDownloadDialog() {
-    final urlController = TextEditingController();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Vuông vức kiểu terminal, không bo tròn
-        side: BorderSide(color: AppTheme.borderHighlight, width: 1),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 18,
-            right: 18,
-            top: 20,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '// COMMAND: WGET_YOUTUBE_AUDIO',
-                    style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary),
-                  ),
-                  TerminalActionBtn(
-                    onTap: () => Navigator.of(ctx).pop(),
-                    hasBorder: false,
-                    padding: const EdgeInsets.all(4),
-                    defaultColor: AppTheme.textMuted,
-                    hoverColor: AppTheme.error,
-                    icon: ReIcon(Reicon.outline.xmark, size: 16),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                '> Extract MP3 192k + Cover art to Google Drive storage.',
-                style: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary, fontSize: 11),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: urlController,
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                decoration: const InputDecoration(
-                  hintText: 'https://youtube.com/watch?v=...',
-                  prefixText: '> url: ',
-                  prefixStyle: TextStyle(fontFamily: 'monospace', color: AppTheme.terminalGreen),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Consumer<SongProvider>(
-                builder: (context, songProv, _) {
-                  return SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: TerminalActionBtn(
-                      onTap: songProv.isDownloading
-                          ? null
-                          : () async {
-                              final url = urlController.text.trim();
-                              if (url.isEmpty) return;
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: audioPlayerService,
+      builder: (context, _) {
+        final hasActiveSong = audioPlayerService.currentSong != null;
+        final surfaceColor = AppTheme.getSurface(context);
+        final borderColor = AppTheme.getBorder(context);
 
-                              final success = await songProv.downloadFromYouTube(url);
-                              if (!ctx.mounted) return;
-                              Navigator.of(ctx).pop();
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  backgroundColor: success ? AppTheme.surface : AppTheme.error,
-                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                                  content: Text(
-                                    success ? '> UPLOAD_COMPLETE: Bài hát đã lưu vào Drive!' : '> ERROR: Tải thất bại!',
-                                    style: const TextStyle(fontFamily: 'monospace'),
-                                  ),
-                                ),
-                              );
-                            },
-                      defaultColor: AppTheme.textPrimary,
-                      hoverColor: AppTheme.terminalGreen,
-                      hoverBorderColor: AppTheme.terminalGreen,
-                      icon: songProv.isDownloading
-                          ? null
-                          : ReIcon(Reicon.outline.plus, size: 16),
-                      label: songProv.isDownloading ? '>>> DOWNLOADING & UPLOADING...' : 'EXECUTE_DOWNLOAD',
+        return Scaffold(
+          backgroundColor: AppTheme.getBg(context),
+          extendBody: true,
+          body: Stack(
+            children: List.generate(_tabs.length, (index) {
+              final isSelected = _currentIndex == index;
+              return IgnorePointer(
+                ignoring: !isSelected,
+                child: AnimatedOpacity(
+                  opacity: isSelected ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  child: _tabs[index],
+                ),
+              );
+            }),
+          ),
+          bottomNavigationBar: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Mini Player Dock
+              if (hasActiveSong)
+                MiniPlayerWidget(playerService: audioPlayerService),
+
+              // Bottom Navigation Bar with Gradient Blur (top-to-bottom blur & fade)
+              ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          surfaceColor.withValues(alpha: 0.45),
+                          surfaceColor.withValues(alpha: 0.80),
+                          surfaceColor.withValues(alpha: 0.98),
+                        ],
+                        stops: const [0.0, 0.45, 1.0],
+                      ),
+                      border: Border(
+                        top: BorderSide(
+                          color: borderColor.withValues(alpha: 0.6),
+                          width: 0.8,
+                        ),
+                      ),
                     ),
-                  );
-                },
+                    child: SafeArea(
+                      top: false,
+                      child: SizedBox(
+                        height: 52,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
+                            _buildNavItem(1, Icons.search_outlined, Icons.search, 'Search'),
+                            _buildNavItem(2, Icons.library_music_outlined, Icons.library_music, 'Library'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -134,280 +123,38 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final songProvider = Provider.of<SongProvider>(context);
+  Widget _buildNavItem(int index, IconData iconOutline, IconData iconFilled, String label) {
+    final isSelected = _currentIndex == index;
+    final activeColor = AppTheme.getText(context);
+    final inactiveColor = AppTheme.getTextMuted(context);
 
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '// MUSIC_STORAGE_TERMINAL',
-              style: TextStyle(fontFamily: 'monospace', fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1),
-            ),
-            Text(
-              'USER: ${authProvider.user?.username ?? "guest"}@drive // STATUS: OK',
-              style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppTheme.textSecondary),
-            ),
-          ],
-        ),
-        actions: [
-          // Nút thêm nhạc YouTube với Reicon
-          Center(
-            child: TerminalActionBtn(
-              onTap: _showYouTubeDownloadDialog,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              defaultColor: AppTheme.terminalGreen,
-              hoverColor: Colors.white,
-              defaultBorderColor: AppTheme.terminalGreen,
-              hoverBorderColor: Colors.white,
-              icon: ReIcon(Reicon.outline.plus, size: 14, color: AppTheme.terminalGreen),
-              label: 'YOUTUBE',
-            ),
-          ),
-          const SizedBox(width: 8),
-
-          // Nút đăng xuất với Reicon - Rõ ràng, có viền, nhãn LOGOUT nổi bật
-          Center(
-            child: TerminalActionBtn(
-              onTap: () async {
-                await authProvider.logout();
-                if (!context.mounted) return;
-                Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 400),
-                    pageBuilder: (_, anim, __) => const LoginScreen(),
-                    transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
-                  ),
-                );
-              },
-              hasBorder: true,
-              defaultBorderColor: const Color(0xFF444444),
-              hoverBorderColor: AppTheme.error,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              defaultColor: const Color(0xFFDDDDDD),
-              hoverColor: AppTheme.error,
-              icon: ReIcon(Reicon.outline.logout, size: 14),
-              label: 'LOGOUT',
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: ListenableBuilder(
-        listenable: audioPlayerService,
-        builder: (context, _) {
-          final hasActiveSong = audioPlayerService.currentSong != null;
-
-          return Stack(
+    return Expanded(
+      child: InkWell(
+        onTap: () => _onTabTapped(index),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: SizedBox(
+          height: 52,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Column(
-                children: [
-                  // Thanh tìm kiếm dạng CLI prompt
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-                    child: TextField(
-                      controller: _searchController,
-                      style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                      decoration: InputDecoration(
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ReIcon(Reicon.outline.search, size: 15, color: AppTheme.terminalGreen),
-                              const SizedBox(width: 6),
-                              const Text('> grep: ', style: TextStyle(fontFamily: 'monospace', color: AppTheme.terminalGreen, fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-                        hintText: 'find track, artist, album...',
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? Padding(
-                                padding: const EdgeInsets.only(right: 6),
-                                child: TerminalActionBtn(
-                                  hasBorder: false,
-                                  padding: const EdgeInsets.all(6),
-                                  defaultColor: AppTheme.textMuted,
-                                  hoverColor: AppTheme.error,
-                                  icon: ReIcon(Reicon.outline.xmark, size: 14),
-                                  onTap: () {
-                                    _searchController.clear();
-                                    songProvider.fetchSongs(query: '');
-                                  },
-                                ),
-                              )
-                            : null,
-                      ),
-                      onChanged: (val) {
-                        songProvider.fetchSongs(query: val);
-                      },
-                    ),
-                  ),
-
-                  // Danh sách bài hát
-                  Expanded(
-                    child: RefreshIndicator(
-                      color: AppTheme.textPrimary,
-                      backgroundColor: AppTheme.surface,
-                      onRefresh: () => songProvider.fetchSongs(),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 350),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        transitionBuilder: (child, animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(0, 0.04),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: songProvider.isLoading
-                            ? const Center(
-                                key: ValueKey('loading_db'),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(strokeWidth: 1.8, color: AppTheme.terminalGreen),
-                                    ),
-                                    SizedBox(height: 12),
-                                    Text('> FETCHING_DATABASE...', style: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary)),
-                                  ],
-                                ),
-                              )
-                            : songProvider.songs.isEmpty
-                                ? Center(
-                                    key: const ValueKey('empty_db'),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('> REPO_EMPTY: No songs found.', style: TextStyle(fontFamily: 'monospace', color: AppTheme.textMuted)),
-                                        const SizedBox(height: 16),
-                                        TerminalActionBtn(
-                                          onTap: _showYouTubeDownloadDialog,
-                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                          defaultColor: AppTheme.terminalGreen,
-                                          hoverColor: Colors.white,
-                                          icon: ReIcon(Reicon.outline.plus, size: 16),
-                                          label: 'INGEST_FROM_YOUTUBE',
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    key: const ValueKey('songs_list_view'),
-                                    padding: const EdgeInsets.only(bottom: 92),
-                                    itemCount: songProvider.songs.length,
-                                    itemBuilder: (context, index) {
-                                      final song = songProvider.songs[index];
-                                      final isCurrent = audioPlayerService.currentSong?.id == song.id;
-                                      final isPlaying = isCurrent && audioPlayerService.isPlaying;
-                                      final isBuffering = isCurrent && audioPlayerService.isLoading;
-
-                                      return SongCardWidget(
-                                        index: index,
-                                        song: song,
-                                        isCurrent: isCurrent,
-                                        isPlaying: isPlaying,
-                                        isBuffering: isBuffering,
-                                        onTap: () {
-                                          if (isCurrent) {
-                                            audioPlayerService.togglePlayPause();
-                                          } else {
-                                            audioPlayerService.setPlaylist(songProvider.songs, initialIndex: index);
-                                          }
-                                        },
-                                      onDelete: () async {
-                                        final confirm = await showDialog<bool>(
-                                          context: context,
-                                          builder: (ctx) => AlertDialog(
-                                            backgroundColor: AppTheme.surface,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.zero,
-                                              side: BorderSide(color: AppTheme.border, width: 1),
-                                            ),
-                                            title: const Text('// CONFIRM_DELETE', style: TextStyle(fontFamily: 'monospace', fontSize: 14)),
-                                            content: Text(
-                                              '> Xoá bài hát "${song.title}" khỏi Google Drive?',
-                                              style: const TextStyle(fontFamily: 'monospace', fontSize: 12, color: AppTheme.textSecondary),
-                                            ),
-                                            actions: [
-                                              TerminalActionBtn(
-                                                onTap: () => Navigator.of(ctx).pop(false),
-                                                defaultColor: AppTheme.textMuted,
-                                                hoverColor: AppTheme.textPrimary,
-                                                label: 'CANCEL',
-                                              ),
-                                              TerminalActionBtn(
-                                                onTap: () => Navigator.of(ctx).pop(true),
-                                                defaultColor: AppTheme.error,
-                                                hoverColor: Colors.redAccent,
-                                                defaultBorderColor: AppTheme.error,
-                                                label: 'DELETE_PERMANENTLY',
-                                              ),
-                                            ],
-                                          ),
-                                        );
-
-                                        if (confirm == true) {
-                                          final ok = await songProvider.deleteSong(song.id);
-                                          if (!context.mounted) return;
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              backgroundColor: ok ? AppTheme.surface : AppTheme.error,
-                                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                                              content: Text(
-                                                ok ? '> PURGED: Đã xoá bài hát thành công.' : '> ERROR: Không thể xoá bài hát!',
-                                                style: const TextStyle(fontFamily: 'monospace'),
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    );
-                                  },
-                                ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-              // Mini Player cố định ở dưới cùng với hiệu ứng trượt xuất hiện
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AnimatedSlide(
-                  offset: hasActiveSong ? Offset.zero : const Offset(0, 1),
-                  duration: const Duration(milliseconds: 380),
-                  curve: Curves.easeOutQuart,
-                  child: AnimatedOpacity(
-                    opacity: hasActiveSong ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                    child: hasActiveSong
-                        ? MiniPlayerWidget(playerService: audioPlayerService)
-                        : const SizedBox.shrink(),
-                  ),
+              Icon(
+                isSelected ? iconFilled : iconOutline,
+                color: isSelected ? activeColor : inactiveColor,
+                size: 20,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? activeColor : inactiveColor,
                 ),
               ),
             ],
-          );
-        },
+          ),
+        ),
       ),
     );
   }

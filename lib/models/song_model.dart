@@ -1,5 +1,7 @@
 import '../core/constants/api_constants.dart';
 
+typedef SongModel = Song;
+
 class Song {
   final String id;
   final String title;
@@ -19,6 +21,8 @@ class Song {
   final String? userId;
   final String? userUsername;
   final DateTime? createdAt;
+
+  String get bitrate => '192 kbps';
 
   Song({
     required this.id,

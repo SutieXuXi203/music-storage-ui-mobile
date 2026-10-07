@@ -93,6 +93,23 @@ class ApiService {
     }
   }
 
+  Future<bool> updateProfile({String? fullName, String? email}) async {
+    try {
+      final body = <String, dynamic>{};
+      if (fullName != null && fullName.trim().isNotEmpty) {
+        body['full_name'] = fullName.trim();
+      }
+      if (email != null && email.trim().isNotEmpty) {
+        body['email'] = email.trim();
+      }
+      if (body.isEmpty) return true;
+      final response = await _dio.put(ApiConstants.getMe, data: body);
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();

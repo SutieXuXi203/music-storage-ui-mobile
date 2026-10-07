@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum WaveMusicType {
@@ -55,9 +55,14 @@ extension WaveMusicTypeExt on WaveMusicType {
 
 class SettingsProvider extends ChangeNotifier {
   static const String _prefWaveTypeKey = 'wave_music_type';
+  static const String _prefThemeModeKey = 'app_theme_mode';
+
   WaveMusicType _waveType = WaveMusicType.spectrumBars;
+  ThemeMode _themeMode = ThemeMode.dark;
 
   WaveMusicType get waveType => _waveType;
+  ThemeMode get themeMode => _themeMode;
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
 
   SettingsProvider() {
     _loadSettings();
@@ -73,8 +78,13 @@ class SettingsProvider extends ChangeNotifier {
           orElse: () => WaveMusicType.spectrumBars,
         );
         _waveType = match;
-        notifyListeners();
       }
+
+      final savedTheme = prefs.getString(_prefThemeModeKey);
+      if (savedTheme != null) {
+        _themeMode = savedTheme == 'light' ? ThemeMode.light : ThemeMode.dark;
+      }
+      notifyListeners();
     } catch (e) {
       debugPrint('[SettingsProvider] Lỗi tải cài đặt: $e');
     }
@@ -90,6 +100,22 @@ class SettingsProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('[SettingsProvider] Lỗi lưu cài đặt: $e');
     }
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    if (_themeMode == mode) return;
+    _themeMode = mode;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefThemeModeKey, mode == ThemeMode.light ? 'light' : 'dark');
+    } catch (e) {
+      debugPrint('[SettingsProvider] Lỗi lưu cài đặt theme: $e');
+    }
+  }
+
+  void toggleTheme() {
+    setThemeMode(_themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
   }
 
   void cycleWaveType() {
