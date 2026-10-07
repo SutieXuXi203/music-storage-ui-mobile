@@ -38,15 +38,6 @@ Bạn có thể tải file cài đặt APK mới nhất trực tiếp về đi�
 
 ---
 
-## 🌐 HỆ THỐNG MÁY CHỦ (PRODUCTION BACKEND)
-
-Ứng dụng được kết nối sẵn với máy chủ Production:
-* **API Base URL:** `https://music-storage-backend.fly.dev/api`
-* **Swagger API Docs:** [https://music-storage-backend.fly.dev/docs](https://music-storage-backend.fly.dev/docs)
-* **Backend Repository:** [music-storage-backend](https://github.com/SutieXuXi203/music-storage-backend)
-
----
-
 ## 🛠️ HƯỚNG DẪN DÀNH CHO LẬP TRÌNH VIÊN
 
 ### 1. Yêu cầu môi trường
