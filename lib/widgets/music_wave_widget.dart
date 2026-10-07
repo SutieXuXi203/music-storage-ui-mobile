@@ -67,11 +67,14 @@ class _MusicWaveWidgetState extends State<MusicWaveWidget> with SingleTickerProv
     _lastElapsed = elapsed;
 
     if (widget.isPlaying) {
-      // Đồng bộ thời gian nhịp với vị trí bài hát (playback position)
+      // Luôn cộng thời gian thực tế dt để sóng chuyển động mượt mà 60fps không bị đứng giật
+      _internalTimeSec += dt.clamp(0.0, 0.05);
+      // Nếu có seek bài hát (chênh lệch lớn hơn 1 giây) thì đồng bộ lại mốc
       if (widget.position != null) {
-        _internalTimeSec = widget.position!.inMilliseconds / 1000.0;
-      } else {
-        _internalTimeSec += dt.clamp(0.0, 0.05);
+        final posSec = widget.position!.inMilliseconds / 1000.0;
+        if ((posSec - _internalTimeSec).abs() > 1.2) {
+          _internalTimeSec = posSec;
+        }
       }
     }
 

@@ -60,6 +60,7 @@ class TerminalActionBtn extends StatefulWidget {
 
 class _TerminalActionBtnState extends State<TerminalActionBtn> {
   bool _isHovered = false;
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,38 +77,48 @@ class _TerminalActionBtnState extends State<TerminalActionBtn> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
+        onTapDown: widget.onTap != null ? (_) => setState(() => _isPressed = true) : null,
+        onTapUp: widget.onTap != null ? (_) => setState(() => _isPressed = false) : null,
+        onTapCancel: widget.onTap != null ? () => setState(() => _isPressed = false) : null,
         behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: widget.padding,
-          decoration: BoxDecoration(
-            color: Colors.transparent, // Tuyệt đối không đổi màu nền khi hover
-            borderRadius: BorderRadius.zero, // Bỏ bo tròn hoàn toàn
-            border: widget.hasBorder
-                ? Border.all(color: activeBorderColor, width: 1.0)
-                : null,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.icon != null)
-                IconTheme(
-                  data: IconThemeData(color: activeColor, size: 18),
-                  child: widget.icon!,
-                ),
-              if (widget.icon != null && widget.label != null)
-                const SizedBox(width: 6),
-              if (widget.label != null)
-                Text(
-                  widget.label!,
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: activeColor, // Chỉ đổi màu chữ
+        child: AnimatedScale(
+          scale: _isPressed ? 0.96 : 1.0,
+          duration: const Duration(milliseconds: 140),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            padding: widget.padding,
+            decoration: BoxDecoration(
+              color: _isPressed ? widget.hoverColor.withValues(alpha: 0.08) : Colors.transparent,
+              borderRadius: BorderRadius.zero,
+              border: widget.hasBorder
+                  ? Border.all(color: activeBorderColor, width: 1.0)
+                  : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.icon != null)
+                  IconTheme(
+                    data: IconThemeData(color: activeColor, size: 18),
+                    child: widget.icon!,
                   ),
-                ),
-            ],
+                if (widget.icon != null && widget.label != null)
+                  const SizedBox(width: 6),
+                if (widget.label != null)
+                  Text(
+                    widget.label!,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: activeColor,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

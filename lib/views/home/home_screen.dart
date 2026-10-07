@@ -178,7 +178,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 await authProvider.logout();
                 if (!context.mounted) return;
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 400),
+                    pageBuilder: (_, anim, __) => const LoginScreen(),
+                    transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
+                  ),
                 );
               },
               hasBorder: true,
@@ -252,48 +256,80 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppTheme.textPrimary,
                       backgroundColor: AppTheme.surface,
                       onRefresh: () => songProvider.fetchSongs(),
-                      child: songProvider.isLoading
-                          ? const Center(
-                              child: Text('> FETCHING_DATABASE...', style: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary)),
-                            )
-                          : songProvider.songs.isEmpty
-                              ? Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text('> REPO_EMPTY: No songs found.', style: TextStyle(fontFamily: 'monospace', color: AppTheme.textMuted)),
-                                      const SizedBox(height: 16),
-                                      TerminalActionBtn(
-                                        onTap: _showYouTubeDownloadDialog,
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                        defaultColor: AppTheme.terminalGreen,
-                                        hoverColor: Colors.white,
-                                        icon: ReIcon(Reicon.outline.plus, size: 16),
-                                        label: 'INGEST_FROM_YOUTUBE',
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : ListView.builder(
-                                  padding: EdgeInsets.only(bottom: hasActiveSong ? 85 : 20),
-                                  itemCount: songProvider.songs.length,
-                                  itemBuilder: (context, index) {
-                                    final song = songProvider.songs[index];
-                                    final isCurrent = audioPlayerService.currentSong?.id == song.id;
-                                    final isPlaying = isCurrent && audioPlayerService.isPlaying;
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 350),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.04),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: songProvider.isLoading
+                            ? const Center(
+                                key: ValueKey('loading_db'),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(strokeWidth: 1.8, color: AppTheme.terminalGreen),
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text('> FETCHING_DATABASE...', style: TextStyle(fontFamily: 'monospace', color: AppTheme.textSecondary)),
+                                  ],
+                                ),
+                              )
+                            : songProvider.songs.isEmpty
+                                ? Center(
+                                    key: const ValueKey('empty_db'),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Text('> REPO_EMPTY: No songs found.', style: TextStyle(fontFamily: 'monospace', color: AppTheme.textMuted)),
+                                        const SizedBox(height: 16),
+                                        TerminalActionBtn(
+                                          onTap: _showYouTubeDownloadDialog,
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                          defaultColor: AppTheme.terminalGreen,
+                                          hoverColor: Colors.white,
+                                          icon: ReIcon(Reicon.outline.plus, size: 16),
+                                          label: 'INGEST_FROM_YOUTUBE',
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    key: const ValueKey('songs_list_view'),
+                                    padding: const EdgeInsets.only(bottom: 92),
+                                    itemCount: songProvider.songs.length,
+                                    itemBuilder: (context, index) {
+                                      final song = songProvider.songs[index];
+                                      final isCurrent = audioPlayerService.currentSong?.id == song.id;
+                                      final isPlaying = isCurrent && audioPlayerService.isPlaying;
+                                      final isBuffering = isCurrent && audioPlayerService.isLoading;
 
-                                    return SongCardWidget(
-                                      index: index,
-                                      song: song,
-                                      isCurrent: isCurrent,
-                                      isPlaying: isPlaying,
-                                      onTap: () {
-                                        if (isCurrent) {
-                                          audioPlayerService.togglePlayPause();
-                                        } else {
-                                          audioPlayerService.setPlaylist(songProvider.songs, initialIndex: index);
-                                        }
-                                      },
+                                      return SongCardWidget(
+                                        index: index,
+                                        song: song,
+                                        isCurrent: isCurrent,
+                                        isPlaying: isPlaying,
+                                        isBuffering: isBuffering,
+                                        onTap: () {
+                                          if (isCurrent) {
+                                            audioPlayerService.togglePlayPause();
+                                          } else {
+                                            audioPlayerService.setPlaylist(songProvider.songs, initialIndex: index);
+                                          }
+                                        },
                                       onDelete: () async {
                                         final confirm = await showDialog<bool>(
                                           context: context,
@@ -346,17 +382,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                     ),
                   ),
-                ],
-              ),
-
-              // Mini Player cố định ở dưới cùng
-              if (hasActiveSong)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: MiniPlayerWidget(playerService: audioPlayerService),
                 ),
+              ],
+            ),
+
+              // Mini Player cố định ở dưới cùng với hiệu ứng trượt xuất hiện
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: AnimatedSlide(
+                  offset: hasActiveSong ? Offset.zero : const Offset(0, 1),
+                  duration: const Duration(milliseconds: 380),
+                  curve: Curves.easeOutQuart,
+                  child: AnimatedOpacity(
+                    opacity: hasActiveSong ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    child: hasActiveSong
+                        ? MiniPlayerWidget(playerService: audioPlayerService)
+                        : const SizedBox.shrink(),
+                  ),
+                ),
+              ),
             ],
           );
         },

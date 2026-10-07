@@ -13,7 +13,10 @@ class AudioPlayerService extends ChangeNotifier {
   List<Song> get playlist => _playlist;
   int get currentIndex => _currentIndex;
   Song? get currentSong => _currentIndex >= 0 && _currentIndex < _playlist.length ? _playlist[_currentIndex] : null;
-  bool get isLoading => _isLoading;
+  bool get isLoading =>
+      _isLoading ||
+      _player.processingState == ProcessingState.buffering ||
+      _player.processingState == ProcessingState.loading;
   bool get isPlaying => _player.playing;
 
   AudioPlayerService() {
