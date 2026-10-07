@@ -8,12 +8,12 @@ import '../../../models/song_model.dart';
 import '../settings_screen.dart';
 
 class HomeTab extends StatefulWidget {
-  final VoidCallback onNavigateToSearch;
+  final VoidCallback? onNavigateToSearch;
   final VoidCallback onNavigateToLibrary;
 
   const HomeTab({
     super.key,
-    required this.onNavigateToSearch,
+    this.onNavigateToSearch,
     required this.onNavigateToLibrary,
   });
 
@@ -192,7 +192,7 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${songs.isNotEmpty ? songs.length : 14} bài hát đã được lưu của những ngày gần đây.',
+                    '${songs.length} bài hát đã được lưu trong kho nhạc của bạn.',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w400,
@@ -202,42 +202,9 @@ class _HomeTabState extends State<HomeTab> {
                 ],
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 18),
 
-              // 3. Search Bar: [search] Tìm kiếm bài hát, nghệ sĩ, album...
-              GestureDetector(
-                onTap: widget.onNavigateToSearch,
-                child: Container(
-                  height: 42,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: AppTheme.getSurface(context),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(
-                      color: AppTheme.getBorder(context),
-                      width: 1.0,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, size: 18, color: AppTheme.getTextMuted(context)),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Tìm kiếm bài hát, nghệ sĩ, album...',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          color: AppTheme.getTextMuted(context),
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // 3. Section: Recently Played
+              // 2. Section: Recently Played
               _buildSectionHeader('Recently Played', onSeeAll: widget.onNavigateToLibrary),
               const SizedBox(height: 8),
 
