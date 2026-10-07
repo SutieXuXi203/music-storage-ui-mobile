@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/song_provider.dart';
 import '../../models/song_model.dart';
-import 'album_screen.dart';
 
 class ArtistScreen extends StatefulWidget {
   final String artistName;
@@ -90,7 +89,7 @@ class _ArtistScreenState extends State<ArtistScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                '12 albums · 214 songs',
+                '214 songs',
                 style: AppTheme.monoStyle(
                   fontSize: 11,
                   color: AppTheme.getTextSecondary(context),
@@ -129,63 +128,6 @@ class _ArtistScreenState extends State<ArtistScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
-
-              // Section 1: Album
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Album',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.getText(context),
-                    ),
-                  ),
-                  Text(
-                    'Xem tất cả →',
-                    style: AppTheme.monoStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.getTextSecondary(context),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              SizedBox(
-                height: 125,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    _buildAlbumItem(
-                      context,
-                      title: 'Đừng Làm Trái Tim Anh Đau',
-                      year: '2020',
-                      coverUrl: songs.isNotEmpty ? songs.first.coverUrl : null,
-                    ),
-                    const SizedBox(width: 10),
-                    _buildAlbumItem(
-                      context,
-                      title: 'Chúng Ta Của Hiện Tại',
-                      year: '2019',
-                      coverUrl: songs.length > 1 ? songs[1].coverUrl : null,
-                    ),
-                    const SizedBox(width: 10),
-                    _buildAlbumItem(
-                      context,
-                      title: 'Lạc Trôi',
-                      year: '2017',
-                      coverUrl: songs.length > 2 ? songs[2].coverUrl : null,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 18),
 
               // Section 2: Bài hát phổ biến
               Align(
@@ -216,50 +158,6 @@ class _ArtistScreenState extends State<ArtistScreen> {
     );
   }
 
-  Widget _buildAlbumItem(BuildContext context, {required String title, required String year, String? coverUrl}) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => AlbumScreen(albumName: title, artistName: widget.artistName),
-          ),
-        );
-      },
-      child: SizedBox(
-        width: 90,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 80,
-              width: 90,
-              decoration: BoxDecoration(
-                color: AppTheme.getSurfaceSubtle(context),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: coverUrl != null && coverUrl.isNotEmpty
-                  ? Image.network(coverUrl, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Icon(Icons.album, size: 24, color: AppTheme.getTextMuted(context)))
-                  : Icon(Icons.album, size: 24, color: AppTheme.getTextMuted(context)),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
-            ),
-            Text(
-              year,
-              style: TextStyle(fontSize: 10, color: AppTheme.getTextSecondary(context)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildSongTile(BuildContext context, Song song) {
     return Container(

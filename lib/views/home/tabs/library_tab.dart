@@ -6,7 +6,6 @@ import '../../../services/audio_player_service.dart';
 import '../../../models/song_model.dart';
 import '../../../widgets/song_card_widget.dart';
 import '../../details/playlist_screen.dart';
-import '../../details/album_screen.dart';
 import '../../details/artist_screen.dart';
 
 class LibraryTab extends StatefulWidget {
@@ -19,7 +18,7 @@ class LibraryTab extends StatefulWidget {
 class _LibraryTabState extends State<LibraryTab> {
   String _selectedCategory = 'Bài hát';
   String _sortOption = 'Gần đây nhất';
-  final List<String> _categories = ['Bài hát', 'Album', 'Nghệ sĩ', 'Playlist'];
+  final List<String> _categories = ['Bài hát', 'Nghệ sĩ', 'Playlist'];
 
   void _showSortMenu() {
     showModalBottomSheet(
@@ -269,46 +268,13 @@ class _LibraryTabState extends State<LibraryTab> {
   }
 
   Widget _buildCategoryContent(BuildContext context, List<Song> songs) {
-    if (_selectedCategory == 'Album') {
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
-        children: [
-          _buildItemTile(
-            title: 'Đừng Làm Trái Tim Anh Đau',
-            subtitle: 'Sơn Tùng M-TP · 10 songs',
-            icon: Icons.album,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AlbumScreen(albumName: 'Đừng Làm Trái Tim Anh Đau', artistName: 'Sơn Tùng M-TP')),
-            ),
-          ),
-          _buildItemTile(
-            title: 'Chúng Ta Của Hiện Tại',
-            subtitle: 'Sơn Tùng M-TP · 8 songs',
-            icon: Icons.album,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AlbumScreen(albumName: 'Chúng Ta Của Hiện Tại', artistName: 'Sơn Tùng M-TP')),
-            ),
-          ),
-          _buildItemTile(
-            title: 'Lạc Trôi',
-            subtitle: 'Sơn Tùng M-TP · 5 songs',
-            icon: Icons.album,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AlbumScreen(albumName: 'Lạc Trôi', artistName: 'Sơn Tùng M-TP')),
-            ),
-          ),
-        ],
-      );
-    } else if (_selectedCategory == 'Nghệ sĩ') {
+    if (_selectedCategory == 'Nghệ sĩ') {
       return ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
         children: [
           _buildItemTile(
             title: 'Sơn Tùng M-TP',
-            subtitle: '12 albums · 214 songs',
+            subtitle: '214 songs',
             icon: Icons.person,
             isCircle: true,
             onTap: () => Navigator.push(
