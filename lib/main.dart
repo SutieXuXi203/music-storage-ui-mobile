@@ -5,6 +5,7 @@ import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/song_provider.dart';
+import 'providers/folder_provider.dart';
 import 'views/auth/login_screen.dart';
 import 'views/home/home_screen.dart';
 
@@ -30,6 +31,7 @@ class MusicApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => SongProvider()),
+        ChangeNotifierProvider(create: (_) => FolderProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: Consumer<SettingsProvider>(

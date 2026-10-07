@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../models/folder_model.dart';
+import '../../../models/song_model.dart';
+import '../../../providers/folder_provider.dart';
 import '../../../providers/song_provider.dart';
 import '../../../services/audio_player_service.dart';
-import '../../../models/song_model.dart';
 import '../../../widgets/song_card_widget.dart';
+import '../../details/folder_detail_screen.dart';
 
 class LibraryTab extends StatefulWidget {
   const LibraryTab({super.key});
@@ -16,7 +19,7 @@ class LibraryTab extends StatefulWidget {
 class _LibraryTabState extends State<LibraryTab> {
   String _selectedCategory = 'Bài hát';
   String _sortOption = 'Gần đây nhất';
-  final List<String> _categories = ['Bài hát', 'Playlist'];
+  final List<String> _categories = ['Bài hát', 'Thư mục'];
 
   void _showSortMenu() {
     showModalBottomSheet(
@@ -96,7 +99,7 @@ class _LibraryTabState extends State<LibraryTab> {
           side: BorderSide(color: AppTheme.getBorder(context), width: 1.0),
         ),
         title: Text(
-          'Add from YouTube',
+          'Thêm từ YouTube',
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppTheme.getText(context)),
         ),
         content: Column(
@@ -104,7 +107,7 @@ class _LibraryTabState extends State<LibraryTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Enter YouTube URL to download to Google Drive:',
+              'Nhập URL video YouTube để tải về lưu trữ:',
               style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
             ),
             const SizedBox(height: 12),
@@ -122,7 +125,7 @@ class _LibraryTabState extends State<LibraryTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12)),
+            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -131,12 +134,191 @@ class _LibraryTabState extends State<LibraryTab> {
                 Navigator.pop(ctx);
                 final songProv = Provider.of<SongProvider>(context, listen: false);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Downloading track...'), duration: Duration(seconds: 2)),
+                  const SnackBar(content: Text('Đang xử lý tải bài hát...'), duration: Duration(seconds: 2)),
                 );
                 await songProv.downloadFromYouTube(url);
               }
             },
-            child: const Text('Download', style: TextStyle(fontSize: 12)),
+            child: const Text('Tải xuống', style: TextStyle(fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateFolderDialog() {
+    final nameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.getSurfaceElevated(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+        ),
+        title: Text(
+          'Tạo thư mục mới',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Đặt tên cho thư mục bài hát của bạn:',
+              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: nameController,
+              autofocus: true,
+              style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
+              decoration: InputDecoration(
+                hintText: 'Ví dụ: Nhạc Acoustic, Lofi, EDM...',
+                hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                isDense: true,
+                filled: true,
+                fillColor: AppTheme.getSurface(context),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.getText(context),
+              foregroundColor: AppTheme.getBg(context),
+            ),
+            onPressed: () async {
+              final name = nameController.text.trim();
+              if (name.isNotEmpty) {
+                Navigator.pop(ctx);
+                final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                final folder = await folderProv.createFolder(name);
+                if (mounted && folder != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: AppTheme.getSurfaceElevated(context),
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Tạo', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRenameFolderDialog(Folder folder) {
+    final controller = TextEditingController(text: folder.name);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.getSurfaceElevated(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+        ),
+        title: Text(
+          'Đổi tên thư mục',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
+          decoration: InputDecoration(
+            hintText: 'Nhập tên mới...',
+            hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
+            isDense: true,
+            filled: true,
+            fillColor: AppTheme.getSurface(context),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.getText(context),
+              foregroundColor: AppTheme.getBg(context),
+            ),
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty) {
+                Navigator.pop(ctx);
+                final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                await folderProv.renameFolder(folder.id, newName);
+              }
+            },
+            child: const Text('Lưu', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteFolder(Folder folder) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.getSurfaceElevated(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+        ),
+        title: Text(
+          'Xóa thư mục?',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn xóa thư mục "${folder.name}"? Các bài hát vẫn sẽ được giữ an toàn trong kho nhạc chính.',
+          style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.getDanger(context),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final folderProv = Provider.of<FolderProvider>(context, listen: false);
+              final ok = await folderProv.deleteFolder(folder.id);
+              if (mounted && ok) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Đã xóa thư mục "${folder.name}"', style: AppTheme.monoStyle(fontSize: 12)),
+                    backgroundColor: AppTheme.getSurfaceElevated(context),
+                  ),
+                );
+              }
+            },
+            child: const Text('Xóa', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -146,6 +328,7 @@ class _LibraryTabState extends State<LibraryTab> {
   @override
   Widget build(BuildContext context) {
     final songProvider = Provider.of<SongProvider>(context);
+    final folderProvider = Provider.of<FolderProvider>(context);
     final songs = songProvider.songs;
 
     return Scaffold(
@@ -163,11 +346,18 @@ class _LibraryTabState extends State<LibraryTab> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.add, color: AppTheme.getText(context), size: 22),
-            tooltip: 'Thêm từ YouTube',
-            onPressed: _showAddSongDialog,
-          ),
+          if (_selectedCategory == 'Thư mục')
+            IconButton(
+              icon: Icon(Icons.create_new_folder_outlined, color: AppTheme.getText(context), size: 22),
+              tooltip: 'Tạo thư mục mới',
+              onPressed: _showCreateFolderDialog,
+            )
+          else
+            IconButton(
+              icon: Icon(Icons.add, color: AppTheme.getText(context), size: 22),
+              tooltip: 'Thêm từ YouTube',
+              onPressed: _showAddSongDialog,
+            ),
           const SizedBox(width: 4),
         ],
       ),
@@ -175,7 +365,7 @@ class _LibraryTabState extends State<LibraryTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Filter Tabs: [ Bài hát | Album | Nghệ sĩ | Playlist ]
+            // 1. Filter Tabs: [ Bài hát | Thư mục ]
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -257,7 +447,9 @@ class _LibraryTabState extends State<LibraryTab> {
 
             // 3. Main Content
             Expanded(
-              child: _buildCategoryContent(context, songs),
+              child: _selectedCategory == 'Thư mục'
+                  ? _buildFoldersContent(context, folderProvider)
+                  : _buildSongsContent(context, songs),
             ),
           ],
         ),
@@ -265,25 +457,36 @@ class _LibraryTabState extends State<LibraryTab> {
     );
   }
 
-  Widget _buildCategoryContent(BuildContext context, List<Song> songs) {
-    if (_selectedCategory == 'Playlist') {
+  Widget _buildFoldersContent(BuildContext context, FolderProvider folderProvider) {
+    if (folderProvider.isLoading && folderProvider.folders.isEmpty) {
+      return Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: AppTheme.getText(context),
+        ),
+      );
+    }
+
+    final folders = folderProvider.folders;
+
+    if (folders.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
                 color: AppTheme.getSurface(context),
                 shape: BoxShape.circle,
                 border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
               ),
-              child: Icon(Icons.queue_music, size: 22, color: AppTheme.getTextMuted(context)),
+              child: Icon(Icons.folder_open_outlined, size: 24, color: AppTheme.getTextMuted(context)),
             ),
             const SizedBox(height: 12),
             Text(
-              'Chưa có danh sách phát nào.',
+              'Chưa có thư mục nào.',
               style: TextStyle(
                 color: AppTheme.getTextSecondary(context),
                 fontSize: 13,
@@ -292,18 +495,147 @@ class _LibraryTabState extends State<LibraryTab> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Danh sách phát sẽ xuất hiện tại đây.',
+              'Tạo thư mục để phân loại và gom nhóm bài hát.',
               style: TextStyle(
                 color: AppTheme.getTextMuted(context),
                 fontSize: 11.5,
               ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                backgroundColor: AppTheme.getText(context),
+                foregroundColor: AppTheme.getBg(context),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                ),
+              ),
+              icon: Icon(Icons.add, size: 16, color: AppTheme.getBg(context)),
+              label: Text(
+                'Tạo thư mục mới',
+                style: AppTheme.monoStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              ),
+              onPressed: _showCreateFolderDialog,
             ),
           ],
         ),
       );
     }
 
-    // Default: 'Bài hát'
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
+      itemCount: folders.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 6),
+      itemBuilder: (context, index) {
+        final folder = folders[index];
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.getSurface(context),
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+          ),
+          child: ListTile(
+            dense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            leading: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppTheme.getSurfaceElevated(context),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: folder.coverUrl != null && folder.coverUrl!.isNotEmpty
+                  ? Image.network(
+                      folder.coverUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.folder_outlined,
+                        color: AppTheme.getText(context),
+                        size: 22,
+                      ),
+                    )
+                  : Icon(
+                      Icons.folder_outlined,
+                      color: AppTheme.getText(context),
+                      size: 22,
+                    ),
+            ),
+            title: Text(
+              folder.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.getText(context),
+              ),
+            ),
+            subtitle: Text(
+              '${folder.songCount} bài hát',
+              style: AppTheme.monoStyle(
+                fontSize: 11,
+                color: AppTheme.getTextSecondary(context),
+              ),
+            ),
+            trailing: PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, size: 18, color: AppTheme.getTextSecondary(context)),
+              color: AppTheme.getSurfaceElevated(context),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+              ),
+              onSelected: (val) {
+                if (val == 'rename') {
+                  _showRenameFolderDialog(folder);
+                } else if (val == 'delete') {
+                  _confirmDeleteFolder(folder);
+                }
+              },
+              itemBuilder: (ctx) => [
+                PopupMenuItem(
+                  value: 'rename',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit_outlined, size: 16, color: AppTheme.getText(context)),
+                      const SizedBox(width: 8),
+                      Text('Đổi tên', style: TextStyle(fontSize: 12, color: AppTheme.getText(context))),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline, size: 16, color: AppTheme.getDanger(context)),
+                      const SizedBox(width: 8),
+                      Text('Xóa thư mục', style: TextStyle(fontSize: 12, color: AppTheme.getDanger(context))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => FolderDetailScreen(
+                    folderId: folder.id,
+                    initialName: folder.name,
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSongsContent(BuildContext context, List<Song> songs) {
     if (songs.isEmpty) {
       return Center(
         child: Column(

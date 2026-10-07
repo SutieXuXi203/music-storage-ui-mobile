@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/song_model.dart';
+import '../providers/folder_provider.dart';
 import '../core/theme/app_theme.dart';
 import '../views/details/song_detail_screen.dart';
 import 'mini_equalizer_widget.dart';
@@ -129,16 +131,11 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 ),
                 ListTile(
                   dense: true,
-                  leading: Icon(Icons.playlist_add, color: AppTheme.getText(context), size: 20),
-                  title: Text('Thêm vào Playlist', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  leading: Icon(Icons.drive_file_move_outlined, color: AppTheme.getText(context), size: 20),
+                  title: Text('Chuyển vào thư mục', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
                   onTap: () {
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã thêm "${widget.song.title}" vào danh sách phát!'),
-                        duration: const Duration(seconds: 1),
-                      ),
-                    );
+                    _showAddToFolderModal(context);
                   },
                 ),
                 if (widget.onDelete != null)
@@ -151,6 +148,130 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       widget.onDelete!();
                     },
                   ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddToFolderModal(BuildContext context) {
+    final folderProv = Provider.of<FolderProvider>(context, listen: false);
+    final folders = folderProv.folders;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.getSurfaceElevated(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 32,
+                    height: 3,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'CHỌN THƯ MỤC',
+                      style: AppTheme.monoStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.getText(context),
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, size: 20, color: AppTheme.getTextSecondary(context)),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+                Text(
+                  'Chọn thư mục để chuyển bài hát "${widget.song.title}" vào',
+                  style: TextStyle(fontSize: 11.5, color: AppTheme.getTextSecondary(context)),
+                ),
+                const SizedBox(height: 10),
+                Divider(color: AppTheme.getBorder(context), height: 1),
+                const SizedBox(height: 6),
+                if (folders.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: Text(
+                        'Chưa có thư mục nào. Hãy tạo thư mục ở tab Thư viện trước.',
+                        style: TextStyle(fontSize: 12, color: AppTheme.getTextMuted(context)),
+                      ),
+                    ),
+                  )
+                else
+                  ...folders.map((folder) {
+                    final isAlreadyIn = folder.songIds.contains(widget.song.id);
+                    return ListTile(
+                      dense: true,
+                      leading: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: AppTheme.getSurface(context),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                          border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                        ),
+                        child: Icon(Icons.folder_outlined, size: 18, color: AppTheme.getText(context)),
+                      ),
+                      title: Text(
+                        folder.name,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.getText(context),
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${folder.songCount} bài hát',
+                        style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                      ),
+                      trailing: isAlreadyIn
+                          ? Text(
+                              'ĐÃ CÓ',
+                              style: AppTheme.monoStyle(fontSize: 10, color: AppTheme.getTextMuted(context)),
+                            )
+                          : Icon(Icons.add, size: 18, color: AppTheme.getText(context)),
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        final ok = await folderProv.addSongToFolder(folder.id, widget.song);
+                        if (context.mounted && ok) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Đã chuyển "${widget.song.title}" vào thư mục "${folder.name}"',
+                                style: AppTheme.monoStyle(fontSize: 12),
+                              ),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: AppTheme.getSurfaceElevated(context),
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  }),
               ],
             ),
           ),

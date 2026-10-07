@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/api_constants.dart';
 import '../models/song_model.dart';
 import '../models/user_model.dart';
+import '../models/folder_model.dart';
 
 class ApiService {
   late final Dio _dio;
@@ -164,6 +165,92 @@ class ApiService {
       },
     );
     return response.data;
+  }
+
+  // --- FOLDERS ---
+  Future<List<Folder>> getFolders() async {
+    try {
+      final response = await _dio.get(ApiConstants.folders);
+      final List list = response.data['data'] ?? [];
+      return list.map((item) => Folder.fromJson(item)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<Folder?> createFolder(String name) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.folders,
+        data: {'name': name.trim()},
+      );
+      if (response.data['data'] != null) {
+        return Folder.fromJson(response.data['data']);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<Folder?> getFolderDetails(String folderId) async {
+    try {
+      final response = await _dio.get('${ApiConstants.folders}/$folderId');
+      if (response.data['data'] != null) {
+        return Folder.fromJson(response.data['data']);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> renameFolder(String folderId, String newName) async {
+    try {
+      final response = await _dio.put(
+        '${ApiConstants.folders}/$folderId',
+        data: {'name': newName.trim()},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteFolder(String folderId) async {
+    try {
+      final response = await _dio.delete('${ApiConstants.folders}/$folderId');
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> addSongToFolder(String folderId, String songId, {String? fromFolderId}) async {
+    try {
+      final data = <String, dynamic>{
+        'song_id': songId,
+      };
+      if (fromFolderId != null && fromFolderId.isNotEmpty) {
+        data['from_folder_id'] = fromFolderId;
+      }
+      final response = await _dio.post(
+        '${ApiConstants.folders}/$folderId/songs',
+        data: data,
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> removeSongFromFolder(String folderId, String songId) async {
+    try {
+      final response = await _dio.delete('${ApiConstants.folders}/$folderId/songs/$songId');
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
 }
 

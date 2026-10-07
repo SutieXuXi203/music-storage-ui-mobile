@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
@@ -33,21 +32,6 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         ),
       );
     }
-  }
-
-  void _copyToClipboard(String label, String value) {
-    Clipboard.setData(ClipboardData(text: value));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Đã sao chép $label vào bộ nhớ tạm',
-          style: AppTheme.monoStyle(fontSize: 12),
-        ),
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppTheme.getSurfaceElevated(context),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   void _showEditProfileDialog() {
@@ -255,26 +239,6 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     );
   }
 
-  void _exportJson(Map<String, dynamic> data) {
-    final buffer = StringBuffer('{\n');
-    data.forEach((key, value) {
-      buffer.writeln('  "$key": "$value",');
-    });
-    buffer.write('}');
-    Clipboard.setData(ClipboardData(text: buffer.toString()));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Đã sao chép toàn bộ thông tin tài khoản dạng JSON',
-          style: AppTheme.monoStyle(fontSize: 12),
-        ),
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppTheme.getSurfaceElevated(context),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
   String _formatDate(DateTime? dt) {
     if (dt == null) return 'Không xác định';
     final local = dt.toLocal();
@@ -298,11 +262,6 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         : (user != null && user.username.isNotEmpty ? user.username : 'Mạnh Đình');
     final username = user?.username ?? 'user_dev';
     final email = (user != null && user.email.isNotEmpty) ? user.email : 'email@example.com';
-    final userId = (user != null && user.id.isNotEmpty) ? user.id : 'N/A';
-    final driveFolderId = (user != null && user.driveFolderId != null && user.driveFolderId!.isNotEmpty)
-        ? user.driveFolderId!
-        : 'N/A';
-    final driveFolderName = user?.driveFolderName ?? user?.fullName ?? user?.username ?? 'My Music Folder';
     final isActive = user?.isActive ?? true;
     final createdAtStr = _formatDate(user?.createdAt);
     final songCount = songProvider.songs.length;
@@ -451,14 +410,6 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
               children: [
                 _buildInfoRow(
                   context,
-                  label: 'User ID',
-                  value: userId,
-                  isMonospace: true,
-                  onCopy: userId != 'N/A' ? () => _copyToClipboard('User ID', userId) : null,
-                ),
-                _buildDivider(context),
-                _buildInfoRow(
-                  context,
                   label: 'Tên đăng nhập',
                   value: username,
                   isMonospace: true,
@@ -490,43 +441,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
 
             const SizedBox(height: 18),
 
-            // 3. Section: Google Drive & Cloud Storage
-            _buildSectionHeader('Lưu trữ đám mây & Google Drive'),
-            _buildDetailCard(
-              context,
-              children: [
-                _buildInfoRow(
-                  context,
-                  label: 'Nhà cung cấp',
-                  value: 'Google Drive API v3',
-                ),
-                _buildDivider(context),
-                _buildInfoRow(
-                  context,
-                  label: 'Thư mục Drive',
-                  value: driveFolderName,
-                  isMonospace: true,
-                ),
-                _buildDivider(context),
-                _buildInfoRow(
-                  context,
-                  label: 'Mã thư mục (Folder ID)',
-                  value: driveFolderId,
-                  isMonospace: true,
-                  onCopy: driveFolderId != 'N/A' ? () => _copyToClipboard('Folder ID', driveFolderId) : null,
-                ),
-                _buildDivider(context),
-                _buildInfoRow(
-                  context,
-                  label: 'Trạng thái đồng bộ',
-                  value: driveFolderId != 'N/A' ? 'Đã kết nối (Synchronized)' : 'Chưa liên kết',
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 18),
-
-            // 4. Section: Thống kê & Hệ thống (System & Stats)
+            // 3. Section: Thống kê & Hệ thống (System & Stats)
             _buildSectionHeader('Hệ thống & Thống kê'),
             _buildDetailCard(
               context,
@@ -543,75 +458,6 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   label: 'Số bài hát trong thư viện',
                   value: '$songCount bài hát',
                   isMonospace: true,
-                ),
-                _buildDivider(context),
-                _buildInfoRow(
-                  context,
-                  label: 'Cơ chế xác thực',
-                  value: 'OAuth2 JWT Bearer',
-                  isMonospace: true,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            // 5. Actions Row
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 11),
-                      backgroundColor: AppTheme.getSurface(context),
-                      side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      ),
-                    ),
-                    icon: Icon(Icons.code, size: 16, color: AppTheme.getText(context)),
-                    label: Text(
-                      'Sao chép JSON',
-                      style: AppTheme.monoStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.getText(context),
-                      ),
-                    ),
-                    onPressed: () => _exportJson({
-                      'id': userId,
-                      'username': username,
-                      'email': email,
-                      'full_name': displayName,
-                      'drive_folder_id': driveFolderId,
-                      'drive_folder_name': driveFolderName,
-                      'is_active': isActive,
-                      'created_at': createdAtStr,
-                      'total_songs': songCount,
-                    }),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 11),
-                      backgroundColor: AppTheme.getText(context),
-                      foregroundColor: AppTheme.getBg(context),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      ),
-                    ),
-                    icon: Icon(Icons.edit, size: 16, color: AppTheme.getBg(context)),
-                    label: Text(
-                      'Cập nhật hồ sơ',
-                      style: AppTheme.monoStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onPressed: _showEditProfileDialog,
-                  ),
                 ),
               ],
             ),
@@ -658,7 +504,6 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     Color? statusColor,
     String? trailingBadge,
     VoidCallback? onBadgeTap,
-    VoidCallback? onCopy,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -715,24 +560,9 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                         trailingBadge,
                         style: AppTheme.monoStyle(
                           fontSize: 9,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.getText(context),
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.getText(context),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
-                if (onCopy != null) ...[
-                  const SizedBox(width: 4),
-                  InkWell(
-                    onTap: onCopy,
-                    borderRadius: BorderRadius.circular(4),
-                    child: Padding(
-                      padding: const EdgeInsets.all(2),
-                      child: Icon(
-                        Icons.copy,
-                        size: 13,
-                        color: AppTheme.getTextMuted(context),
                       ),
                     ),
                   ),

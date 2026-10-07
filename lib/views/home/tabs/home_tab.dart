@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../models/folder_model.dart';
+import '../../../models/song_model.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/folder_provider.dart';
 import '../../../providers/song_provider.dart';
 import '../../../services/audio_player_service.dart';
-import '../../../models/song_model.dart';
+import '../../details/folder_detail_screen.dart';
 import '../settings_screen.dart';
 
 class HomeTab extends StatefulWidget {
@@ -22,23 +25,107 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
+  void _showCreateFolderDialog(BuildContext context) {
+    final nameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.getSurfaceElevated(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+        ),
+        title: Text(
+          'Tạo thư mục mới',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Đặt tên cho thư mục bài hát của bạn:',
+              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: nameController,
+              autofocus: true,
+              style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
+              decoration: InputDecoration(
+                hintText: 'Ví dụ: Nhạc Acoustic, Lofi, EDM...',
+                hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                isDense: true,
+                filled: true,
+                fillColor: AppTheme.getSurface(context),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.getText(context),
+              foregroundColor: AppTheme.getBg(context),
+            ),
+            onPressed: () async {
+              final name = nameController.text.trim();
+              if (name.isNotEmpty) {
+                Navigator.pop(ctx);
+                final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                final folder = await folderProv.createFolder(name);
+                if (context.mounted && folder != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: AppTheme.getSurfaceElevated(context),
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Tạo', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final songProvider = Provider.of<SongProvider>(context);
+    final folderProvider = Provider.of<FolderProvider>(context);
 
     final user = authProvider.user;
     final userName = (user != null && user.fullName != null && user.fullName!.isNotEmpty)
         ? user.fullName!
         : (user != null && user.username.isNotEmpty ? user.username : 'Mạnh Đình');
     final songs = songProvider.songs;
+    final folders = folderProvider.folders;
+
+    final recentSongs = songs.length > 5 ? songs.take(5).toList() : songs;
 
     return Scaffold(
       backgroundColor: AppTheme.getBg(context),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            await songProvider.fetchSongs();
+            await Future.wait([
+              songProvider.fetchSongs(),
+              folderProvider.fetchFolders(),
+            ]);
           },
           color: AppTheme.getText(context),
           backgroundColor: AppTheme.getSurface(context),
@@ -94,7 +181,6 @@ class _HomeTabState extends State<HomeTab> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Notification Bell with unread dot
                       Stack(
                         children: [
                           IconButton(
@@ -130,7 +216,6 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                       const SizedBox(width: 6),
 
-                      // Avatar (34x34px, compact, tap -> Settings)
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -168,7 +253,7 @@ class _HomeTabState extends State<HomeTab> {
 
               const SizedBox(height: 14),
 
-              // 2. Greeting: Chào bạn, Mạnh Đình + 14 bài hát đã được lưu...
+              // 2. Greeting: Chào bạn, Mạnh Đình + số bài hát đã lưu...
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -204,22 +289,47 @@ class _HomeTabState extends State<HomeTab> {
 
               const SizedBox(height: 18),
 
-              // 2. Section: Recently Played
+              // 3. Section: Recently Played
               _buildSectionHeader('Recently Played', onSeeAll: widget.onNavigateToLibrary),
               const SizedBox(height: 8),
 
-              if (songs.isEmpty)
+              if (recentSongs.isEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Center(
                     child: Text(
-                      'No recent songs',
+                      'Chưa có bài hát nào gần đây',
                       style: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12),
                     ),
                   ),
                 )
               else
-                ...songs.map((song) => _buildRecentSongTile(context, song)),
+                ...recentSongs.map((song) => _buildRecentSongTile(context, song)),
+
+              const SizedBox(height: 22),
+
+              // 4. Section: Thư mục (Folders Grid below Recent Played)
+              _buildSectionHeader('Thư mục', onSeeAll: widget.onNavigateToLibrary),
+              const SizedBox(height: 10),
+
+              if (folders.isEmpty)
+                _buildEmptyFolderCard(context)
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: folders.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 1.15,
+                  ),
+                  itemBuilder: (context, index) {
+                    final folder = folders[index];
+                    return _buildFolderGridCard(context, folder);
+                  },
+                ),
 
               const SizedBox(height: 120),
             ],
@@ -253,6 +363,176 @@ class _HomeTabState extends State<HomeTab> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildFolderGridCard(BuildContext context, Folder folder) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FolderDetailScreen(
+              folderId: folder.id,
+              initialName: folder.name,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppTheme.getSurface(context),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          border: Border.all(
+            color: AppTheme.getBorder(context),
+            width: 0.8,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppTheme.getSurfaceElevated(context),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: AppTheme.getBorder(context),
+                      width: 0.8,
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: folder.coverUrl != null && folder.coverUrl!.isNotEmpty
+                      ? Image.network(
+                          folder.coverUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.folder_outlined,
+                            size: 22,
+                            color: AppTheme.getText(context),
+                          ),
+                        )
+                      : Icon(
+                          Icons.folder_outlined,
+                          size: 22,
+                          color: AppTheme.getText(context),
+                        ),
+                ),
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.getSurfaceElevated(context),
+                    border: Border.all(
+                      color: AppTheme.getBorder(context),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 11,
+                      color: AppTheme.getTextSecondary(context),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              folder.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.getText(context),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '${folder.songCount} bài hát',
+              style: AppTheme.monoStyle(
+                fontSize: 10.5,
+                color: AppTheme.getTextSecondary(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyFolderCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showCreateFolderDialog(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          color: AppTheme.getSurface(context),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          border: Border.all(
+            color: AppTheme.getBorder(context),
+            width: 0.8,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppTheme.getSurfaceElevated(context),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(
+                  color: AppTheme.getBorder(context),
+                  width: 0.8,
+                ),
+              ),
+              child: Icon(
+                Icons.create_new_folder_outlined,
+                size: 22,
+                color: AppTheme.getText(context),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Chưa có thư mục nào',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.getText(context),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Nhấn để tạo thư mục lưu trữ bài hát đầu tiên',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.getTextMuted(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.add,
+              size: 20,
+              color: AppTheme.getText(context),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
