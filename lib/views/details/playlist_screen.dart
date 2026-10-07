@@ -11,7 +11,7 @@ class PlaylistScreen extends StatelessWidget {
 
   const PlaylistScreen({
     super.key,
-    this.title = 'Nhạc Tâm Trạng',
+    this.title = 'Danh sách phát',
   });
 
   @override
@@ -98,7 +98,7 @@ class PlaylistScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${songs.isNotEmpty ? songs.length : 42} songs · 2h 48m',
+                    '${songs.length} bài hát',
                     style: AppTheme.monoStyle(
                       fontSize: 11,
                       color: AppTheme.getTextMuted(context),

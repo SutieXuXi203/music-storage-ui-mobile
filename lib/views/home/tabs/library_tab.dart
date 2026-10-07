@@ -5,8 +5,6 @@ import '../../../providers/song_provider.dart';
 import '../../../services/audio_player_service.dart';
 import '../../../models/song_model.dart';
 import '../../../widgets/song_card_widget.dart';
-import '../../details/playlist_screen.dart';
-import '../../details/artist_screen.dart';
 
 class LibraryTab extends StatefulWidget {
   const LibraryTab({super.key});
@@ -18,7 +16,7 @@ class LibraryTab extends StatefulWidget {
 class _LibraryTabState extends State<LibraryTab> {
   String _selectedCategory = 'Bài hát';
   String _sortOption = 'Gần đây nhất';
-  final List<String> _categories = ['Bài hát', 'Nghệ sĩ', 'Playlist'];
+  final List<String> _categories = ['Bài hát', 'Playlist'];
 
   void _showSortMenu() {
     showModalBottomSheet(
@@ -268,45 +266,40 @@ class _LibraryTabState extends State<LibraryTab> {
   }
 
   Widget _buildCategoryContent(BuildContext context, List<Song> songs) {
-    if (_selectedCategory == 'Nghệ sĩ') {
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
-        children: [
-          _buildItemTile(
-            title: 'Sơn Tùng M-TP',
-            subtitle: '214 songs',
-            icon: Icons.person,
-            isCircle: true,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ArtistScreen(artistName: 'Sơn Tùng M-TP')),
+    if (_selectedCategory == 'Playlist') {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppTheme.getSurface(context),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+              ),
+              child: Icon(Icons.queue_music, size: 22, color: AppTheme.getTextMuted(context)),
             ),
-          ),
-        ],
-      );
-    } else if (_selectedCategory == 'Playlist') {
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
-        children: [
-          _buildItemTile(
-            title: 'Nhạc Tâm Trạng',
-            subtitle: 'Mạnh Đình · 42 songs',
-            icon: Icons.queue_music,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const PlaylistScreen(title: 'Nhạc Tâm Trạng')),
+            const SizedBox(height: 12),
+            Text(
+              'Chưa có danh sách phát nào.',
+              style: TextStyle(
+                color: AppTheme.getTextSecondary(context),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          _buildItemTile(
-            title: 'Giai Điệu Chill',
-            subtitle: 'Mạnh Đình · 25 songs',
-            icon: Icons.queue_music,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const PlaylistScreen(title: 'Giai Điệu Chill')),
+            const SizedBox(height: 4),
+            Text(
+              'Danh sách phát sẽ xuất hiện tại đây.',
+              style: TextStyle(
+                color: AppTheme.getTextMuted(context),
+                fontSize: 11.5,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 
@@ -352,52 +345,6 @@ class _LibraryTabState extends State<LibraryTab> {
           },
         );
       },
-    );
-  }
-
-  Widget _buildItemTile({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    bool isCircle = false,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      decoration: BoxDecoration(
-        color: AppTheme.getSurface(context),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-      ),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-        leading: Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: AppTheme.getSurfaceSubtle(context),
-            shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
-            borderRadius: isCircle ? null : BorderRadius.circular(AppTheme.radiusSm),
-            border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-          ),
-          child: Icon(icon, color: AppTheme.getTextSecondary(context), size: 18),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.getText(context),
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
-        ),
-        trailing: Icon(Icons.chevron_right, color: AppTheme.getTextMuted(context), size: 18),
-        onTap: onTap,
-      ),
     );
   }
 }

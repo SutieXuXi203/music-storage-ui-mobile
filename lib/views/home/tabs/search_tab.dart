@@ -4,7 +4,6 @@ import '../../../core/theme/app_theme.dart';
 import '../../../providers/song_provider.dart';
 import '../../../services/audio_player_service.dart';
 import '../../../models/song_model.dart';
-import '../../details/artist_screen.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -15,8 +14,6 @@ class SearchTab extends StatefulWidget {
 
 class _SearchTabState extends State<SearchTab> {
   final TextEditingController _searchController = TextEditingController();
-  int _selectedFilterIndex = 0;
-  final List<String> _filters = ['Songs', 'Artists'];
 
   @override
   void dispose() {
@@ -86,188 +83,47 @@ class _SearchTabState extends State<SearchTab> {
               ),
             ),
 
-            const SizedBox(height: 12),
-
-            // 2. Filter Pills: [ Songs ] [ Artists ] [ Albums ]
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: List.generate(_filters.length, (idx) {
-                  final isSelected = _selectedFilterIndex == idx;
-                  final activeBg = AppTheme.getAction(context);
-                  final activeText = AppTheme.getActionText(context);
-
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: GestureDetector(
-                      onTap: () => setState(() => _selectedFilterIndex = idx),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isSelected ? activeBg : AppTheme.getSurface(context),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                          border: Border.all(
-                            color: isSelected ? activeBg : AppTheme.getBorder(context),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: Text(
-                          _filters[idx],
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected ? activeText : AppTheme.getTextSecondary(context),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-
             const SizedBox(height: 18),
 
-            // 3. Section: Bài hát (when Songs or general search)
-            if (_selectedFilterIndex == 0) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Bài hát',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.getText(context),
-                    ),
-                  ),
-                  Text(
-                    'Xem tất cả →',
-                    style: AppTheme.monoStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.getTextSecondary(context),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              if (songs.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Center(
-                    child: Text(
-                      'No songs found',
-                      style: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12),
-                    ),
-                  ),
-                )
-              else
-                ...songs.take(4).map((song) => _buildSongTile(context, song)),
-
-              const SizedBox(height: 16),
-            ],
-
-            // 4. Section: Nghệ sĩ (when Songs overview or Artists tab)
-            if (_selectedFilterIndex == 0 || _selectedFilterIndex == 1) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Nghệ sĩ',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.getText(context),
-                    ),
-                  ),
-                  Text(
-                    'Xem tất cả →',
-                    style: AppTheme.monoStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.getTextSecondary(context),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Artist Tile (Compact: 38px circular avatar)
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ArtistScreen(artistName: 'Sơn Tùng M-TP'),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.getSurface(context),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppTheme.getSurfaceSubtle(context),
-                          border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: songs.isNotEmpty && songs.first.coverUrl != null
-                            ? Image.network(
-                                songs.first.coverUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Center(
-                                  child: Text('S', style: TextStyle(color: AppTheme.getText(context), fontWeight: FontWeight.w600, fontSize: 14)),
-                                ),
-                              )
-                            : Center(
-                                child: Text('S', style: TextStyle(color: AppTheme.getText(context), fontWeight: FontWeight.w600, fontSize: 14)),
-                              ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Sơn Tùng M-TP',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.getText(context),
-                              ),
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              '12 albums · 214 songs',
-                              style: AppTheme.monoStyle(
-                                fontSize: 10.5,
-                                color: AppTheme.getTextSecondary(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.chevron_right, color: AppTheme.getTextMuted(context), size: 18),
-                    ],
+            // Section: Danh sách bài hát
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Bài hát',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.getText(context),
                   ),
                 ),
-              ),
+                if (songs.isNotEmpty)
+                  Text(
+                    '${songs.length} bài hát',
+                    style: AppTheme.monoStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.getTextSecondary(context),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
 
-              const SizedBox(height: 120),
-            ],
+            if (songs.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text(
+                    'Không tìm thấy bài hát nào',
+                    style: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                  ),
+                ),
+              )
+            else
+              ...songs.map((song) => _buildSongTile(context, song)),
+
+            const SizedBox(height: 120),
           ],
         ),
       ),
