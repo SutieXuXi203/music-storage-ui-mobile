@@ -1,15 +1,44 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+enum NotificationEventType {
+  progress,
+  completed,
+  failed,
+  cancelled,
+}
+
+class DownloadNotificationRecord {
+  final NotificationEventType type;
+  final int id;
+  final String title;
+  final String? body;
+  final int? progress;
+  final String? payload;
+  final DateTime timestamp;
+
+  DownloadNotificationRecord({
+    required this.type,
+    required this.id,
+    required this.title,
+    this.body,
+    this.progress,
+    this.payload,
+    DateTime? timestamp,
+  }) : timestamp = timestamp ?? DateTime.now();
+}
 
 class NotificationService {
   NotificationService._internal();
   static final NotificationService instance = NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
+  bool get isInitialized => _initialized;
 
   static const String downloadChannelId = 'download_progress_channel';
   static const String downloadChannelName = 'Tiến trình tải nhạc';
@@ -20,6 +49,30 @@ class NotificationService {
   static const String downloadCompletedChannelName = 'Thông báo tải hoàn tất';
   static const String downloadCompletedChannelDesc =
       'Thông báo khi bài hát đã tải xuống thành công và lưu vào thư viện';
+
+  // Stream thông báo cho ứng dụng và thanh trạng thái
+  static final StreamController<DownloadNotificationRecord> _notificationRecordController =
+      StreamController<DownloadNotificationRecord>.broadcast();
+  static Stream<DownloadNotificationRecord> get onNotificationRecord =>
+      _notificationRecordController.stream;
+
+  // Stream khi người dùng bấm vào thông báo hệ thống trên thiết bị
+  static final StreamController<String> _onNotificationTappedController =
+      StreamController<String>.broadcast();
+  static Stream<String> get onNotificationTapped =>
+      _onNotificationTappedController.stream;
+
+  @visibleForTesting
+  void setPluginForTesting(FlutterLocalNotificationsPlugin plugin, {bool initialized = true}) {
+    _notificationsPlugin = plugin;
+    _initialized = initialized;
+  }
+
+  @visibleForTesting
+  void resetForTesting() {
+    _notificationsPlugin = FlutterLocalNotificationsPlugin();
+    _initialized = false;
+  }
 
   Future<void> init() async {
     if (_initialized) return;
@@ -41,7 +94,7 @@ class NotificationService {
           defaultActionName: 'Open notification',
         );
         const windowsInit = WindowsInitializationSettings(
-          appName: 'Sutorage',
+          appName: 'MeowSic',
           appUserModelId: 'com.sutiexuxi.musicapp.mobile_ui',
           guid: '2d1c69c1-7ef4-4f0f-8b9a-4c28f9d0c641',
         );
@@ -54,8 +107,14 @@ class NotificationService {
           windows: windowsInit,
         );
 
-        await _notificationsPlugin.initialize(
+        final initialized = await _notificationsPlugin.initialize(
           settings: initSettings,
+          onDidReceiveNotificationResponse: (NotificationResponse response) {
+            final payload = response.payload;
+            if (payload != null && payload.isNotEmpty) {
+              _onNotificationTappedController.add(payload);
+            }
+          },
         );
 
         // Tạo Notification Channels và xin quyền trên Android
@@ -94,9 +153,10 @@ class NotificationService {
           }
         }
 
-        _initialized = true;
+        _initialized = initialized ?? true;
       } catch (e) {
-        debugPrint('[NotificationService] Lỗi khởi tạo thông báo: $e');
+        debugPrint('[NotificationService] Lưu ý: Thông báo nền hệ thống chưa khả dụng: $e');
+        _initialized = false;
       }
     }
   }
@@ -108,10 +168,22 @@ class NotificationService {
     required String stageDesc,
     required int progressPercent,
   }) async {
+    final safeProgress = progressPercent.clamp(0, 100);
+    final body = '$stageDesc ($safeProgress%)';
+
+    _notificationRecordController.add(
+      DownloadNotificationRecord(
+        type: NotificationEventType.progress,
+        id: id,
+        title: title,
+        body: body,
+        progress: safeProgress,
+      ),
+    );
+
     if (!_initialized) return;
 
     try {
-      final safeProgress = progressPercent.clamp(0, 100);
       final androidDetails = AndroidNotificationDetails(
         downloadChannelId,
         downloadChannelName,
@@ -129,12 +201,25 @@ class NotificationService {
         icon: '@mipmap/ic_launcher',
       );
 
-      final notifDetails = NotificationDetails(android: androidDetails);
+      final windowsDetails = WindowsNotificationDetails(
+        progressBars: [
+          WindowsProgressBar(
+            id: 'progress_$id',
+            status: body,
+            value: safeProgress / 100.0,
+          ),
+        ],
+      );
+
+      final notifDetails = NotificationDetails(
+        android: androidDetails,
+        windows: windowsDetails,
+      );
 
       await _notificationsPlugin.show(
         id: id,
         title: title,
-        body: '$stageDesc ($safeProgress%)',
+        body: body,
         notificationDetails: notifDetails,
       );
     } catch (e) {
@@ -147,7 +232,23 @@ class NotificationService {
     required int id,
     required String title,
     String? artist,
+    String? payload,
   }) async {
+    final body = (artist != null && artist.isNotEmpty && artist != 'Unknown')
+        ? '$artist • Đã lưu vào Google Drive & Thư viện thành công'
+        : 'Đã lưu vào Google Drive & Thư viện thành công';
+
+    _notificationRecordController.add(
+      DownloadNotificationRecord(
+        type: NotificationEventType.completed,
+        id: id,
+        title: '✓ Đã tải xong: $title',
+        body: body,
+        progress: 100,
+        payload: payload,
+      ),
+    );
+
     if (!_initialized) return;
 
     try {
@@ -166,6 +267,8 @@ class NotificationService {
         playSound: true,
         enableVibration: true,
         icon: '@mipmap/ic_launcher',
+        channelShowBadge: true,
+        category: AndroidNotificationCategory.status,
       );
 
       final notifDetails = const NotificationDetails(
@@ -180,16 +283,16 @@ class NotificationService {
           presentBadge: true,
           presentSound: true,
         ),
+        windows: WindowsNotificationDetails(),
+        linux: LinuxNotificationDetails(),
       );
-      final body = (artist != null && artist.isNotEmpty && artist != 'Unknown')
-          ? '$artist • Đã lưu vào Google Drive & Thư viện thành công'
-          : 'Đã lưu vào Google Drive & Thư viện thành công';
 
       await _notificationsPlugin.show(
         id: id,
         title: '✓ Đã tải xong: $title',
         body: body,
         notificationDetails: notifDetails,
+        payload: payload ?? title,
       );
     } catch (e) {
       debugPrint('[NotificationService] Lỗi hiển thị thông báo hoàn tất: $e');
@@ -202,6 +305,15 @@ class NotificationService {
     required String title,
     required String error,
   }) async {
+    _notificationRecordController.add(
+      DownloadNotificationRecord(
+        type: NotificationEventType.failed,
+        id: id,
+        title: '✕ Tải không thành công: $title',
+        body: error,
+      ),
+    );
+
     if (!_initialized) return;
 
     try {
@@ -219,6 +331,7 @@ class NotificationService {
         playSound: true,
         enableVibration: true,
         icon: '@mipmap/ic_launcher',
+        category: AndroidNotificationCategory.status,
       );
 
       final notifDetails = const NotificationDetails(
@@ -233,6 +346,8 @@ class NotificationService {
           presentBadge: true,
           presentSound: true,
         ),
+        windows: WindowsNotificationDetails(),
+        linux: LinuxNotificationDetails(),
       );
 
       await _notificationsPlugin.show(
@@ -248,6 +363,14 @@ class NotificationService {
 
   /// Hủy thông báo theo ID
   Future<void> cancel(int id) async {
+    _notificationRecordController.add(
+      DownloadNotificationRecord(
+        type: NotificationEventType.cancelled,
+        id: id,
+        title: 'Cancelled',
+      ),
+    );
+
     if (!_initialized) return;
     try {
       await _notificationsPlugin.cancel(id: id);

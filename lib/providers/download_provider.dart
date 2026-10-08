@@ -10,6 +10,7 @@ class DownloadProvider extends ChangeNotifier {
   final List<DownloadTask> _tasks = [];
   Timer? _timer;
   int _selectedTaskIndex = 0;
+  bool _disposed = false;
 
   List<DownloadTask> get tasks => List.unmodifiable(_tasks);
 
@@ -21,34 +22,48 @@ class DownloadProvider extends ChangeNotifier {
   int get selectedIndex => _selectedTaskIndex;
 
   DownloadTask? get primaryTask {
-    if (activeTasks.isNotEmpty) {
-      final safeIdx = _selectedTaskIndex.clamp(0, activeTasks.length - 1);
-      return activeTasks[safeIdx];
-    }
-    if (_tasks.isNotEmpty) {
-      return _tasks.last;
-    }
-    return null;
+    if (_tasks.isEmpty) return null;
+    final safeIdx = _selectedTaskIndex.clamp(0, _tasks.length - 1);
+    return _tasks[safeIdx];
   }
 
   void nextTask() {
-    if (activeTasks.length > 1) {
-      _selectedTaskIndex = (_selectedTaskIndex + 1) % activeTasks.length;
+    if (_tasks.length > 1) {
+      _selectedTaskIndex = (_selectedTaskIndex + 1) % _tasks.length;
       notifyListeners();
     }
   }
 
   void prevTask() {
-    if (activeTasks.length > 1) {
+    if (_tasks.length > 1) {
       _selectedTaskIndex =
-          (_selectedTaskIndex - 1 + activeTasks.length) % activeTasks.length;
+          (_selectedTaskIndex - 1 + _tasks.length) % _tasks.length;
       notifyListeners();
     }
+  }
+
+  void selectTask(int index) {
+    if (index >= 0 && index < _tasks.length) {
+      _selectedTaskIndex = index;
+      notifyListeners();
+    }
+  }
+
+  @visibleForTesting
+  void addTestTask(DownloadTask task) {
+    _tasks.add(task);
+    _selectedTaskIndex = _tasks.length - 1;
+    notifyListeners();
   }
 
   void _ensureTimer() {
     if (_timer != null && _timer!.isActive) return;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_disposed) {
+        timer.cancel();
+        return;
+      }
+
       bool changed = false;
       for (final task in _tasks) {
         if (task.isActive) {
@@ -72,16 +87,22 @@ class DownloadProvider extends ChangeNotifier {
             task.progress = (0.88 + ((task.elapsedSeconds - 24) * 0.01)).clamp(0.88, 0.96);
           }
 
-          // Cập nhật thanh tiến trình lên thông báo hệ thống của thiết bị
+          // Cập nhật thanh tiến trình lên thông báo hệ thống (chu kỳ 3s hoặc mốc quan trọng)
           final percent = (task.progress * 100).round().clamp(0, 100);
-          NotificationService.instance.showDownloadProgress(
-            id: task.notificationId,
-            title: task.title ?? 'Đang tải nhạc từ YouTube...',
-            stageDesc: task.stageDescriptionVi,
-            progressPercent: percent,
-          );
+          final shouldNotify = task.elapsedSeconds == 1 ||
+              (task.elapsedSeconds % 3 == 0) ||
+              percent >= 90;
+          if (shouldNotify) {
+            NotificationService.instance.showDownloadProgress(
+              id: task.notificationId,
+              title: task.title ?? 'Đang tải nhạc từ YouTube...',
+              stageDesc: task.stageDescriptionVi,
+              progressPercent: percent,
+            );
+          }
         }
       }
+
       if (changed) {
         notifyListeners();
       } else {
@@ -107,7 +128,7 @@ class DownloadProvider extends ChangeNotifier {
     );
 
     _tasks.add(task);
-    _selectedTaskIndex = activeTasks.length - 1;
+    _selectedTaskIndex = _tasks.length - 1;
     _ensureTimer();
     notifyListeners();
 
@@ -126,11 +147,17 @@ class DownloadProvider extends ChangeNotifier {
         saveToDrive: true,
       );
 
+      // Nếu người dùng đã hủy task trong lúc đang tải
+      if (!_tasks.any((t) => t.id == task.id)) {
+        return false;
+      }
+
       if (res['status'] == 'success') {
         task.stage = DownloadStage.completed;
         task.progress = 1.0;
         task.title = res['title']?.toString();
         task.artist = res['artist']?.toString();
+        task.songId = res['song_id']?.toString();
         notifyListeners();
 
         // Báo cho thiết bị biết tải thành công (Chuông / Rung / Heads-up notification)
@@ -138,6 +165,7 @@ class DownloadProvider extends ChangeNotifier {
           id: task.notificationId,
           title: task.title ?? 'Bài hát mới',
           artist: task.artist,
+          payload: task.songId,
         );
 
         // Tự động làm mới danh sách bài hát trong thư viện
@@ -164,6 +192,10 @@ class DownloadProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
+      if (!_tasks.any((t) => t.id == task.id)) {
+        return false;
+      }
+
       task.stage = DownloadStage.failed;
       var msg = e.toString();
       if (msg.contains('400') || msg.contains('HTTP 400')) {
@@ -196,10 +228,12 @@ class DownloadProvider extends ChangeNotifier {
   void dismissTask(String taskId) {
     final idx = _tasks.indexWhere((t) => t.id == taskId);
     if (idx != -1) {
-      NotificationService.instance.cancel(_tasks[idx].notificationId);
-      _tasks.removeAt(idx);
-      if (_selectedTaskIndex >= activeTasks.length && activeTasks.isNotEmpty) {
-        _selectedTaskIndex = activeTasks.length - 1;
+      final removed = _tasks.removeAt(idx);
+      NotificationService.instance.cancel(removed.notificationId);
+      if (_selectedTaskIndex >= _tasks.length && _tasks.isNotEmpty) {
+        _selectedTaskIndex = _tasks.length - 1;
+      } else if (_tasks.isEmpty) {
+        _selectedTaskIndex = 0;
       }
       notifyListeners();
     }
@@ -210,12 +244,24 @@ class DownloadProvider extends ChangeNotifier {
       NotificationService.instance.cancel(t.notificationId);
     }
     _tasks.removeWhere((t) => !t.isActive);
-    _selectedTaskIndex = 0;
+    if (_selectedTaskIndex >= _tasks.length && _tasks.isNotEmpty) {
+      _selectedTaskIndex = _tasks.length - 1;
+    } else {
+      _selectedTaskIndex = 0;
+    }
     notifyListeners();
   }
 
   @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
+  }
+
+  @override
   void dispose() {
+    _disposed = true;
     _timer?.cancel();
     super.dispose();
   }

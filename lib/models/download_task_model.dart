@@ -9,10 +9,13 @@ enum DownloadStage {
 }
 
 class DownloadTask {
+  static int _idCounter = 1000;
+
   final String id;
   final String url;
   String? title;
   String? artist;
+  String? songId;
   DownloadStage stage;
   double progress; // 0.0 -> 1.0
   int elapsedSeconds;
@@ -25,6 +28,7 @@ class DownloadTask {
     required this.url,
     this.title,
     this.artist,
+    this.songId,
     this.stage = DownloadStage.queued,
     this.progress = 0.05,
     this.elapsedSeconds = 0,
@@ -32,8 +36,7 @@ class DownloadTask {
     DateTime? startedAt,
     int? notificationId,
   })  : startedAt = startedAt ?? DateTime.now(),
-        notificationId =
-            notificationId ?? (id.hashCode.abs() % 100000 == 0 ? 1001 : id.hashCode.abs() % 100000);
+        notificationId = notificationId ?? (++_idCounter);
 
   String get stageTag {
     switch (stage) {

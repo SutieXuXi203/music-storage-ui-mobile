@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../models/song_model.dart';
 import '../../services/audio_player_service.dart';
+import '../../services/notification_service.dart';
 import '../../providers/song_provider.dart';
 import '../../providers/folder_provider.dart';
 import '../../widgets/mini_player_widget.dart';
@@ -21,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final List<Widget> _tabs;
+  StreamSubscription? _notifSub;
 
   @override
   void initState() {
@@ -37,6 +41,29 @@ class _HomeScreenState extends State<HomeScreen> {
       Provider.of<SongProvider>(context, listen: false).fetchSongs();
       Provider.of<FolderProvider>(context, listen: false).fetchFolders();
     });
+
+    _notifSub = NotificationService.onNotificationTapped.listen((payload) {
+      if (!mounted) return;
+      final songProv = Provider.of<SongProvider>(context, listen: false);
+      Song? matched;
+      for (final s in songProv.songs) {
+        if (s.id == payload || s.title.toLowerCase() == payload.toLowerCase()) {
+          matched = s;
+          break;
+        }
+      }
+      if (matched != null) {
+        audioPlayerService.playSong(matched);
+      } else {
+        _onTabTapped(2);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _notifSub?.cancel();
+    super.dispose();
   }
 
   void _onTabTapped(int index) {

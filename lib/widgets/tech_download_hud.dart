@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../core/theme/app_theme.dart';
 import '../models/download_task_model.dart';
 import '../models/song_model.dart';
 import '../providers/download_provider.dart';
@@ -33,26 +34,53 @@ class _TechDownloadHudState extends State<TechDownloadHud>
     super.dispose();
   }
 
-  void _safePlaySong(DownloadTask task, SongProvider songProv) {
+  void _safePlaySong(
+    BuildContext context,
+    DownloadTask task,
+    SongProvider songProv,
+  ) {
     Song? matched;
-    final taskTitle = task.title?.trim().toLowerCase();
 
-    if (taskTitle != null && taskTitle.isNotEmpty) {
+    // 1. Tìm chính xác theo songId từ cơ sở dữ liệu
+    if (task.songId != null && task.songId!.isNotEmpty) {
       for (final song in songProv.songs) {
-        final sTitle = song.title.trim().toLowerCase();
-        if (sTitle == taskTitle ||
-            sTitle.contains(taskTitle) ||
-            taskTitle.contains(sTitle)) {
+        if (song.id == task.songId) {
           matched = song;
           break;
         }
       }
     }
 
-    matched ??= songProv.songs.isNotEmpty ? songProv.songs.first : null;
+    // 2. Tìm theo tên bài hát nếu không khớp id
+    if (matched == null) {
+      final taskTitle = task.title?.trim().toLowerCase();
+      if (taskTitle != null && taskTitle.isNotEmpty) {
+        for (final song in songProv.songs) {
+          final sTitle = song.title.trim().toLowerCase();
+          if (sTitle == taskTitle ||
+              sTitle.contains(taskTitle) ||
+              taskTitle.contains(sTitle)) {
+            matched = song;
+            break;
+          }
+        }
+      }
+    }
 
+    // 3. Phát nếu tìm thấy, hoặc thông báo nếu không tìm thấy trong thư viện
     if (matched != null) {
       audioPlayerService.playSong(matched);
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Bài hát đã được lưu. Mở tab Thư viện để nghe.',
+            style: GoogleFonts.jetBrainsMono(fontSize: 12),
+          ),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -79,9 +107,9 @@ class _TechDownloadHudState extends State<TechDownloadHud>
         }
 
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final hudBg = isDark ? const Color(0xFF101217) : const Color(0xFFFFFFFF);
-        final textPrimary = isDark ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
-        final textMuted = isDark ? const Color(0xFF808896) : const Color(0xFF6B7280);
+        final hudBg = AppTheme.getSurfaceElevated(context);
+        final textPrimary = AppTheme.getText(context);
+        final textMuted = AppTheme.getTextMuted(context);
 
         Color accentColor;
         String statusLabel;
@@ -101,7 +129,7 @@ class _TechDownloadHudState extends State<TechDownloadHud>
           statusIcon = Icons.arrow_downward_rounded;
         }
 
-        final activeCount = downloadProv.activeTasks.length;
+        final tasksCount = downloadProv.tasks.length;
         final currentIdx = downloadProv.selectedIndex;
 
         return AnimatedSize(
@@ -112,7 +140,7 @@ class _TechDownloadHudState extends State<TechDownloadHud>
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: hudBg,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               border: Border.all(
                 color: accentColor.withValues(alpha: 0.40),
                 width: 1.0,
@@ -130,65 +158,68 @@ class _TechDownloadHudState extends State<TechDownloadHud>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Header Bar: [Icon + Status] ... [Timer + Multi-task + Dismiss]
+                // 1. Thanh tiêu đề: [Icon + Trạng thái] ... [Bộ đếm đa tác vụ + Timer + % + Nút đóng]
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (task.isActive)
-                          AnimatedBuilder(
-                            animation: _pulseController,
-                            builder: (context, _) {
-                              return Opacity(
-                                opacity: 0.4 + (_pulseController.value * 0.6),
-                                child: Icon(statusIcon, size: 14, color: accentColor),
-                              );
-                            },
-                          )
-                        else
-                          Icon(statusIcon, size: 14, color: accentColor),
-                        const SizedBox(width: 6),
-                        Text(
-                          statusLabel,
-                          style: GoogleFonts.jetBrainsMono(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.6,
-                            color: accentColor,
-                          ),
-                        ),
-                        if (activeCount > 1) ...[
-                          const SizedBox(width: 8),
-                          InkWell(
-                            onTap: downloadProv.prevTask,
-                            borderRadius: BorderRadius.circular(4),
-                            child: Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: Icon(Icons.chevron_left_rounded, size: 14, color: textMuted),
-                            ),
-                          ),
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (task.isActive)
+                            AnimatedBuilder(
+                              animation: _pulseController,
+                              builder: (context, _) {
+                                return Opacity(
+                                  opacity: 0.4 + (_pulseController.value * 0.6),
+                                  child: Icon(statusIcon, size: 14, color: accentColor),
+                                );
+                              },
+                            )
+                          else
+                            Icon(statusIcon, size: 14, color: accentColor),
+                          const SizedBox(width: 6),
                           Text(
-                            '${currentIdx + 1}/$activeCount',
+                            statusLabel,
                             style: GoogleFonts.jetBrainsMono(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w600,
-                              color: textPrimary,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                              color: accentColor,
                             ),
                           ),
-                          InkWell(
-                            onTap: downloadProv.nextTask,
-                            borderRadius: BorderRadius.circular(4),
-                            child: Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: Icon(Icons.chevron_right_rounded, size: 14, color: textMuted),
+                          if (tasksCount > 1) ...[
+                            const SizedBox(width: 8),
+                            InkWell(
+                              onTap: downloadProv.prevTask,
+                              borderRadius: BorderRadius.circular(4),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2),
+                                child: Icon(Icons.chevron_left_rounded, size: 14, color: textMuted),
+                              ),
                             ),
-                          ),
+                            Text(
+                              '${currentIdx + 1}/$tasksCount',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w600,
+                                color: textPrimary,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: downloadProv.nextTask,
+                              borderRadius: BorderRadius.circular(4),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2),
+                                child: Icon(Icons.chevron_right_rounded, size: 14, color: textMuted),
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           '[${task.formattedTimer}]',
@@ -226,13 +257,13 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                 ),
                 const SizedBox(height: 5),
 
-                // 2. Target info: Song Title / Artist or YouTube URL
+                // 2. Thông tin bài hát / Nghệ sĩ hoặc URL YouTube
                 Row(
                   children: [
                     Expanded(
                       child: Text(
                         task.title != null
-                            ? '${task.title}${task.artist != null && task.artist!.isNotEmpty ? " • ${task.artist}" : ""}'
+                            ? '${task.title}${task.artist != null && task.artist!.isNotEmpty && task.artist != 'Unknown' ? " • ${task.artist}" : ""}'
                             : task.url,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -247,7 +278,7 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                 ),
                 const SizedBox(height: 5),
 
-                // 3. Smooth Animated Progress Bar
+                // 3. Thanh tiến trình chạy mượt mà (Animated Progress Bar)
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(
                     begin: 0.0,
@@ -278,11 +309,11 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                 ),
                 const SizedBox(height: 5),
 
-                // 4. Execution Stage & Action Controls
+                // 4. Mô tả giai đoạn & Các nút thao tác
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Stage Step Indicator & Vietnamese Description
+                    // Tag giai đoạn & Mô tả tiếng Việt
                     Expanded(
                       child: Row(
                         children: [
@@ -317,14 +348,14 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                       ),
                     ),
 
-                    // Action Controls: [▶ PHÁT] / [↻ THỬ LẠI] / [HỦY]
+                    // Nút điều khiển: [▶ PHÁT] / [↻ THỬ LẠI] / [HỦY] / [ĐÓNG]
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (task.stage == DownloadStage.completed) ...[
                           InkWell(
                             onTap: () {
-                              _safePlaySong(task, songProv);
+                              _safePlaySong(context, task, songProv);
                               downloadProv.dismissTask(task.id);
                             },
                             borderRadius: BorderRadius.circular(4),
