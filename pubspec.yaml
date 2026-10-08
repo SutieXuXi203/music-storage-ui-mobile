@@ -1,7 +1,7 @@
 name: mobile_ui
 description: "Ứng dụng nghe nhạc Music Storage đa nền tảng kết nối FastAPI & Google Drive"
 publish_to: "none"
-version: 1.0.8+9
+version: 1.0.9+10
 
 environment:
   sdk: ^3.5.0
@@ -29,6 +29,7 @@ dependencies:
   flutter_spinkit: ^5.2.1
   reicon_flutter: ^1.0.1
   flutter_svg: ^2.3.0
+  flutter_local_notifications: ^22.3.1
 
 dev_dependencies:
   flutter_test:

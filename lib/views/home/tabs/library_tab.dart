@@ -107,6 +107,35 @@ class _LibraryTabState extends State<LibraryTab> {
               final songProv = Provider.of<SongProvider>(context, listen: false);
               final downloadProv = Provider.of<DownloadProvider>(context, listen: false);
               downloadProv.startDownload(url, songProvider: songProv);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  backgroundColor: AppTheme.getSurfaceElevated(context),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                  ),
+                  content: Row(
+                    children: [
+                      const Icon(Icons.downloading_rounded, size: 18, color: Color(0xFF38BDF8)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Đang tải bài hát từ YouTube. Thiết bị sẽ có thông báo khi hoàn tất.',
+                          style: AppTheme.monoStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.getText(context),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
             }
           }
 

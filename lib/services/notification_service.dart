@@ -1,0 +1,258 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+class NotificationService {
+  NotificationService._internal();
+  static final NotificationService instance = NotificationService._internal();
+
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  bool _initialized = false;
+
+  static const String downloadChannelId = 'download_progress_channel';
+  static const String downloadChannelName = 'Tiến trình tải nhạc';
+  static const String downloadChannelDesc =
+      'Hiển thị thông báo và thanh tiến trình khi tải bài hát từ YouTube vào Google Drive';
+
+  static const String downloadCompletedChannelId = 'download_completed_channel';
+  static const String downloadCompletedChannelName = 'Thông báo tải hoàn tất';
+  static const String downloadCompletedChannelDesc =
+      'Thông báo khi bài hát đã tải xuống thành công và lưu vào thư viện';
+
+  Future<void> init() async {
+    if (_initialized) return;
+
+    if (!kIsWeb &&
+        (Platform.isAndroid ||
+            Platform.isIOS ||
+            Platform.isMacOS ||
+            Platform.isWindows ||
+            Platform.isLinux)) {
+      try {
+        const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+        const darwinInit = DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
+        const linuxInit = LinuxInitializationSettings(
+          defaultActionName: 'Open notification',
+        );
+        const windowsInit = WindowsInitializationSettings(
+          appName: 'Sutorage',
+          appUserModelId: 'com.sutiexuxi.musicapp.mobile_ui',
+          guid: '2d1c69c1-7ef4-4f0f-8b9a-4c28f9d0c641',
+        );
+
+        final initSettings = const InitializationSettings(
+          android: androidInit,
+          iOS: darwinInit,
+          macOS: darwinInit,
+          linux: linuxInit,
+          windows: windowsInit,
+        );
+
+        await _notificationsPlugin.initialize(
+          settings: initSettings,
+        );
+
+        // Tạo Notification Channels và xin quyền trên Android
+        if (Platform.isAndroid) {
+          final androidPlatform = _notificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+
+          if (androidPlatform != null) {
+            // Channel 1: Tiến trình tải nhạc (Silent, Low importance)
+            const progressChannel = AndroidNotificationChannel(
+              downloadChannelId,
+              downloadChannelName,
+              description: downloadChannelDesc,
+              importance: Importance.low,
+              playSound: false,
+              enableVibration: false,
+              showBadge: false,
+            );
+            await androidPlatform.createNotificationChannel(progressChannel);
+
+            // Channel 2: Tải hoàn tất (Alert, High importance, Sound + Vibration)
+            const completedChannel = AndroidNotificationChannel(
+              downloadCompletedChannelId,
+              downloadCompletedChannelName,
+              description: downloadCompletedChannelDesc,
+              importance: Importance.high,
+              playSound: true,
+              enableVibration: true,
+              showBadge: true,
+            );
+            await androidPlatform.createNotificationChannel(completedChannel);
+
+            // Xin cấp quyền hiển thị thông báo (bắt buộc từ Android 13 / Tiramisu)
+            await androidPlatform.requestNotificationsPermission();
+          }
+        }
+
+        _initialized = true;
+      } catch (e) {
+        debugPrint('[NotificationService] Lỗi khởi tạo thông báo: $e');
+      }
+    }
+  }
+
+  /// Hiển thị thanh tiến trình tải bài hát trên thanh thông báo của thiết bị
+  Future<void> showDownloadProgress({
+    required int id,
+    required String title,
+    required String stageDesc,
+    required int progressPercent,
+  }) async {
+    if (!_initialized) return;
+
+    try {
+      final safeProgress = progressPercent.clamp(0, 100);
+      final androidDetails = AndroidNotificationDetails(
+        downloadChannelId,
+        downloadChannelName,
+        channelDescription: downloadChannelDesc,
+        importance: Importance.low,
+        priority: Priority.low,
+        showProgress: true,
+        maxProgress: 100,
+        progress: safeProgress,
+        ongoing: true,
+        onlyAlertOnce: true,
+        autoCancel: false,
+        playSound: false,
+        enableVibration: false,
+        icon: '@mipmap/ic_launcher',
+      );
+
+      final notifDetails = NotificationDetails(android: androidDetails);
+
+      await _notificationsPlugin.show(
+        id: id,
+        title: title,
+        body: '$stageDesc ($safeProgress%)',
+        notificationDetails: notifDetails,
+      );
+    } catch (e) {
+      debugPrint('[NotificationService] Lỗi cập nhật thông báo tiến trình: $e');
+    }
+  }
+
+  /// Thông báo bài hát đã được tải và đồng bộ hoàn tất từ thiết bị đang sử dụng
+  Future<void> showDownloadCompleted({
+    required int id,
+    required String title,
+    String? artist,
+  }) async {
+    if (!_initialized) return;
+
+    try {
+      // Hủy bỏ thanh tiến trình đang hiển thị
+      await _notificationsPlugin.cancel(id: id);
+
+      const androidDetails = AndroidNotificationDetails(
+        downloadCompletedChannelId,
+        downloadCompletedChannelName,
+        channelDescription: downloadCompletedChannelDesc,
+        importance: Importance.high,
+        priority: Priority.high,
+        showProgress: false,
+        ongoing: false,
+        autoCancel: true,
+        playSound: true,
+        enableVibration: true,
+        icon: '@mipmap/ic_launcher',
+      );
+
+      final notifDetails = const NotificationDetails(
+        android: androidDetails,
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      );
+      final body = (artist != null && artist.isNotEmpty && artist != 'Unknown')
+          ? '$artist • Đã lưu vào Google Drive & Thư viện thành công'
+          : 'Đã lưu vào Google Drive & Thư viện thành công';
+
+      await _notificationsPlugin.show(
+        id: id,
+        title: '✓ Đã tải xong: $title',
+        body: body,
+        notificationDetails: notifDetails,
+      );
+    } catch (e) {
+      debugPrint('[NotificationService] Lỗi hiển thị thông báo hoàn tất: $e');
+    }
+  }
+
+  /// Thông báo tải bài hát gặp lỗi
+  Future<void> showDownloadFailed({
+    required int id,
+    required String title,
+    required String error,
+  }) async {
+    if (!_initialized) return;
+
+    try {
+      await _notificationsPlugin.cancel(id: id);
+
+      const androidDetails = AndroidNotificationDetails(
+        downloadCompletedChannelId,
+        downloadCompletedChannelName,
+        channelDescription: downloadCompletedChannelDesc,
+        importance: Importance.high,
+        priority: Priority.high,
+        showProgress: false,
+        ongoing: false,
+        autoCancel: true,
+        playSound: true,
+        enableVibration: true,
+        icon: '@mipmap/ic_launcher',
+      );
+
+      final notifDetails = const NotificationDetails(
+        android: androidDetails,
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      );
+
+      await _notificationsPlugin.show(
+        id: id,
+        title: '✕ Tải không thành công: $title',
+        body: error,
+        notificationDetails: notifDetails,
+      );
+    } catch (e) {
+      debugPrint('[NotificationService] Lỗi hiển thị thông báo thất bại: $e');
+    }
+  }
+
+  /// Hủy thông báo theo ID
+  Future<void> cancel(int id) async {
+    if (!_initialized) return;
+    try {
+      await _notificationsPlugin.cancel(id: id);
+    } catch (e) {
+      debugPrint('[NotificationService] Lỗi hủy thông báo: $e');
+    }
+  }
+}

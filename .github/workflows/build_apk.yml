@@ -71,14 +71,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.8
-          name: Sutorage App Release v1.0.8
+          tag_name: v1.0.9
+          name: Sutorage App Release v1.0.9
           body: |
-            ## Sutorage Music App Android Release v1.0.8
+            ## Sutorage Music App Android Release v1.0.9
             - Tên hiển thị trên điện thoại: **Sutorage**
-            - Phiên bản: **v1.0.8** (Build 9)
-            - Khắc phục triệt để lỗi phân quyền và cô lập thư mục riêng tư giữa các tài khoản: mỗi tài khoản chỉ xem và quản lý bài hát của chính mình.
-            - Đồng bộ dọn sạch dữ liệu bộ nhớ đệm (RAM) khi đăng xuất và tự động làm mới khi đăng nhập tài khoản khác.
+            - Phiên bản: **v1.0.9** (Build 10)
+            - **Thông báo thanh trạng thái thiết bị**: Tự động hiển thị tiến trình và % tải nhạc trực tiếp lên thanh thông báo của điện thoại theo thời gian thực khi thoát ứng dụng ra màn hình chính.
+            - Thông báo rung/chuông khi hoàn tất tải nhạc và lưu vào thư viện / Google Drive.
+            - Hỗ trợ tải ngầm (Background download) không bị gián đoạn.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `sutorage.apk` bên dưới về điện thoại và cài đặt.
           files: build/app/outputs/flutter-apk/sutorage.apk

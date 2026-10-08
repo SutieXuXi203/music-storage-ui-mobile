@@ -7,11 +7,16 @@ import 'providers/download_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/song_provider.dart';
 import 'providers/folder_provider.dart';
+import 'services/notification_service.dart';
 import 'views/auth/login_screen.dart';
 import 'views/home/home_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Khởi tạo hệ thống thông báo đẩy trên thiết bị (tiến trình tải ngầm)
+  await NotificationService.instance.init();
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

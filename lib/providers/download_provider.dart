@@ -2,12 +2,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/download_task_model.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 import 'song_provider.dart';
 
 class DownloadProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   final List<DownloadTask> _tasks = [];
   Timer? _timer;
+  int _selectedTaskIndex = 0;
 
   List<DownloadTask> get tasks => List.unmodifiable(_tasks);
 
@@ -16,14 +18,32 @@ class DownloadProvider extends ChangeNotifier {
   List<DownloadTask> get activeTasks =>
       _tasks.where((t) => t.isActive).toList();
 
+  int get selectedIndex => _selectedTaskIndex;
+
   DownloadTask? get primaryTask {
     if (activeTasks.isNotEmpty) {
-      return activeTasks.last;
+      final safeIdx = _selectedTaskIndex.clamp(0, activeTasks.length - 1);
+      return activeTasks[safeIdx];
     }
     if (_tasks.isNotEmpty) {
       return _tasks.last;
     }
     return null;
+  }
+
+  void nextTask() {
+    if (activeTasks.length > 1) {
+      _selectedTaskIndex = (_selectedTaskIndex + 1) % activeTasks.length;
+      notifyListeners();
+    }
+  }
+
+  void prevTask() {
+    if (activeTasks.length > 1) {
+      _selectedTaskIndex =
+          (_selectedTaskIndex - 1 + activeTasks.length) % activeTasks.length;
+      notifyListeners();
+    }
   }
 
   void _ensureTimer() {
@@ -35,7 +55,7 @@ class DownloadProvider extends ChangeNotifier {
           task.elapsedSeconds += 1;
           changed = true;
 
-          // Cập nhật tiến trình và stage giả định theo thời gian thực thi
+          // Cập nhật tiến trình và stage mô phỏng theo thời gian thực thi
           if (task.elapsedSeconds <= 3) {
             task.stage = DownloadStage.connecting;
             task.progress = (0.05 + task.elapsedSeconds * 0.05).clamp(0.0, 0.20);
@@ -51,6 +71,15 @@ class DownloadProvider extends ChangeNotifier {
             task.stage = DownloadStage.indexingDb;
             task.progress = (0.88 + ((task.elapsedSeconds - 24) * 0.01)).clamp(0.88, 0.96);
           }
+
+          // Cập nhật thanh tiến trình lên thông báo hệ thống của thiết bị
+          final percent = (task.progress * 100).round().clamp(0, 100);
+          NotificationService.instance.showDownloadProgress(
+            id: task.notificationId,
+            title: task.title ?? 'Đang tải nhạc từ YouTube...',
+            stageDesc: task.stageDescriptionVi,
+            progressPercent: percent,
+          );
         }
       }
       if (changed) {
@@ -78,8 +107,17 @@ class DownloadProvider extends ChangeNotifier {
     );
 
     _tasks.add(task);
+    _selectedTaskIndex = activeTasks.length - 1;
     _ensureTimer();
     notifyListeners();
+
+    // Hiển thị ngay thông báo bắt đầu tải lên hệ thống của thiết bị
+    NotificationService.instance.showDownloadProgress(
+      id: task.notificationId,
+      title: 'Đang kết nối YouTube...',
+      stageDesc: task.stageDescriptionVi,
+      progressPercent: 8,
+    );
 
     try {
       final res = await _apiService.downloadFromYoutube(
@@ -95,13 +133,34 @@ class DownloadProvider extends ChangeNotifier {
         task.artist = res['artist']?.toString();
         notifyListeners();
 
+        // Báo cho thiết bị biết tải thành công (Chuông / Rung / Heads-up notification)
+        await NotificationService.instance.showDownloadCompleted(
+          id: task.notificationId,
+          title: task.title ?? 'Bài hát mới',
+          artist: task.artist,
+        );
+
         // Tự động làm mới danh sách bài hát trong thư viện
         await songProvider.fetchSongs();
+
+        // Tự động đóng HUD sau 12 giây nếu người dùng không bấm play/dismiss
+        Future.delayed(const Duration(seconds: 12), () {
+          if (_tasks.any((t) => t.id == task.id && t.stage == DownloadStage.completed)) {
+            dismissTask(task.id);
+          }
+        });
+
         return true;
       } else {
         task.stage = DownloadStage.failed;
         task.errorMessage = res['message']?.toString() ?? 'Lỗi không xác định từ máy chủ';
         notifyListeners();
+
+        await NotificationService.instance.showDownloadFailed(
+          id: task.notificationId,
+          title: task.title ?? 'Tải nhạc từ YouTube',
+          error: task.errorMessage!,
+        );
         return false;
       }
     } catch (e) {
@@ -114,6 +173,12 @@ class DownloadProvider extends ChangeNotifier {
       }
       task.errorMessage = msg;
       notifyListeners();
+
+      await NotificationService.instance.showDownloadFailed(
+        id: task.notificationId,
+        title: task.title ?? 'Tải nhạc từ YouTube',
+        error: msg,
+      );
       return false;
     }
   }
@@ -123,17 +188,29 @@ class DownloadProvider extends ChangeNotifier {
     if (idx != -1) {
       final old = _tasks[idx];
       _tasks.removeAt(idx);
+      NotificationService.instance.cancel(old.notificationId);
       startDownload(old.url, songProvider: songProvider);
     }
   }
 
   void dismissTask(String taskId) {
-    _tasks.removeWhere((t) => t.id == taskId);
-    notifyListeners();
+    final idx = _tasks.indexWhere((t) => t.id == taskId);
+    if (idx != -1) {
+      NotificationService.instance.cancel(_tasks[idx].notificationId);
+      _tasks.removeAt(idx);
+      if (_selectedTaskIndex >= activeTasks.length && activeTasks.isNotEmpty) {
+        _selectedTaskIndex = activeTasks.length - 1;
+      }
+      notifyListeners();
+    }
   }
 
   void clearCompleted() {
+    for (final t in _tasks.where((t) => !t.isActive)) {
+      NotificationService.instance.cancel(t.notificationId);
+    }
     _tasks.removeWhere((t) => !t.isActive);
+    _selectedTaskIndex = 0;
     notifyListeners();
   }
 

@@ -15,8 +15,10 @@ class SongProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String get searchQuery => _searchQuery;
 
-  SongProvider() {
-    fetchSongs();
+  SongProvider({bool autoFetch = true}) {
+    if (autoFetch) {
+      fetchSongs();
+    }
   }
 
   void clear() {

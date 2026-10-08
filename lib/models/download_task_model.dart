@@ -18,6 +18,7 @@ class DownloadTask {
   int elapsedSeconds;
   String? errorMessage;
   final DateTime startedAt;
+  final int notificationId;
 
   DownloadTask({
     required this.id,
@@ -29,7 +30,10 @@ class DownloadTask {
     this.elapsedSeconds = 0,
     this.errorMessage,
     DateTime? startedAt,
-  }) : startedAt = startedAt ?? DateTime.now();
+    int? notificationId,
+  })  : startedAt = startedAt ?? DateTime.now(),
+        notificationId =
+            notificationId ?? (id.hashCode.abs() % 100000 == 0 ? 1001 : id.hashCode.abs() % 100000);
 
   String get stageTag {
     switch (stage) {
@@ -50,22 +54,61 @@ class DownloadTask {
     }
   }
 
-  String get stageDescription {
+  String get stageShortVi {
     switch (stage) {
       case DownloadStage.queued:
-        return 'WAITING IN QUEUE...';
+        return 'Hàng đợi';
       case DownloadStage.connecting:
-        return 'INITIALIZING STREAM METADATA';
+        return 'Kết nối';
       case DownloadStage.extracting:
-        return 'DOWNLOADING & CONVERTING MP3 320K';
+        return 'Trích xuất MP3';
       case DownloadStage.syncingDrive:
-        return 'UPLOADING TO GOOGLE DRIVE STORAGE';
+        return 'Lưu Google Drive';
       case DownloadStage.indexingDb:
-        return 'INDEXING RECORD IN DATABASE';
+        return 'Lưu Thư viện';
       case DownloadStage.completed:
-        return 'INGEST SUCCESSFUL // READY';
+        return 'Thành công';
       case DownloadStage.failed:
-        return errorMessage ?? 'INGESTION FAILED // ABORTED';
+        return 'Thất bại';
+    }
+  }
+
+  String get stageDescriptionVi {
+    switch (stage) {
+      case DownloadStage.queued:
+        return 'Đang chờ trong hàng đợi...';
+      case DownloadStage.connecting:
+        return 'Đang kết nối & nạp dữ liệu YouTube...';
+      case DownloadStage.extracting:
+        return 'Đang trích xuất & chuyển đổi MP3 320kbps...';
+      case DownloadStage.syncingDrive:
+        return 'Đang đồng bộ âm thanh lên Google Drive...';
+      case DownloadStage.indexingDb:
+        return 'Đang lập chỉ mục & lưu vào thư viện bài hát...';
+      case DownloadStage.completed:
+        return 'Đã tải xong! Đã lưu vào Google Drive & Thư viện';
+      case DownloadStage.failed:
+        return errorMessage ?? 'Tải bài hát không thành công';
+    }
+  }
+
+  String get stageDescription => stageDescriptionVi;
+
+  int get stageStep {
+    switch (stage) {
+      case DownloadStage.queued:
+        return 0;
+      case DownloadStage.connecting:
+        return 1;
+      case DownloadStage.extracting:
+        return 2;
+      case DownloadStage.syncingDrive:
+        return 3;
+      case DownloadStage.indexingDb:
+      case DownloadStage.completed:
+        return 4;
+      case DownloadStage.failed:
+        return 0;
     }
   }
 
