@@ -83,15 +83,26 @@ class _HomeTabState extends State<HomeTab> {
                 Navigator.pop(ctx);
                 final folderProv = Provider.of<FolderProvider>(context, listen: false);
                 final folder = await folderProv.createFolder(name);
-                if (context.mounted && folder != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
-                      duration: const Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: AppTheme.getSurfaceElevated(context),
-                    ),
-                  );
+                if (context.mounted) {
+                  if (folder != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: AppTheme.getSurfaceElevated(context),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(folderProv.errorMessage ?? 'Tạo thư mục thất bại. Vui lòng thử lại!', style: AppTheme.monoStyle(fontSize: 12)),
+                        duration: const Duration(seconds: 3),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: AppTheme.getDanger(context),
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -142,11 +153,11 @@ class _HomeTabState extends State<HomeTab> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'MUSIC_STORAGE',
+                        'MEOWSIC',
                         style: AppTheme.monoStyle(
-                          fontSize: 16,
+                          fontSize: 17,
                           fontWeight: FontWeight.w800,
-                          letterSpacing: 0.8,
+                          letterSpacing: 1.2,
                           color: AppTheme.getText(context),
                         ),
                       ),

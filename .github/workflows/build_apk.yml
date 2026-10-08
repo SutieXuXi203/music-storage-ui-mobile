@@ -59,29 +59,32 @@ jobs:
       - name: Build APK Release
         run: |
           flutter build apk --release --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/meowsic.apk
           cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/sutorage.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Sutorage-Release-APK
-          path: build/app/outputs/flutter-apk/sutorage.apk
+          name: Meowsic-Release-APK
+          path: build/app/outputs/flutter-apk/meowsic.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.10
-          name: Sutorage App Release v1.0.10
+          tag_name: v1.0.11
+          name: Meowsic App Release v1.0.11
           body: |
-            ## Sutorage Music App Android Release v1.0.10
-            - Tên hiển thị trên điện thoại: **Sutorage**
-            - Phiên bản: **v1.0.10** (Build 11)
-            - **Cải tiến HUD & Thông báo đa tiến trình**: Điều hướng trực quan giữa các tác vụ tải ngầm (multi-task HUD navigation).
-            - Khớp bài hát chính xác hơn sau khi tải xong và tự động đồng bộ vào thư viện.
-            - Hỗ trợ đầy đủ thông báo thanh trạng thái thiết bị thời gian thực khi ẩn ứng dụng.
+            ## Meowsic Music App Android Release v1.0.11
+            - Tên hiển thị trên điện thoại: **Meowsic**
+            - Phiên bản: **v1.0.11** (Build 12)
+            - **Đổi tên ứng dụng chính thức thành Meowsic**: Cập nhật nhận diện thương hiệu, tiêu đề và branding đồng bộ.
+            - **Tối ưu Thư mục bộ sưu tập (Collection Folders)**: Gom nhóm và phân loại bài hát mượt mà, hiển thị thông báo kết quả và xử lý lỗi chi tiết.
+            - **Tương thích API**: Mở rộng kết nối API 2 chiều linh hoạt giữa mobile và backend.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
-            - Tải file `sutorage.apk` bên dưới về điện thoại và cài đặt.
-          files: build/app/outputs/flutter-apk/sutorage.apk
+            - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
+          files: |
+            build/app/outputs/flutter-apk/meowsic.apk
+            build/app/outputs/flutter-apk/sutorage.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

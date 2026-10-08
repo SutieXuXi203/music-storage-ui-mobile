@@ -94,7 +94,7 @@ class NotificationService {
           defaultActionName: 'Open notification',
         );
         const windowsInit = WindowsInitializationSettings(
-          appName: 'MeowSic',
+          appName: 'Meowsic',
           appUserModelId: 'com.sutiexuxi.musicapp.mobile_ui',
           guid: '2d1c69c1-7ef4-4f0f-8b9a-4c28f9d0c641',
         );

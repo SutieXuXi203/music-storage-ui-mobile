@@ -18,6 +18,9 @@ class FolderProvider extends ChangeNotifier {
   Folder? get currentFolder => _currentFolder;
   bool get isLoadingDetails => _isLoadingDetails;
 
+  List<Playlist> get playlists => _folders;
+  Playlist? get currentPlaylist => _currentFolder;
+
   FolderProvider() {
     fetchFolders();
   }
@@ -37,30 +40,38 @@ class FolderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _folders = await apiService.getFolders();
+      _folders = await apiService.getPlaylists();
     } catch (e) {
-      _errorMessage = 'Không thể tải danh sách thư mục: $e';
+      _errorMessage = 'Không thể tải danh sách thư mục: ${apiService.lastErrorMessage ?? e}';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<Folder?> createFolder(String name) async {
+  Future<void> fetchPlaylists() => fetchFolders();
+
+  Future<Playlist?> createFolder(String name) async {
+    _errorMessage = null;
     try {
-      final newFolder = await apiService.createFolder(name);
+      final newFolder = await apiService.createPlaylist(name);
       if (newFolder != null) {
         _folders.insert(0, newFolder);
         notifyListeners();
         return newFolder;
       }
+      _errorMessage = apiService.lastErrorMessage ?? 'Tạo thư mục thất bại. Vui lòng kiểm tra lại.';
+      notifyListeners();
       return null;
     } catch (e) {
-      _errorMessage = 'Tạo thư mục thất bại: $e';
+      _errorMessage = apiService.lastErrorMessage ?? 'Tạo thư mục thất bại: $e';
       notifyListeners();
       return null;
     }
   }
+
+  Future<Playlist?> createPlaylist(String name) => createFolder(name);
+
 
   Future<bool> renameFolder(String folderId, String newName) async {
     try {
@@ -224,3 +235,7 @@ class FolderProvider extends ChangeNotifier {
     }
   }
 }
+
+// Tương thích ngược
+typedef PlaylistProvider = FolderProvider;
+

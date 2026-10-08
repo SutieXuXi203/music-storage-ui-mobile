@@ -124,11 +124,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'MUSIC_STORAGE',
+                          'MEOWSIC',
                           style: AppTheme.monoStyle(
-                            fontSize: 19,
+                            fontSize: 20,
                             fontWeight: FontWeight.w800,
-                            letterSpacing: 1.0,
+                            letterSpacing: 1.5,
                             color: AppTheme.getText(context),
                           ),
                         ),

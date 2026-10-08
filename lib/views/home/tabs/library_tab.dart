@@ -331,15 +331,26 @@ class _LibraryTabState extends State<LibraryTab> {
                 Navigator.pop(ctx);
                 final folderProv = Provider.of<FolderProvider>(context, listen: false);
                 final folder = await folderProv.createFolder(name);
-                if (mounted && folder != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
-                      duration: const Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: AppTheme.getSurfaceElevated(context),
-                    ),
-                  );
+                if (mounted) {
+                  if (folder != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: AppTheme.getSurfaceElevated(context),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(folderProv.errorMessage ?? 'Tạo thư mục thất bại. Vui lòng thử lại!', style: AppTheme.monoStyle(fontSize: 12)),
+                        duration: const Duration(seconds: 3),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: AppTheme.getDanger(context),
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -349,6 +360,7 @@ class _LibraryTabState extends State<LibraryTab> {
       ),
     );
   }
+
 
   void _showRenameFolderDialog(Folder folder) {
     final controller = TextEditingController(text: folder.name);
@@ -369,7 +381,7 @@ class _LibraryTabState extends State<LibraryTab> {
           autofocus: true,
           style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
           decoration: InputDecoration(
-            hintText: 'Nhập tên mới...',
+            hintText: 'Nhập tên thư mục mới...',
             hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
             isDense: true,
             filled: true,
@@ -395,7 +407,15 @@ class _LibraryTabState extends State<LibraryTab> {
               if (newName.isNotEmpty) {
                 Navigator.pop(ctx);
                 final folderProv = Provider.of<FolderProvider>(context, listen: false);
-                await folderProv.renameFolder(folder.id, newName);
+                final ok = await folderProv.renameFolder(folder.id, newName);
+                if (mounted && ok) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Đã đổi tên thư mục thành "$newName"', style: AppTheme.monoStyle(fontSize: 12)),
+                      backgroundColor: AppTheme.getSurfaceElevated(context),
+                    ),
+                  );
+                }
               }
             },
             child: const Text('Lưu', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
@@ -451,6 +471,7 @@ class _LibraryTabState extends State<LibraryTab> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -714,7 +735,7 @@ class _LibraryTabState extends State<LibraryTab> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      'Drive',
+                      'Mặc định',
                       style: AppTheme.monoStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w700,
@@ -769,6 +790,7 @@ class _LibraryTabState extends State<LibraryTab> {
                   ),
               ],
             ),
+
             onTap: () {
               Navigator.push(
                 context,

@@ -1,6 +1,6 @@
 import 'song_model.dart';
 
-class Folder {
+class Playlist {
   final String id;
   final String name;
   final String userId;
@@ -13,7 +13,7 @@ class Folder {
   final DateTime? updatedAt;
   final List<Song> songs;
 
-  Folder({
+  Playlist({
     required this.id,
     required this.name,
     required this.userId,
@@ -27,7 +27,7 @@ class Folder {
     this.songs = const [],
   });
 
-  factory Folder.fromJson(Map<String, dynamic> json) {
+  factory Playlist.fromJson(Map<String, dynamic> json) {
     final rawSongIds = json['song_ids'];
     List<String> parsedSongIds = [];
     if (rawSongIds is List) {
@@ -53,10 +53,11 @@ class Folder {
         ? (json['song_count'] as num).toInt()
         : parsedSongIds.length;
 
-    return Folder(
+    return Playlist(
       id: id,
       name: json['name']?.toString() ?? 'Thư mục không tên',
       userId: json['user_id']?.toString() ?? '',
+
       driveFolderId: json['drive_folder_id']?.toString(),
       isDefault: json['is_default'] == true,
       songIds: parsedSongIds,
@@ -83,7 +84,7 @@ class Folder {
     };
   }
 
-  Folder copyWith({
+  Playlist copyWith({
     String? id,
     String? name,
     String? userId,
@@ -96,7 +97,7 @@ class Folder {
     DateTime? updatedAt,
     List<Song>? songs,
   }) {
-    return Folder(
+    return Playlist(
       id: id ?? this.id,
       name: name ?? this.name,
       userId: userId ?? this.userId,
@@ -111,3 +112,7 @@ class Folder {
     );
   }
 }
+
+// Tương thích ngược
+typedef Folder = Playlist;
+
