@@ -75,26 +75,32 @@ class _TechDownloadHudState extends State<TechDownloadHud>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        '[SYS://INGEST_DAEMON]',
-                        style: GoogleFonts.jetBrainsMono(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                          color: accentColor,
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '[SYS://INGEST_DAEMON]',
+                            style: GoogleFonts.jetBrainsMono(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: accentColor,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '#${task.id}',
-                        style: GoogleFonts.jetBrainsMono(
-                          fontSize: 9.5,
-                          color: textMuted,
+                        const SizedBox(width: 6),
+                        Text(
+                          '#${task.id}',
+                          style: GoogleFonts.jetBrainsMono(
+                            fontSize: 9.5,
+                            color: textMuted,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Row(
                     children: [

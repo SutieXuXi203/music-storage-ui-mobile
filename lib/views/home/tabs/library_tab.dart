@@ -94,105 +94,148 @@ class _LibraryTabState extends State<LibraryTab> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.getSurfaceElevated(context),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero, // Góc vuông chuẩn Terminal
-          side: BorderSide(color: AppTheme.getBorder(context), width: 1.0),
-        ),
-        title: Text(
-          '[CMD://INGEST_YOUTUBE_STREAM]',
-          style: GoogleFonts.jetBrainsMono(
-            fontWeight: FontWeight.w700,
-            fontSize: 13.5,
-            letterSpacing: 0.5,
-            color: const Color(0xFF38BDF8),
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '> TARGET: HTTPS://YOUTUBE_AUDIO_EXTRACTION',
-              style: GoogleFonts.jetBrainsMono(
-                color: AppTheme.getTextSecondary(context),
-                fontSize: 11,
-              ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          final screenWidth = MediaQuery.of(ctx).size.width;
+          // Cố định chiều rộng chuẩn Terminal, không bị co giãn hay vỡ layout khi paste URL dài
+          final dialogWidth = (screenWidth * 0.9).clamp(320.0, 440.0);
+
+          void submit() {
+            final url = urlController.text.replaceAll('\r', '').replaceAll('\n', '').trim();
+            if (url.isNotEmpty) {
+              Navigator.pop(ctx);
+              final songProv = Provider.of<SongProvider>(context, listen: false);
+              final downloadProv = Provider.of<DownloadProvider>(context, listen: false);
+              downloadProv.startDownload(url, songProvider: songProv);
+            }
+          }
+
+          return AlertDialog(
+            backgroundColor: AppTheme.getSurfaceElevated(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // Góc vuông chuẩn Terminal
+              side: BorderSide(color: AppTheme.getBorder(context), width: 1.0),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: urlController,
-              autofocus: true,
-              style: GoogleFonts.jetBrainsMono(
-                color: AppTheme.getText(context),
-                fontSize: 12,
-              ),
-              decoration: InputDecoration(
-                isDense: true,
-                filled: true,
-                fillColor: AppTheme.getSurface(context),
-                hintText: 'https://youtube.com/watch?v=...',
-                hintStyle: GoogleFonts.jetBrainsMono(
-                  fontSize: 11,
-                  color: AppTheme.getTextMuted(context),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            titlePadding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '[CMD://INGEST_YOUTUBE_STREAM]',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                      letterSpacing: 0.5,
+                      color: const Color(0xFF38BDF8),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                prefixText: '> ',
-                prefixStyle: GoogleFonts.jetBrainsMono(
-                  color: const Color(0xFF38BDF8),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: Color(0xFF38BDF8), width: 1.2),
-                ),
+              ],
+            ),
+            content: SizedBox(
+              width: dialogWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '> TARGET: HTTPS://YOUTUBE_AUDIO_EXTRACTION',
+                    style: GoogleFonts.jetBrainsMono(
+                      color: AppTheme.getTextSecondary(context),
+                      fontSize: 11,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: urlController,
+                    autofocus: true,
+                    maxLines: 1,
+                    keyboardType: TextInputType.url,
+                    textInputAction: TextInputAction.go,
+                    onSubmitted: (_) => submit(),
+                    onChanged: (_) => setDialogState(() {}),
+                    style: GoogleFonts.jetBrainsMono(
+                      color: AppTheme.getText(context),
+                      fontSize: 12,
+                    ),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      filled: true,
+                      fillColor: AppTheme.getSurface(context),
+                      hintText: 'https://youtube.com/watch?v=...',
+                      hintStyle: GoogleFonts.jetBrainsMono(
+                        fontSize: 11,
+                        color: AppTheme.getTextMuted(context),
+                      ),
+                      prefixText: '> ',
+                      prefixStyle: GoogleFonts.jetBrainsMono(
+                        color: const Color(0xFF38BDF8),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      suffixIcon: urlController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.close, size: 16),
+                              splashRadius: 16,
+                              tooltip: 'Clear',
+                              color: AppTheme.getTextMuted(context),
+                              onPressed: () {
+                                urlController.clear();
+                                setDialogState(() {});
+                              },
+                            )
+                          : null,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.zero,
+                        borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.zero,
+                        borderSide: BorderSide(color: Color(0xFF38BDF8), width: 1.2),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              '[CANCEL]',
-              style: GoogleFonts.jetBrainsMono(
-                color: AppTheme.getTextSecondary(context),
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  '[CANCEL]',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: AppTheme.getTextSecondary(context),
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF38BDF8),
-              foregroundColor: Colors.black,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-              elevation: 0,
-            ),
-            onPressed: () {
-              final url = urlController.text.trim();
-              if (url.isNotEmpty) {
-                Navigator.pop(ctx);
-                final songProv = Provider.of<SongProvider>(context, listen: false);
-                final downloadProv = Provider.of<DownloadProvider>(context, listen: false);
-                downloadProv.startDownload(url, songProvider: songProv);
-              }
-            },
-            child: Text(
-              '[EXECUTE]',
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF38BDF8),
+                  foregroundColor: Colors.black,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  elevation: 0,
+                ),
+                onPressed: submit,
+                child: Text(
+                  '[EXECUTE]',
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -212,32 +255,36 @@ class _LibraryTabState extends State<LibraryTab> {
           'Tạo thư mục mới',
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Đặt tên cho thư mục bài hát của bạn:',
-              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: nameController,
-              autofocus: true,
-              style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
-              decoration: InputDecoration(
-                hintText: 'Ví dụ: Nhạc Acoustic, Lofi, EDM...',
-                hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
-                isDense: true,
-                filled: true,
-                fillColor: AppTheme.getSurface(context),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+        content: SizedBox(
+          width: (MediaQuery.of(ctx).size.width * 0.9).clamp(320.0, 420.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Đặt tên cho thư mục bài hát của bạn:',
+                style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: nameController,
+                autofocus: true,
+                maxLines: 1,
+                style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
+                decoration: InputDecoration(
+                  hintText: 'Ví dụ: Nhạc Acoustic, Lofi, EDM...',
+                  hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                  isDense: true,
+                  filled: true,
+                  fillColor: AppTheme.getSurface(context),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
