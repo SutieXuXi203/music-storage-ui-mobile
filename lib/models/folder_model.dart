@@ -4,6 +4,8 @@ class Folder {
   final String id;
   final String name;
   final String userId;
+  final String? driveFolderId;
+  final bool isDefault;
   final List<String> songIds;
   final int songCount;
   final String? coverUrl;
@@ -15,6 +17,8 @@ class Folder {
     required this.id,
     required this.name,
     required this.userId,
+    this.driveFolderId,
+    this.isDefault = false,
     this.songIds = const [],
     this.songCount = 0,
     this.coverUrl,
@@ -53,6 +57,8 @@ class Folder {
       id: id,
       name: json['name']?.toString() ?? 'Thư mục không tên',
       userId: json['user_id']?.toString() ?? '',
+      driveFolderId: json['drive_folder_id']?.toString(),
+      isDefault: json['is_default'] == true,
       songIds: parsedSongIds,
       songCount: count,
       coverUrl: json['cover_url']?.toString(),
@@ -67,6 +73,8 @@ class Folder {
       'id': id,
       'name': name,
       'user_id': userId,
+      'drive_folder_id': driveFolderId,
+      'is_default': isDefault,
       'song_ids': songIds,
       'song_count': songCount,
       'cover_url': coverUrl,
@@ -79,6 +87,8 @@ class Folder {
     String? id,
     String? name,
     String? userId,
+    String? driveFolderId,
+    bool? isDefault,
     List<String>? songIds,
     int? songCount,
     String? coverUrl,
@@ -90,6 +100,8 @@ class Folder {
       id: id ?? this.id,
       name: name ?? this.name,
       userId: userId ?? this.userId,
+      driveFolderId: driveFolderId ?? this.driveFolderId,
+      isDefault: isDefault ?? this.isDefault,
       songIds: songIds ?? this.songIds,
       songCount: songCount ?? this.songCount,
       coverUrl: coverUrl ?? this.coverUrl,

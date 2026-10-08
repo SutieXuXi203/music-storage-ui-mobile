@@ -662,15 +662,38 @@ class _LibraryTabState extends State<LibraryTab> {
                       size: 22,
                     ),
             ),
-            title: Text(
-              folder.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.getText(context),
-              ),
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    folder.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.getText(context),
+                    ),
+                  ),
+                ),
+                if (folder.isDefault)
+                  Container(
+                    margin: const EdgeInsets.only(left: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: AppTheme.getAction(context).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'Drive',
+                      style: AppTheme.monoStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.getAction(context),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             subtitle: Text(
               '${folder.songCount} bài hát',
@@ -704,16 +727,17 @@ class _LibraryTabState extends State<LibraryTab> {
                     ],
                   ),
                 ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_outline, size: 16, color: AppTheme.getDanger(context)),
-                      const SizedBox(width: 8),
-                      Text('Xóa thư mục', style: TextStyle(fontSize: 12, color: AppTheme.getDanger(context))),
-                    ],
+                if (!folder.isDefault)
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, size: 16, color: AppTheme.getDanger(context)),
+                        const SizedBox(width: 8),
+                        Text('Xóa thư mục', style: TextStyle(fontSize: 12, color: AppTheme.getDanger(context))),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
             onTap: () {
