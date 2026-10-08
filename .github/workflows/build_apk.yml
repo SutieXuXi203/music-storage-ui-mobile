@@ -34,15 +34,27 @@ jobs:
       - name: Configure Keystore
         if: env.RELEASE_KEYSTORE_BASE64 != ''
         run: |
-          python3 -c "import base64, os; open('android/app/release.keystore', 'wb').write(base64.b64decode(os.environ['RELEASE_KEYSTORE_BASE64'].strip()))"
-          cat <<EOF > android/key.properties
-          storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}
-          keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}
-          storeFile=release.keystore
-          EOF
+          python3 - << 'PYEOF'
+          import base64, os
+          ks_b64 = os.environ.get('RELEASE_KEYSTORE_BASE64', '').strip().lstrip('\ufeff')
+          with open('android/app/release.keystore', 'wb') as f:
+              f.write(base64.b64decode(ks_b64))
+
+          store_pass = os.environ.get('KEYSTORE_STORE_PASSWORD', '').strip().lstrip('\ufeff')
+          key_pass = os.environ.get('KEYSTORE_KEY_PASSWORD', '').strip().lstrip('\ufeff')
+          key_alias = os.environ.get('KEYSTORE_KEY_ALIAS', '').strip().lstrip('\ufeff')
+
+          with open('android/key.properties', 'w', encoding='utf-8') as f:
+              f.write(f"storePassword={store_pass}\n")
+              f.write(f"keyPassword={key_pass}\n")
+              f.write(f"keyAlias={key_alias}\n")
+              f.write("storeFile=release.keystore\n")
+          PYEOF
         env:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
 
       - name: Build APK Release
         run: |
