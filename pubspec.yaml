@@ -1,7 +1,7 @@
 name: mobile_ui
 description: "Ứng dụng nghe nhạc Music Storage đa nền tảng kết nối FastAPI & Google Drive"
 publish_to: "none"
-version: 1.0.7+8
+version: 1.0.8+9
 
 environment:
   sdk: ^3.5.0
