@@ -66,7 +66,6 @@ jobs:
             - Tên hiển thị trên điện thoại: **Sutorage**
             - Phiên bản: **v1.0.3** (Build 4)
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
-            - Tự động kết nối với Fly.io Backend: `https://music-storage-backend.fly.dev/api`
             - Tải file `sutorage.apk` bên dưới về điện thoại và cài đặt.
           files: build/app/outputs/flutter-apk/sutorage.apk
         env:
