@@ -259,7 +259,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
 
     final displayName = (user != null && user.fullName != null && user.fullName!.isNotEmpty)
         ? user.fullName!
-        : (user != null && user.username.isNotEmpty ? user.username : 'Mạnh Đình');
+        : (user != null && user.username.isNotEmpty ? user.username : 'Người dùng');
     final username = user?.username ?? 'user_dev';
     final email = (user != null && user.email.isNotEmpty) ? user.email : 'email@example.com';
     final isActive = user?.isActive ?? true;

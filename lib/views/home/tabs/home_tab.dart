@@ -111,7 +111,7 @@ class _HomeTabState extends State<HomeTab> {
     final user = authProvider.user;
     final userName = (user != null && user.fullName != null && user.fullName!.isNotEmpty)
         ? user.fullName!
-        : (user != null && user.username.isNotEmpty ? user.username : 'Mạnh Đình');
+        : (user != null && user.username.isNotEmpty ? user.username : 'Người dùng');
     final songs = songProvider.songs;
     final folders = folderProvider.folders;
 

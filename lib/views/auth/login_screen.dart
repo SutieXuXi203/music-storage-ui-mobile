@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/song_provider.dart';
+import '../../providers/folder_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/isometric_cubes_widget.dart';
 import '../home/home_screen.dart';
@@ -63,6 +65,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     if (success) {
       setState(() => _isLoggingIn = false);
+      Provider.of<SongProvider>(context, listen: false).fetchSongs();
+      Provider.of<FolderProvider>(context, listen: false).fetchFolders();
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 300),

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../services/audio_player_service.dart';
 import '../../providers/song_provider.dart';
+import '../../providers/folder_provider.dart';
 import '../../widgets/mini_player_widget.dart';
 import '../../widgets/tech_download_hud.dart';
 import 'tabs/home_tab.dart';
@@ -34,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SongProvider>(context, listen: false).fetchSongs();
+      Provider.of<FolderProvider>(context, listen: false).fetchFolders();
     });
   }
 

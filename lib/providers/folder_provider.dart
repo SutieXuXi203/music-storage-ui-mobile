@@ -22,6 +22,15 @@ class FolderProvider extends ChangeNotifier {
     fetchFolders();
   }
 
+  void clear() {
+    _folders = [];
+    _currentFolder = null;
+    _isLoading = false;
+    _isLoadingDetails = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   Future<void> fetchFolders() async {
     _isLoading = true;
     _errorMessage = null;

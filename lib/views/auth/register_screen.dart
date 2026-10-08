@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/song_provider.dart';
+import '../../providers/folder_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../home/home_screen.dart';
 
@@ -83,6 +85,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
+      Provider.of<SongProvider>(context, listen: false).fetchSongs();
+      Provider.of<FolderProvider>(context, listen: false).fetchFolders();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );

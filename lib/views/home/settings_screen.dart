@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/song_provider.dart';
+import '../../providers/folder_provider.dart';
 import '../auth/login_screen.dart';
 import 'account_info_screen.dart';
 
@@ -22,7 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final displayName = (user != null && user.fullName != null && user.fullName!.isNotEmpty)
         ? user.fullName!
-        : (user != null && user.username.isNotEmpty ? user.username : 'Mạnh Đình');
+        : (user != null && user.username.isNotEmpty ? user.username : 'Người dùng');
     final email = (user != null && user.email.isNotEmpty)
         ? user.email
         : 'email@example.com';
@@ -152,6 +154,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 onPressed: () {
                   authProvider.logout();
+                  Provider.of<SongProvider>(context, listen: false).clear();
+                  Provider.of<FolderProvider>(context, listen: false).clear();
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (_) => const LoginScreen()),

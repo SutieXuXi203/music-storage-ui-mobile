@@ -19,6 +19,15 @@ class SongProvider extends ChangeNotifier {
     fetchSongs();
   }
 
+  void clear() {
+    _songs = [];
+    _isLoading = false;
+    _isDownloading = false;
+    _errorMessage = null;
+    _searchQuery = '';
+    notifyListeners();
+  }
+
   Future<void> fetchSongs({String? query}) async {
     _isLoading = true;
     _errorMessage = null;

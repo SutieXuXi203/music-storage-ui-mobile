@@ -20,7 +20,7 @@ class PlaylistScreen extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context);
     final songs = songProvider.songs;
 
-    final owner = authProvider.user?.fullName ?? authProvider.user?.username ?? 'Mạnh Đình';
+    final owner = authProvider.user?.fullName ?? authProvider.user?.username ?? 'Người dùng';
 
     return Scaffold(
       backgroundColor: AppTheme.getBg(context),
