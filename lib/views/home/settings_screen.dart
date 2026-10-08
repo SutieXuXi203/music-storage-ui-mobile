@@ -49,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           children: [
-            // 1. Profile header (Compact: 42x42 avatar + Premium badge)
+            // 1. Profile header (Compact: 42x42 avatar)
             InkWell(
               onTap: () {
                 Navigator.push(
@@ -107,23 +107,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               color: AppTheme.getTextSecondary(context),
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppTheme.getSurfaceElevated(context),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-                            ),
-                            child: Text(
-                              'Premium',
-                              style: AppTheme.monoStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.getText(context),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -137,25 +120,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
-
-            // 2. Section: Tài khoản
-            _buildSectionHeader('Tài khoản'),
-            _buildListTile(
-              icon: Icons.person_outline,
-              title: 'Thông tin tài khoản',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AccountInfoScreen()),
-                );
-              },
-            ),
-            _buildListTile(icon: Icons.shield_outlined, title: 'Bảo mật', onTap: () {}),
-
             const SizedBox(height: 18),
 
-            // 3. Section: Giao diện
+            // 2. Section: Giao diện
             _buildSectionHeader('Giao diện'),
             _buildSelectTile<ThemeMode>(
               icon: Icons.brightness_medium_outlined,
@@ -222,29 +189,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
-  Widget _buildListTile({IconData? icon, required String title, required VoidCallback onTap}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      decoration: BoxDecoration(
-        color: AppTheme.getSurface(context),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-      ),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-        leading: icon != null ? Icon(icon, size: 16, color: AppTheme.getTextSecondary(context)) : null,
-        title: Text(
-          title,
-          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: AppTheme.getText(context)),
-        ),
-        trailing: Icon(Icons.chevron_right, size: 16, color: AppTheme.getTextMuted(context)),
-        onTap: onTap,
-      ),
-    );
-  }
-
 
   Widget _buildSelectTile<T>({
     IconData? icon,

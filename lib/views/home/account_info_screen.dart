@@ -266,6 +266,11 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     final createdAtStr = _formatDate(user?.createdAt);
     final songCount = songProvider.songs.length;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final greenText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
+    final greenBg = isDark ? const Color(0x1F22C55E) : const Color(0x1416A34A);
+    final greenBorder = isDark ? const Color(0x6622C55E) : const Color(0x5516A34A);
+
     return Scaffold(
       backgroundColor: AppTheme.getBg(context),
       appBar: AppBar(
@@ -317,85 +322,76 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
               ),
-              child: Column(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppTheme.getSurfaceElevated(context),
-                          border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
-                        ),
-                        child: Center(
-                          child: Text(
-                            displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
-                            style: TextStyle(
-                              color: AppTheme.getText(context),
-                              fontWeight: FontWeight.w700,
-                              fontSize: 22,
-                            ),
-                          ),
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppTheme.getSurfaceElevated(context),
+                      border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                    ),
+                    child: Center(
+                      child: Text(
+                        displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                        style: TextStyle(
+                          color: AppTheme.getText(context),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 22,
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              displayName,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.getText(context),
+                            Expanded(
+                              child: Text(
+                                displayName,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.getText(context),
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '@$username',
-                              style: AppTheme.monoStyle(
-                                fontSize: 12,
-                                color: AppTheme.getTextSecondary(context),
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              email,
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                color: AppTheme.getTextMuted(context),
-                              ),
+                            const SizedBox(width: 8),
+                            _buildTag(
+                              context,
+                              label: 'STATUS: ${isActive ? 'ACTIVE' : 'INACTIVE'}',
+                              isHighlighted: true,
+                              textColor: isActive ? greenText : AppTheme.getDanger(context),
+                              borderColor: isActive ? greenBorder : AppTheme.getDanger(context).withValues(alpha: 0.5),
+                              backgroundColor: isActive ? greenBg : AppTheme.getDanger(context).withValues(alpha: 0.1),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  // Badges Row
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [
-                      _buildTag(
-                        context,
-                        label: 'STATUS: ${isActive ? 'ACTIVE' : 'INACTIVE'}',
-                        isHighlighted: isActive,
-                      ),
-                      _buildTag(
-                        context,
-                        label: 'TIER: PREMIUM',
-                        isHighlighted: false,
-                      ),
-                      _buildTag(
-                        context,
-                        label: 'ROLE: OWNER',
-                        isHighlighted: false,
-                      ),
-                    ],
+                        const SizedBox(height: 3),
+                        Text(
+                          '@$username',
+                          style: AppTheme.monoStyle(
+                            fontSize: 12,
+                            color: AppTheme.getTextSecondary(context),
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          email,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: AppTheme.getTextMuted(context),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -428,13 +424,9 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   label: 'Email',
                   value: email,
                   trailingBadge: 'VERIFIED',
-                ),
-                _buildDivider(context),
-                _buildInfoRow(
-                  context,
-                  label: 'Trạng thái',
-                  value: isActive ? 'Hoạt động (Active)' : 'Vô hiệu hóa (Inactive)',
-                  statusColor: isActive ? null : AppTheme.getDanger(context),
+                  badgeColor: greenBg,
+                  badgeBorderColor: greenBorder,
+                  badgeTextColor: greenText,
                 ),
               ],
             ),
@@ -503,6 +495,9 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     bool isMonospace = false,
     Color? statusColor,
     String? trailingBadge,
+    Color? badgeColor,
+    Color? badgeTextColor,
+    Color? badgeBorderColor,
     VoidCallback? onBadgeTap,
   }) {
     return Padding(
@@ -552,16 +547,19 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppTheme.getSurfaceElevated(context),
+                        color: badgeColor ?? AppTheme.getSurfaceElevated(context),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                        border: Border.all(
+                          color: badgeBorderColor ?? AppTheme.getBorder(context),
+                          width: 0.8,
+                        ),
                       ),
                       child: Text(
                         trailingBadge,
                         style: AppTheme.monoStyle(
                           fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.getText(context),
+                          fontWeight: FontWeight.w600,
+                          color: badgeTextColor ?? AppTheme.getText(context),
                         ),
                       ),
                     ),
@@ -583,14 +581,27 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     );
   }
 
-  Widget _buildTag(BuildContext context, {required String label, required bool isHighlighted}) {
+  Widget _buildTag(
+    BuildContext context, {
+    required String label,
+    required bool isHighlighted,
+    Color? textColor,
+    Color? borderColor,
+    Color? backgroundColor,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: isHighlighted ? AppTheme.getSurfaceElevated(context) : AppTheme.getSurfaceSubtle(context),
+        color: backgroundColor ??
+            (isHighlighted
+                ? AppTheme.getSurfaceElevated(context)
+                : AppTheme.getSurfaceSubtle(context)),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: isHighlighted ? AppTheme.getText(context).withValues(alpha: 0.4) : AppTheme.getBorder(context),
+          color: borderColor ??
+              (isHighlighted
+                  ? AppTheme.getText(context).withValues(alpha: 0.4)
+                  : AppTheme.getBorder(context)),
           width: 0.8,
         ),
       ),
@@ -599,7 +610,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         style: AppTheme.monoStyle(
           fontSize: 9.5,
           fontWeight: FontWeight.w600,
-          color: AppTheme.getText(context),
+          color: textColor ?? AppTheme.getText(context),
         ),
       ),
     );
