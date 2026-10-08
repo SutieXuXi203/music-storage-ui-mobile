@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../services/audio_player_service.dart';
 import '../../providers/song_provider.dart';
 import '../../widgets/mini_player_widget.dart';
+import '../../widgets/tech_download_hud.dart';
 import 'tabs/home_tab.dart';
 import 'tabs/search_tab.dart';
 import 'tabs/library_tab.dart';
@@ -72,6 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
           bottomNavigationBar: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // High-Tech Download Process HUD
+              const TechDownloadHud(),
+
               // Mini Player Dock
               if (hasActiveSong)
                 MiniPlayerWidget(playerService: audioPlayerService),

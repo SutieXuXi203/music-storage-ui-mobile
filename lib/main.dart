@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/download_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/song_provider.dart';
 import 'providers/folder_provider.dart';
@@ -30,6 +31,7 @@ class MusicApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => DownloadProvider()),
         ChangeNotifierProvider(create: (_) => SongProvider()),
         ChangeNotifierProvider(create: (_) => FolderProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),

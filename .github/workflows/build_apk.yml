@@ -46,7 +46,7 @@ jobs:
 
       - name: Build APK Release
         run: |
-          flutter build apk --release --dart-define=API_BASE_URL=https://music-storage-backend.fly.dev/api
+          flutter build apk --release --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
           cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/sutorage.apk
 
       - name: Upload APK Artifact
@@ -59,13 +59,13 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.4
-          name: Sutorage App Release v1.0.4
+          tag_name: v1.0.5
+          name: Sutorage App Release v1.0.5
           body: |
-            ## Sutorage Music App Android Release v1.0.4
+            ## Sutorage Music App Android Release v1.0.5
             - Tên hiển thị trên điện thoại: **Sutorage**
-            - Phiên bản: **v1.0.4** (Build 5)
-            - Cập nhật biểu tượng ứng dụng mới (App Icon chú mèo nghe nhạc).
+            - Phiên bản: **v1.0.5** (Build 6)
+            - Bổ sung bảng điều khiển tiến trình tải nhạc công nghệ cao (Cyber/CLI Download HUD).
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `sutorage.apk` bên dưới về điện thoại và cài đặt.
           files: build/app/outputs/flutter-apk/sutorage.apk

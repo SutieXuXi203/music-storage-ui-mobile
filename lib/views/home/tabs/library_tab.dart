@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/folder_model.dart';
 import '../../../models/song_model.dart';
+import '../../../providers/download_provider.dart';
 import '../../../providers/folder_provider.dart';
 import '../../../providers/song_provider.dart';
 import '../../../services/audio_player_service.dart';
@@ -95,29 +97,60 @@ class _LibraryTabState extends State<LibraryTab> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.getSurfaceElevated(context),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          borderRadius: BorderRadius.zero, // Góc vuông chuẩn Terminal
           side: BorderSide(color: AppTheme.getBorder(context), width: 1.0),
         ),
         title: Text(
-          'Thêm từ YouTube',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppTheme.getText(context)),
+          '[CMD://INGEST_YOUTUBE_STREAM]',
+          style: GoogleFonts.jetBrainsMono(
+            fontWeight: FontWeight.w700,
+            fontSize: 13.5,
+            letterSpacing: 0.5,
+            color: const Color(0xFF38BDF8),
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Nhập URL video YouTube để tải về lưu trữ:',
-              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+              '> TARGET: HTTPS://YOUTUBE_AUDIO_EXTRACTION',
+              style: GoogleFonts.jetBrainsMono(
+                color: AppTheme.getTextSecondary(context),
+                fontSize: 11,
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: urlController,
-              style: TextStyle(color: AppTheme.getText(context), fontSize: 12.5),
+              autofocus: true,
+              style: GoogleFonts.jetBrainsMono(
+                color: AppTheme.getText(context),
+                fontSize: 12,
+              ),
               decoration: InputDecoration(
                 isDense: true,
+                filled: true,
+                fillColor: AppTheme.getSurface(context),
                 hintText: 'https://youtube.com/watch?v=...',
-                prefixIcon: Icon(Icons.link, size: 18, color: AppTheme.getTextMuted(context)),
+                hintStyle: GoogleFonts.jetBrainsMono(
+                  fontSize: 11,
+                  color: AppTheme.getTextMuted(context),
+                ),
+                prefixText: '> ',
+                prefixStyle: GoogleFonts.jetBrainsMono(
+                  color: const Color(0xFF38BDF8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: Color(0xFF38BDF8), width: 1.2),
+                ),
               ),
             ),
           ],
@@ -125,21 +158,39 @@ class _LibraryTabState extends State<LibraryTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12)),
+            child: Text(
+              '[CANCEL]',
+              style: GoogleFonts.jetBrainsMono(
+                color: AppTheme.getTextSecondary(context),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           ElevatedButton(
-            onPressed: () async {
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF38BDF8),
+              foregroundColor: Colors.black,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              elevation: 0,
+            ),
+            onPressed: () {
               final url = urlController.text.trim();
               if (url.isNotEmpty) {
                 Navigator.pop(ctx);
                 final songProv = Provider.of<SongProvider>(context, listen: false);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đang xử lý tải bài hát...'), duration: Duration(seconds: 2)),
-                );
-                await songProv.downloadFromYouTube(url);
+                final downloadProv = Provider.of<DownloadProvider>(context, listen: false);
+                downloadProv.startDownload(url, songProvider: songProv);
               }
             },
-            child: const Text('Tải xuống', style: TextStyle(fontSize: 12)),
+            child: Text(
+              '[EXECUTE]',
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+              ),
+            ),
           ),
         ],
       ),
