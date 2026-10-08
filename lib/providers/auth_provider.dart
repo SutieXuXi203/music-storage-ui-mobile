@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
@@ -57,6 +58,13 @@ class AuthProvider extends ChangeNotifier {
       _errorMessage = 'Đăng nhập không thành công.';
       return false;
     } catch (e) {
+      if (e is DioException && e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map && data.containsKey('detail') && data['detail'] is String) {
+          _errorMessage = data['detail'];
+          return false;
+        }
+      }
       if (e.toString().contains('401')) {
         _errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác.';
       } else if (e.toString().contains('422')) {
@@ -91,7 +99,30 @@ class AuthProvider extends ChangeNotifier {
       // Đăng nhập luôn sau khi đăng ký
       return await login(username, password);
     } catch (e) {
-      _errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
+      if (e is DioException && e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map && data.containsKey('detail')) {
+          final detail = data['detail'];
+          if (detail is String) {
+            _errorMessage = detail;
+          } else if (detail is List && detail.isNotEmpty) {
+            final firstErr = detail[0];
+            if (firstErr is Map && firstErr.containsKey('msg')) {
+              var msg = firstErr['msg'].toString();
+              msg = msg.replaceFirst(RegExp(r'^Value error,\s*'), '');
+              _errorMessage = msg;
+            } else {
+              _errorMessage = detail.first.toString();
+            }
+          } else {
+            _errorMessage = 'Dữ liệu không hợp lệ (mã 422).';
+          }
+        } else {
+          _errorMessage = 'Đăng ký thất bại (${e.response?.statusCode ?? 'Lỗi mạng'}).';
+        }
+      } else {
+        _errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
+      }
       return false;
     } finally {
       _isLoading = false;

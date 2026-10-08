@@ -41,6 +41,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (username.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tên đăng nhập phải có tối thiểu 3 ký tự')),
+      );
+      return;
+    }
+
+    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(username)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tên đăng nhập chỉ gồm chữ cái không dấu, chữ số và dấu gạch dưới (_)')),
+      );
+      return;
+    }
+
+    final hasLetters = RegExp(r'[A-Za-z]').hasMatch(password);
+    final hasDigits = RegExp(r'[0-9]').hasMatch(password);
+    if (password.length < 6 || !hasLetters || !hasDigits) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mật khẩu phải từ 6 ký tự trở lên, bao gồm cả chữ cái và chữ số')),
+      );
+      return;
+    }
+
+    if (email.isNotEmpty && !RegExp(r'^[\w\.\+\-]+@[a-zA-Z0-9_\.\-]+$').hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email không đúng định dạng hợp lệ')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     final success = await authProvider.register(
       username: username,
@@ -146,7 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   _buildInputField(
                     context,
                     controller: _usernameController,
-                    hint: 'Username (viết liền)',
+                    hint: 'Tên đăng nhập (từ 3 ký tự, không dấu)',
                     icon: Icons.person_outline,
                   ),
                   const SizedBox(height: 10),
@@ -154,7 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   _buildInputField(
                     context,
                     controller: _emailController,
-                    hint: 'Email (ví dụ: user@example.com)',
+                    hint: 'Email (tùy chọn, ví dụ: user@gmail.com)',
                     icon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                   ),
@@ -163,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   _buildInputField(
                     context,
                     controller: _passwordController,
-                    hint: 'Mật khẩu',
+                    hint: 'Mật khẩu (từ 6 ký tự, gồm cả chữ & số)',
                     icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
                     suffixIcon: IconButton(
