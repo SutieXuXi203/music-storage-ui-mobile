@@ -59,12 +59,13 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.3
-          name: Sutorage App Release v1.0.3
+          tag_name: v1.0.4
+          name: Sutorage App Release v1.0.4
           body: |
-            ## Sutorage Music App Android Release v1.0.3
+            ## Sutorage Music App Android Release v1.0.4
             - Tên hiển thị trên điện thoại: **Sutorage**
-            - Phiên bản: **v1.0.3** (Build 4)
+            - Phiên bản: **v1.0.4** (Build 5)
+            - Cập nhật biểu tượng ứng dụng mới (App Icon chú mèo nghe nhạc).
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `sutorage.apk` bên dưới về điện thoại và cài đặt.
           files: build/app/outputs/flutter-apk/sutorage.apk
