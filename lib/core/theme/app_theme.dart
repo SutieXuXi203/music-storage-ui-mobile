@@ -18,13 +18,13 @@ class AppTheme {
   static const double space24 = 24.0;
   static const double space32 = 32.0;
 
-  // Corner Radius Constants (Section 5)
-  static const double radiusXs = 6.0;
-  static const double radiusSm = 8.0;
-  static const double radiusMd = 12.0;
-  static const double radiusLg = 14.0;
-  static const double radiusSheet = 20.0;
-  static const double radiusPill = 20.0;
+  // Corner Radius Constants (Section 5) - Đồng nhất bo tròn theo 4.0px (px nhỏ nhất trong giao diện)
+  static const double radiusXs = 4.0;
+  static const double radiusSm = 4.0;
+  static const double radiusMd = 4.0;
+  static const double radiusLg = 4.0;
+  static const double radiusSheet = 4.0;
+  static const double radiusPill = 4.0;
 
   // Light Theme Colors (Section 2.2)
   static const Color lightBg = Color(0xFFFFFFFF);

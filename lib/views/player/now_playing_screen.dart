@@ -196,7 +196,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                           height: 230,
                           decoration: BoxDecoration(
                             color: AppTheme.getSurfaceSubtle(context),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                             border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
                           ),
                           clipBehavior: Clip.antiAlias,
@@ -390,7 +390,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                                   height: 36,
                                   decoration: BoxDecoration(
                                     color: AppTheme.getSurfaceSubtle(context),
-                                    borderRadius: BorderRadius.circular(6),
+                                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                                     border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
                                   ),
                                   clipBehavior: Clip.antiAlias,

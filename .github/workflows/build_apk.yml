@@ -72,15 +72,14 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.12
-          name: Meowsic App Release v1.0.12
+          tag_name: v1.0.13
+          name: Meowsic App Release v1.0.13
           body: |
-            ## Meowsic Music App Android Release v1.0.12
+            ## Meowsic Music App Android Release v1.0.13
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.12** (Build 13)
-            - **Tách biệt hoàn toàn Collection Folders & Playlists**: Thư mục gom bài hát và Danh sách phát giờ là 2 thực thể độc lập, không còn bị đồng bộ trùng lặp dữ liệu.
-            - **Dọn dẹp cơ sở dữ liệu**: Loại bỏ dữ liệu nhân bản giữa `folders` và `playlists`, bảo toàn thư mục Drive và danh sách bài hát của người dùng.
-            - **Đồng bộ API Mobile**: Cập nhật FolderProvider kết nối chính xác tới `/api/folders`.
+            - Phiên bản: **v1.0.13** (Build 14)
+            - **Đồng nhất bo tròn 4px toàn bộ giao diện**: Chuẩn hóa bo góc theo giá trị nhỏ nhất (4.0px) cho toàn bộ tab, thẻ bài hát, thẻ thư mục, nút bấm, ô tìm kiếm và hộp thoại. Thiết kế phẳng tối giản, sắc nét và hiện đại.
+            - **Tối ưu hóa dữ liệu & Tinh gọn hệ thống**: Xóa bỏ hoàn toàn collection và router `playlists` thừa, tập trung duy nhất vào tính năng gom bài hát và phát nhạc theo Thư mục.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |

@@ -24,7 +24,6 @@ class ApiConstants {
   // YouTube Ingestion
   static const String youtubeDownload = '/dowload-music-from-yt';
 
-  // Playlist & Folder endpoints
-  static const String playlists = '/playlists';
+  // Folder endpoints
   static const String folders = '/folders';
 }

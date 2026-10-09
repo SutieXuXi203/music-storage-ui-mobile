@@ -47,7 +47,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
       isScrollControlled: true,
       backgroundColor: AppTheme.getSurface(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {

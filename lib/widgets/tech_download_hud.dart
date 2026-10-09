@@ -241,7 +241,7 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                         const SizedBox(width: 4),
                         InkWell(
                           onTap: () => downloadProv.dismissTask(task.id),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                           child: Padding(
                             padding: const EdgeInsets.all(2),
                             child: Icon(
