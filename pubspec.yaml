@@ -1,7 +1,7 @@
 name: mobile_ui
 description: "Ứng dụng nghe nhạc Meowsic đa nền tảng kết nối FastAPI & Google Drive"
 publish_to: "none"
-version: 1.0.13+14
+version: 1.0.14+15
 
 environment:
   sdk: ^3.5.0
@@ -30,6 +30,7 @@ dependencies:
   reicon_flutter: ^1.0.1
   flutter_svg: ^2.3.0
   flutter_local_notifications: ^22.3.1
+  image_picker: ^1.2.4
 
 dev_dependencies:
   flutter_test:

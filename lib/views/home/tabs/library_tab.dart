@@ -9,6 +9,7 @@ import '../../../providers/folder_provider.dart';
 import '../../../providers/song_provider.dart';
 import '../../../services/audio_player_service.dart';
 import '../../../widgets/song_card_widget.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../details/folder_detail_screen.dart';
 
 class LibraryTab extends StatefulWidget {
@@ -472,6 +473,234 @@ class _LibraryTabState extends State<LibraryTab> {
     );
   }
 
+  void _showChangeCoverDialog(BuildContext context, Folder folder) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.getSurfaceElevated(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 32,
+                  height: 3,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                ),
+              ),
+              Text(
+                'Ảnh bìa thư mục "${folder.name}"',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.getText(context),
+                ),
+              ),
+              const SizedBox(height: 14),
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.getSurface(context),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                  ),
+                  child: Icon(Icons.photo_library_outlined, size: 18, color: AppTheme.getText(context)),
+                ),
+                title: Text(
+                  'Chọn ảnh từ thiết bị',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                ),
+                subtitle: Text(
+                  'Tải lên ảnh từ thư viện của máy',
+                  style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                ),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                  try {
+                    final picker = ImagePicker();
+                    final XFile? file = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+                    if (file != null) {
+                      final bytes = await file.readAsBytes();
+                      final ok = await folderProv.uploadFolderCoverImage(folder.id, bytes, file.name);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(ok ? 'Đã cập nhật ảnh bìa thư mục' : 'Không thể cập nhật ảnh bìa', style: AppTheme.monoStyle(fontSize: 12)),
+                            backgroundColor: ok ? AppTheme.getSurfaceElevated(context) : AppTheme.getDanger(context),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Lỗi chọn ảnh: $e', style: AppTheme.monoStyle(fontSize: 12)),
+                          backgroundColor: AppTheme.getDanger(context),
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
+              const Divider(height: 1),
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.getSurface(context),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                  ),
+                  child: Icon(Icons.link_outlined, size: 18, color: AppTheme.getText(context)),
+                ),
+                title: Text(
+                  'Nhập đường link ảnh (URL)',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                ),
+                subtitle: Text(
+                  'Dán liên kết ảnh trực tiếp từ web',
+                  style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                ),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showCoverUrlInputDialog(context, folder);
+                },
+              ),
+              if (folder.coverUrl != null && folder.coverUrl!.isNotEmpty) ...[
+                const Divider(height: 1),
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppTheme.getSurface(context),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                    ),
+                    child: Icon(Icons.delete_outline, size: 18, color: AppTheme.getDanger(context)),
+                  ),
+                  title: Text(
+                    'Gỡ ảnh bìa tùy chỉnh',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getDanger(context)),
+                  ),
+                  subtitle: Text(
+                    'Khôi phục ảnh bìa theo bài hát',
+                    style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                  ),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                    final ok = await folderProv.updateFolderCoverUrl(folder.id, null);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại', style: AppTheme.monoStyle(fontSize: 12)),
+                          backgroundColor: AppTheme.getSurfaceElevated(context),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCoverUrlInputDialog(BuildContext context, Folder folder) {
+    final controller = TextEditingController(text: folder.coverUrl ?? '');
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.getSurfaceElevated(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+        ),
+        title: Text(
+          'Đổi ảnh bìa thư mục',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dán liên kết hình ảnh trực tiếp (JPG, PNG, WebP):',
+              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
+              decoration: InputDecoration(
+                hintText: 'https://example.com/cover.jpg',
+                hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                isDense: true,
+                filled: true,
+                fillColor: AppTheme.getSurface(context),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.getText(context),
+              foregroundColor: AppTheme.getBg(context),
+            ),
+            onPressed: () async {
+              final url = controller.text.trim();
+              Navigator.pop(ctx);
+              final folderProv = Provider.of<FolderProvider>(context, listen: false);
+              final ok = await folderProv.updateFolderCoverUrl(folder.id, url.isNotEmpty ? url : null);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại', style: AppTheme.monoStyle(fontSize: 12)),
+                    backgroundColor: ok ? AppTheme.getSurfaceElevated(context) : AppTheme.getDanger(context),
+                  ),
+                );
+              }
+            },
+            child: const Text('Lưu', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -687,63 +916,59 @@ class _LibraryTabState extends State<LibraryTab> {
           child: ListTile(
             dense: true,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            leading: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppTheme.getSurfaceElevated(context),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: folder.coverUrl != null && folder.coverUrl!.isNotEmpty
-                  ? Image.network(
-                      folder.coverUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.folder_outlined,
-                        color: AppTheme.getText(context),
-                        size: 22,
-                      ),
-                    )
-                  : Icon(
-                      Icons.folder_outlined,
-                      color: AppTheme.getText(context),
-                      size: 22,
-                    ),
-            ),
-            title: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    folder.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.getText(context),
-                    ),
-                  ),
-                ),
-                if (folder.isDefault)
+            leading: GestureDetector(
+              onTap: () => _showChangeCoverDialog(context, folder),
+              child: Stack(
+                children: [
                   Container(
-                    margin: const EdgeInsets.only(left: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
-                      color: AppTheme.getAction(context).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppTheme.getSurfaceElevated(context),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
                     ),
-                    child: Text(
-                      'Mặc định',
-                      style: AppTheme.monoStyle(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.getAction(context),
+                    clipBehavior: Clip.antiAlias,
+                    child: folder.coverUrl != null && folder.coverUrl!.isNotEmpty
+                        ? Image.network(
+                            folder.coverUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.folder_outlined,
+                              color: AppTheme.getText(context),
+                              size: 22,
+                            ),
+                          )
+                        : Icon(
+                            Icons.folder_outlined,
+                            color: AppTheme.getText(context),
+                            size: 22,
+                          ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: AppTheme.getSurface(context).withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(2),
                       ),
+                      child: Icon(Icons.camera_alt, size: 8, color: AppTheme.getTextSecondary(context)),
                     ),
                   ),
-              ],
+                ],
+              ),
+            ),
+            title: Text(
+              folder.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.getText(context),
+              ),
             ),
             subtitle: Text(
               '${folder.songCount} bài hát',
@@ -762,6 +987,8 @@ class _LibraryTabState extends State<LibraryTab> {
               onSelected: (val) {
                 if (val == 'rename') {
                   _showRenameFolderDialog(folder);
+                } else if (val == 'cover') {
+                  _showChangeCoverDialog(context, folder);
                 } else if (val == 'delete') {
                   _confirmDeleteFolder(folder);
                 }
@@ -777,17 +1004,26 @@ class _LibraryTabState extends State<LibraryTab> {
                     ],
                   ),
                 ),
-                if (!folder.isDefault)
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete_outline, size: 16, color: AppTheme.getDanger(context)),
-                        const SizedBox(width: 8),
-                        Text('Xóa thư mục', style: TextStyle(fontSize: 12, color: AppTheme.getDanger(context))),
-                      ],
-                    ),
+                PopupMenuItem(
+                  value: 'cover',
+                  child: Row(
+                    children: [
+                      Icon(Icons.image_outlined, size: 16, color: AppTheme.getText(context)),
+                      const SizedBox(width: 8),
+                      Text('Đổi ảnh bìa', style: TextStyle(fontSize: 12, color: AppTheme.getText(context))),
+                    ],
                   ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline, size: 16, color: AppTheme.getDanger(context)),
+                      const SizedBox(width: 8),
+                      Text('Xóa thư mục', style: TextStyle(fontSize: 12, color: AppTheme.getDanger(context))),
+                    ],
+                  ),
+                ),
               ],
             ),
 

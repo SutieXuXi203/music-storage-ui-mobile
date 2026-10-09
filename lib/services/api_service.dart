@@ -254,6 +254,40 @@ class ApiService {
     }
   }
 
+  Future<bool> updateFolderCoverUrl(String folderId, String? coverUrl) async {
+    try {
+      _lastErrorMessage = null;
+      final response = await _dio.put(
+        '${ApiConstants.folders}/$folderId',
+        data: {'cover_url': coverUrl ?? ''},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      _extractError(e);
+      return false;
+    }
+  }
+
+  Future<Folder?> uploadFolderCoverImage(String folderId, List<int> bytes, String filename) async {
+    try {
+      _lastErrorMessage = null;
+      final formData = FormData.fromMap({
+        'file': MultipartFile.fromBytes(bytes, filename: filename),
+      });
+      final response = await _dio.post(
+        '${ApiConstants.folders}/$folderId/cover-image',
+        data: formData,
+      );
+      if (response.data['data'] != null) {
+        return Folder.fromJson(response.data['data']);
+      }
+      return null;
+    } catch (e) {
+      _extractError(e);
+      return null;
+    }
+  }
+
   Future<bool> deleteFolder(String folderId) async {
     try {
       _lastErrorMessage = null;

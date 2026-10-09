@@ -93,6 +93,46 @@ class FolderProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateFolderCoverUrl(String folderId, String? coverUrl) async {
+    try {
+      final ok = await apiService.updateFolderCoverUrl(folderId, coverUrl);
+      if (ok) {
+        final idx = _folders.indexWhere((f) => f.id == folderId);
+        if (idx != -1) {
+          _folders[idx] = _folders[idx].copyWith(coverUrl: coverUrl, updatedAt: DateTime.now());
+        }
+        if (_currentFolder?.id == folderId) {
+          _currentFolder = _currentFolder!.copyWith(coverUrl: coverUrl, updatedAt: DateTime.now());
+        }
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> uploadFolderCoverImage(String folderId, List<int> bytes, String filename) async {
+    try {
+      final updated = await apiService.uploadFolderCoverImage(folderId, bytes, filename);
+      if (updated != null) {
+        final idx = _folders.indexWhere((f) => f.id == folderId);
+        if (idx != -1) {
+          _folders[idx] = updated;
+        }
+        if (_currentFolder?.id == folderId) {
+          _currentFolder = updated;
+        }
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> deleteFolder(String folderId) async {
     try {
       final ok = await apiService.deleteFolder(folderId);
