@@ -65,7 +65,6 @@ jobs:
           echo "Building APK with API_BASE_URL=$API_URL"
           flutter build apk --release --dart-define=API_BASE_URL="$API_URL"
           cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/meowsic.apk
-          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/sutorage.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -97,6 +96,5 @@ jobs:
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |
             build/app/outputs/flutter-apk/meowsic.apk
-            build/app/outputs/flutter-apk/sutorage.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
