@@ -77,23 +77,22 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.20
-          name: Meowsic App Release v1.0.20
+          tag_name: v1.0.21
+          name: Meowsic App Release v1.0.21
           body: |
-            ## Meowsic Music App Android Release v1.0.20
+            ## Meowsic Music App Android Release v1.0.21
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.20** (Build 21)
-            - **Khắc phục triệt để lỗi ảnh bìa thumbnail bị co giãn / biến dạng tỷ lệ**:
-              - Tối ưu bộ giải mã ảnh theo tỷ lệ khung hình chuẩn xác, loại bỏ việc ép cưỡng bức khung hình thành vuông gây méo ảnh. Ảnh thumbnail của từng bài hát luôn hiển thị sắc nét, chuẩn tỷ lệ tự nhiên.
-            - **Tái cấu trúc hàng đợi & Tích hợp khung "Bài tiếp theo" trực tiếp vào trình phát**:
-              - Loại bỏ màn hình Hàng đợi riêng biệt, thay vào đó khi đang có bài hát phát mà thêm bài hát thứ 2 trở lên thì danh sách sẽ xuất hiện ngay trong khung **"Bài tiếp theo"** ở màn hình phát nhạc.
-              - Danh sách bài tiếp theo hiển thị thứ tự `= 01`, `= 02`, ảnh bìa, tiêu đề, thời lượng và nút xóa từng bài hoặc xóa tất cả.
-              - Thêm lựa chọn **"Phát tiếp theo"** vào menu 3 chấm của mỗi bài hát trên toàn ứng dụng.
-            - **Hiển thị "Nhóm đang phát" tại Trang Chủ**:
-              - Khi người dùng dừng hoặc tạm dừng nghe nhạc, nhóm phát hiện tại sẽ xuất hiện trực tiếp ở Trang Chủ với nhãn trạng thái trực quan, cho phép tiếp tục nghe lại ngay lập tức.
-            - **Kiểm soát phát nhạc trong nền & Hỏi ý kiến người dùng**:
-              - Tắt tự động phát nhạc khi rời ứng dụng / tắt màn hình; thay vào đó hiển thị hộp thoại hỏi người dùng có muốn phát nhạc trong nền không.
-              - Thêm công tắc cài đặt bật/tắt tính năng phát nhạc trong nền trong trang Cài đặt.
+            - Phiên bản: **v1.0.21** (Build 22)
+            - **Thiết kế lại công tắc Phát nhạc trong nền nhỏ gọn & vuông vắn (TechSwitch)**:
+              - Thay thế công tắc tròn to bản Material mặc định bằng công tắc công nghệ `TechSwitch` với kích thước nhỏ gọn `36x20 dp`.
+              - Thiết kế góc bo nhẹ sắc sảo (`3.0 dp` cho track, `2.0 dp` cho thumb vuông `16x16 dp`), tương phản cao, chuyển động trượt mượt mà kèm phản hồi xúc giác.
+              - Hỗ trợ thao tác chạm linh hoạt trên toàn bộ hàng cài đặt để bật/tắt nhanh chóng.
+            - **Kế thừa các cải tiến ổn định từ v1.0.20**:
+              - Ảnh thumbnail chuẩn tỷ lệ tự nhiên, không bị co giãn/méo hình.
+              - Khung "Bài tiếp theo" tích hợp trực tiếp vào màn hình phát nhạc thay cho màn hình hàng đợi riêng biệt.
+              - Thêm "Phát tiếp theo" vào menu 3 chấm của mỗi bài hát.
+              - Mục "Nhóm đang phát" hiển thị trực tiếp ở Trang Chủ khi tạm dừng nghe nhạc.
+              - Hộp thoại hỏi ý kiến phát nhạc trong nền khi thoát ứng dụng.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |

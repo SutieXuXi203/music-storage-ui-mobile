@@ -131,50 +131,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 18),
             _buildSectionHeader('Phát nhạc'),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppTheme.getSurface(context),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(
-                    color: AppTheme.getBorder(context), width: 0.8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.headset_rounded,
-                      color: AppTheme.getText(context), size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Phát nhạc trong nền',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.getText(context),
+            InkWell(
+              onTap: () {
+                settingsProvider.setBackgroundPlayback(
+                    !settingsProvider.backgroundPlayback);
+              },
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppTheme.getSurface(context),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                      color: AppTheme.getBorder(context), width: 0.8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.headset_rounded,
+                        color: AppTheme.getText(context), size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Phát nhạc trong nền',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.getText(context),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Tiếp tục phát nhạc khi rời ứng dụng hoặc tắt màn hình',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppTheme.getTextSecondary(context),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Tiếp tục phát nhạc khi rời ứng dụng hoặc tắt màn hình',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.getTextSecondary(context),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Switch(
-                    value: settingsProvider.backgroundPlayback,
-                    activeThumbColor: AppTheme.getAction(context),
-                    onChanged: (val) {
-                      settingsProvider.setBackgroundPlayback(val);
-                    },
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    TechSwitch(
+                      value: settingsProvider.backgroundPlayback,
+                      onChanged: (val) {
+                        settingsProvider.setBackgroundPlayback(val);
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 18),

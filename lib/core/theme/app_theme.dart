@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 export '../../widgets/bouncing_widget.dart';
 export '../../widgets/app_cover_image.dart';
+export '../../widgets/tech_switch.dart';
 
 class AppTheme {
   static const double space4 = 4.0;
