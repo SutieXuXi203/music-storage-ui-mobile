@@ -27,8 +27,9 @@ class AppCoverImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final validUrl = url != null && url!.trim().isNotEmpty;
-    final memWidth = width != null ? (width! * 2.0).toInt().clamp(60, 600) : 200;
-    final memHeight = height != null ? (height! * 2.0).toInt().clamp(60, 600) : 200;
+    final memWidth = width != null
+        ? (width! * 2.5).toInt().clamp(80, 800)
+        : (height != null ? (height! * 2.5).toInt().clamp(80, 800) : 320);
 
     Widget imageWidget;
     if (!validUrl) {
@@ -39,8 +40,8 @@ class AppCoverImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
+        alignment: Alignment.center,
         memCacheWidth: memWidth,
-        memCacheHeight: memHeight,
         fadeInDuration: const Duration(milliseconds: 140),
         fadeOutDuration: const Duration(milliseconds: 100),
         placeholder: (context, _) => _buildPlaceholder(context),

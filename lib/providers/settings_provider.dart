@@ -56,13 +56,20 @@ extension WaveMusicTypeExt on WaveMusicType {
 class SettingsProvider extends ChangeNotifier {
   static const String _prefWaveTypeKey = 'wave_music_type';
   static const String _prefThemeModeKey = 'app_theme_mode';
+  static const String _prefBackgroundPlaybackKey = 'pref_background_playback';
+  static const String _prefAskedBackgroundPlaybackKey =
+      'pref_asked_background_playback';
 
   WaveMusicType _waveType = WaveMusicType.spectrumBars;
   ThemeMode _themeMode = ThemeMode.dark;
+  bool _backgroundPlayback = false;
+  bool _askedBackgroundPlayback = false;
 
   WaveMusicType get waveType => _waveType;
   ThemeMode get themeMode => _themeMode;
   bool get isDarkMode => _themeMode == ThemeMode.dark;
+  bool get backgroundPlayback => _backgroundPlayback;
+  bool get askedBackgroundPlayback => _askedBackgroundPlayback;
 
   SettingsProvider() {
     _loadSettings();
@@ -84,9 +91,27 @@ class SettingsProvider extends ChangeNotifier {
       if (savedTheme != null) {
         _themeMode = savedTheme == 'light' ? ThemeMode.light : ThemeMode.dark;
       }
+
+      _backgroundPlayback = prefs.getBool(_prefBackgroundPlaybackKey) ?? false;
+      _askedBackgroundPlayback =
+          prefs.getBool(_prefAskedBackgroundPlaybackKey) ?? false;
+
       notifyListeners();
     } catch (e) {
       debugPrint('[SettingsProvider] Lỗi tải cài đặt: $e');
+    }
+  }
+
+  Future<void> setBackgroundPlayback(bool enabled, {bool asked = true}) async {
+    _backgroundPlayback = enabled;
+    _askedBackgroundPlayback = asked;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_prefBackgroundPlaybackKey, enabled);
+      await prefs.setBool(_prefAskedBackgroundPlaybackKey, asked);
+    } catch (e) {
+      debugPrint('[SettingsProvider] Lỗi lưu cài đặt phát trong nền: $e');
     }
   }
 

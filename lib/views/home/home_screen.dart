@@ -8,6 +8,7 @@ import '../../services/audio_player_service.dart';
 import '../../services/notification_service.dart';
 import '../../providers/song_provider.dart';
 import '../../providers/folder_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../widgets/mini_player_widget.dart';
 import '../../widgets/tech_download_hud.dart';
 import 'tabs/home_tab.dart';
@@ -21,14 +22,17 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
   late final List<Widget> _tabs;
   StreamSubscription? _notifSub;
+  bool _isPromptingBackground = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    audioPlayerService.addListener(_onPlayerChanged);
     _tabs = [
       HomeTab(
         onNavigateToSearch: () => _onTabTapped(2),
@@ -60,8 +64,40 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _onPlayerChanged() {
+    if (!mounted) return;
+    if (audioPlayerService.isPlaying && !_isPromptingBackground) {
+      final settings = Provider.of<SettingsProvider>(context, listen: false);
+      if (!settings.askedBackgroundPlayback) {
+        _isPromptingBackground = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!mounted) return;
+          final result = await AppTheme.showBackgroundPlaybackDialog(context);
+          if (mounted && result != null) {
+            settings.setBackgroundPlayback(result, asked: true);
+          }
+          _isPromptingBackground = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      final settings = Provider.of<SettingsProvider>(context, listen: false);
+      if (!settings.backgroundPlayback && audioPlayerService.isPlaying) {
+        audioPlayerService.pause();
+      }
+    }
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    audioPlayerService.removeListener(_onPlayerChanged);
     _notifSub?.cancel();
     super.dispose();
   }

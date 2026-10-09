@@ -276,6 +276,65 @@ class AppTheme {
     );
   }
 
+  static Future<bool?> showBackgroundPlaybackDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: getSurfaceElevated(ctx),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusMd),
+          side: BorderSide(color: getBorder(ctx), width: 0.8),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.headset_rounded, size: 20, color: getText(ctx)),
+            const SizedBox(width: 8),
+            Text(
+              'Phát nhạc trong nền',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                color: getText(ctx),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Bạn có muốn ứng dụng tiếp tục phát nhạc khi bạn thoát màn hình hoặc tắt màn hình không?',
+          style: TextStyle(
+            fontSize: 12.5,
+            color: getTextSecondary(ctx),
+          ),
+        ),
+        actions: [
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: getTextSecondary(ctx),
+              side: BorderSide(color: getBorder(ctx), width: 0.8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(radiusSm),
+              ),
+            ),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Không'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: getAction(ctx),
+              foregroundColor: getActionText(ctx),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(radiusSm),
+              ),
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Có (Phát trong nền)'),
+          ),
+        ],
+      ),
+    );
+  }
+
   static BoxDecoration pixelBox(
     BuildContext context, {
     Color? color,

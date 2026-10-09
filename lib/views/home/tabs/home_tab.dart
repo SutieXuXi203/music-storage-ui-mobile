@@ -8,6 +8,7 @@ import '../../../providers/folder_provider.dart';
 import '../../../providers/song_provider.dart';
 import '../../../services/audio_player_service.dart';
 import '../../details/folder_detail_screen.dart';
+import '../../player/now_playing_screen.dart';
 import '../settings_screen.dart';
 
 class HomeTab extends StatefulWidget {
@@ -299,6 +300,18 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ),
                 ],
+              ),
+              ListenableBuilder(
+                listenable: audioPlayerService,
+                builder: (context, _) {
+                  final playlist = audioPlayerService.playlist;
+                  final currentSong = audioPlayerService.currentSong;
+                  if (playlist.isEmpty || currentSong == null) {
+                    return const SizedBox.shrink();
+                  }
+                  return _buildActiveGroupSection(
+                      context, playlist, currentSong);
+                },
               ),
               const SizedBox(height: 18),
               _buildSectionHeader('Thư mục',
@@ -677,6 +690,273 @@ class _HomeTabState extends State<HomeTab> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildActiveGroupSection(
+      BuildContext context, List<Song> playlist, Song currentSong) {
+    final upcoming = audioPlayerService.upcomingSongs;
+    final isPlaying = audioPlayerService.isPlaying;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 18),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.getSurface(context),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(
+          color: isPlaying
+              ? AppTheme.getText(context).withValues(alpha: 0.3)
+              : AppTheme.getBorder(context),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.multitrack_audio_rounded,
+                    size: 16,
+                    color: AppTheme.getText(context),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Nhóm đang phát',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.getText(context),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isPlaying
+                          ? const Color(0xFF22C55E).withValues(alpha: 0.12)
+                          : const Color(0xFFFFB800).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: isPlaying
+                            ? const Color(0xFF22C55E).withValues(alpha: 0.4)
+                            : const Color(0xFFFFB800).withValues(alpha: 0.4),
+                        width: 0.8,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: isPlaying
+                                ? const Color(0xFF22C55E)
+                                : const Color(0xFFFFB800),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isPlaying ? 'ĐANG PHÁT' : 'TẠM DỪNG',
+                          style: AppTheme.monoStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                            color: isPlaying
+                                ? const Color(0xFF22C55E)
+                                : const Color(0xFFFFB800),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              BouncingIconButton(
+                padding: EdgeInsets.zero,
+                constraints:
+                    const BoxConstraints(minWidth: 24, minHeight: 24),
+                icon: Icon(Icons.close,
+                    size: 16, color: AppTheme.getTextMuted(context)),
+                onPressed: () {
+                  audioPlayerService.stopAndReset();
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          InkWell(
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => NowPlayingScreen(
+                    playerService: audioPlayerService,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.getSurfaceSubtle(context),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(
+                  color: AppTheme.getBorder(context),
+                  width: 0.8,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: AppTheme.getSurfaceElevated(context),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      border: Border.all(
+                        color: AppTheme.getBorder(context),
+                        width: 0.8,
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: AppCoverImage(
+                      url: currentSong.coverUrl,
+                      width: 38,
+                      height: 38,
+                      borderRadius: AppTheme.radiusSm,
+                      iconSize: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          currentSong.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.getText(context),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${currentSong.artist} • ${currentSong.formattedDuration}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTheme.monoStyle(
+                            fontSize: 10,
+                            color: AppTheme.getTextSecondary(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  BouncingWidget(
+                    onTap: () {
+                      audioPlayerService.togglePlayPause();
+                    },
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppTheme.getAction(context),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          isPlaying ? Icons.pause : Icons.play_arrow,
+                          size: 18,
+                          color: AppTheme.getActionText(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (upcoming.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Text(
+                  'Bài tiếp theo trong nhóm (${upcoming.length}):',
+                  style: AppTheme.monoStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.getTextSecondary(context),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            ...upcoming.take(2).map((song) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppTheme.getSurfaceElevated(context),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: AppTheme.getBorder(context),
+                    width: 0.6,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.subdirectory_arrow_right,
+                        size: 13, color: AppTheme.getTextMuted(context)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        '${song.title} — ${song.artist}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.getText(context),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      song.formattedDuration,
+                      style: AppTheme.monoStyle(
+                        fontSize: 9.5,
+                        color: AppTheme.getTextMuted(context),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            if (upcoming.length > 2)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  '+ ${upcoming.length - 2} bài hát khác trong nhóm',
+                  style: AppTheme.monoStyle(
+                    fontSize: 9.5,
+                    color: AppTheme.getTextMuted(context),
+                  ),
+                ),
+              ),
+          ],
+        ],
       ),
     );
   }

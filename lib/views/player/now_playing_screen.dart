@@ -4,7 +4,6 @@ import '../../services/audio_player_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/song_model.dart';
 import '../../widgets/tech_playback_controls.dart';
-import 'queue_screen.dart';
 
 class NowPlayingScreen extends StatefulWidget {
   final AudioPlayerService playerService;
@@ -88,19 +87,6 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
               ),
               ListTile(
                 dense: true,
-                leading: Icon(Icons.queue_music,
-                    color: AppTheme.getText(context), size: 20),
-                title: Text('Xem hàng đợi phát nhạc',
-                    style: TextStyle(
-                        fontSize: 13, color: AppTheme.getText(context))),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const QueueScreen()));
-                },
-              ),
-              ListTile(
-                dense: true,
                 leading: Icon(Icons.playlist_add,
                     color: AppTheme.getText(context), size: 20),
                 title: Text('Thêm vào danh sách phát',
@@ -160,8 +146,6 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
             ? duration.inMilliseconds.toDouble()
             : 1000.0;
 
-        final nextSong = widget.playerService.nextSong;
-
         return Transform.translate(
           offset: Offset(0, _dragOffset),
           child: Scaffold(
@@ -196,233 +180,333 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
               onVerticalDragUpdate: _onVerticalDragUpdate,
               onVerticalDragEnd: _onVerticalDragEnd,
               child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 8.0),
-                  child: Column(
-                    children: [
-                      const Spacer(flex: 1),
-                      Center(
-                        child: Container(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics()),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 8.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Container(
+                        width: 230,
+                        height: 230,
+                        decoration: BoxDecoration(
+                          color: AppTheme.getSurfaceSubtle(context),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSm),
+                          border: Border.all(
+                              color: AppTheme.getBorder(context), width: 0.8),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: AppCoverImage(
+                          url: song.coverUrl,
                           width: 230,
                           height: 230,
-                          decoration: BoxDecoration(
-                            color: AppTheme.getSurfaceSubtle(context),
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(
-                                color: AppTheme.getBorder(context), width: 0.8),
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: AppCoverImage(
-                            url: song.coverUrl,
-                            width: 230,
-                            height: 230,
-                            borderRadius: AppTheme.radiusSm,
-                            iconSize: 64,
-                          ),
+                          borderRadius: AppTheme.radiusSm,
+                          iconSize: 64,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        song.title,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.getText(context),
-                          letterSpacing: -0.2,
-                        ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      song.title,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.getText(context),
+                        letterSpacing: -0.2,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        song.artist,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                          color: AppTheme.getTextSecondary(context),
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      song.artist,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: AppTheme.getTextSecondary(context),
                       ),
-                      const SizedBox(height: 16),
-                      StreamBuilder<Duration>(
-                        stream: widget.playerService.player.positionStream,
-                        builder: (context, snapshot) {
-                          final livePosition = snapshot.data ??
-                              widget.playerService.player.position;
-                          final currentSeconds = _isDraggingSeek
-                              ? _seekPosition
-                              : livePosition.inMilliseconds
-                                  .toDouble()
-                                  .clamp(0.0, totalSeconds);
+                    ),
+                    const SizedBox(height: 16),
+                    StreamBuilder<Duration>(
+                      stream: widget.playerService.player.positionStream,
+                      builder: (context, snapshot) {
+                        final livePosition = snapshot.data ??
+                            widget.playerService.player.position;
+                        final currentSeconds = _isDraggingSeek
+                            ? _seekPosition
+                            : livePosition.inMilliseconds
+                                .toDouble()
+                                .clamp(0.0, totalSeconds);
 
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              RepaintBoundary(
-                                child: _buildWaveformBar(
-                                    context, currentSeconds / totalSeconds),
-                              ),
-                              const SizedBox(height: 6),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 2),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      _formatDuration(_isDraggingSeek
-                                          ? Duration(
-                                              milliseconds:
-                                                  _seekPosition.round())
-                                          : livePosition),
-                                      style: AppTheme.monoStyle(
-                                        fontSize: 11,
-                                        color:
-                                            AppTheme.getTextSecondary(context),
-                                      ),
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RepaintBoundary(
+                              child: _buildWaveformBar(
+                                  context, currentSeconds / totalSeconds),
+                            ),
+                            const SizedBox(height: 6),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    _formatDuration(_isDraggingSeek
+                                        ? Duration(
+                                            milliseconds:
+                                                _seekPosition.round())
+                                        : livePosition),
+                                    style: AppTheme.monoStyle(
+                                      fontSize: 11,
+                                      color:
+                                          AppTheme.getTextSecondary(context),
                                     ),
-                                    Text(
-                                      _formatDuration(duration),
-                                      style: AppTheme.monoStyle(
-                                        fontSize: 11,
-                                        color:
-                                            AppTheme.getTextSecondary(context),
-                                      ),
+                                  ),
+                                  Text(
+                                    _formatDuration(duration),
+                                    style: AppTheme.monoStyle(
+                                      fontSize: 11,
+                                      color:
+                                          AppTheme.getTextSecondary(context),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 14),
-                      RepaintBoundary(
-                        child: TechPlaybackControls(
-                          playerService: widget.playerService,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        '${song.format.toUpperCase()}  |  ${song.bitrate.toUpperCase()}  |  44.1 KHZ',
-                        style: AppTheme.monoStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.getTextMuted(context),
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      const Spacer(flex: 1),
-                      if (nextSong != null) ...[
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Tiếp theo',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.getText(context),
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        BouncingWidget(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const QueueScreen()),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: AppTheme.getSurface(context),
-                              borderRadius:
-                                  BorderRadius.circular(AppTheme.radiusSm),
-                              border: Border.all(
-                                  color: AppTheme.getBorder(context),
-                                  width: 0.8),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.getSurfaceSubtle(context),
-                                    borderRadius: BorderRadius.circular(
-                                        AppTheme.radiusSm),
-                                    border: Border.all(
-                                        color: AppTheme.getBorder(context),
-                                        width: 0.8),
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: AppCoverImage(
-                                    url: nextSong.coverUrl,
-                                    width: 36,
-                                    height: 36,
-                                    borderRadius: AppTheme.radiusSm,
-                                    iconSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        nextSong.title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppTheme.getText(context),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 1),
-                                      Text(
-                                        '${nextSong.artist} · ${nextSong.formattedDuration}',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: AppTheme.monoStyle(
-                                          fontSize: 10,
-                                          color: AppTheme.getTextSecondary(
-                                              context),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  size: 18,
-                                  color: AppTheme.getTextMuted(context),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 10),
-                    ],
-                  ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    RepaintBoundary(
+                      child: TechPlaybackControls(
+                        playerService: widget.playerService,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      '${song.format.toUpperCase()}  |  ${song.bitrate.toUpperCase()}  |  44.1 KHZ',
+                      style: AppTheme.monoStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.getTextMuted(context),
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    _buildNextSongsSection(
+                        context, widget.playerService.upcomingSongs),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               ),
             ),
           ),
-        );
-      },
+        ),
+      );
+    },
+  );
+}
+
+  String _calculateTotalDuration(List<Song> songs) {
+    final totalSec = songs.fold<int>(0, (sum, s) => sum + s.duration);
+    final m = totalSec ~/ 60;
+    final s = totalSec % 60;
+    if (m >= 60) {
+      final h = m ~/ 60;
+      final remM = m % 60;
+      return '${h}h ${remM}m';
+    }
+    return '${m}m ${s.toString().padLeft(2, '0')}s';
+  }
+
+  Widget _buildNextSongsSection(BuildContext context, List<Song> upcoming) {
+    if (upcoming.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(top: 18),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.getSurface(context),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(
+          color: AppTheme.getBorder(context),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.playlist_play_rounded,
+                    size: 18,
+                    color: AppTheme.getText(context),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Bài tiếp theo',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.getText(context),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${upcoming.length} bài · ${_calculateTotalDuration(upcoming)}',
+                    style: AppTheme.monoStyle(
+                      fontSize: 10.5,
+                      color: AppTheme.getTextSecondary(context),
+                    ),
+                  ),
+                ],
+              ),
+              BouncingWidget(
+                onTap: () {
+                  widget.playerService.clearUpcomingSongs();
+                  AppTheme.showSnackBar(
+                    context,
+                    'Đã dọn dẹp danh sách bài tiếp theo',
+                  );
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: AppTheme.getBorder(context),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Text(
+                    'Xóa tất cả',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.getTextSecondary(context),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...List.generate(upcoming.length, (index) {
+            final upSong = upcoming[index];
+            final trackStr = (index + 1).toString().padLeft(2, '0');
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppTheme.getSurfaceSubtle(context),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(
+                  color: AppTheme.getBorder(context),
+                  width: 0.8,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.drag_handle,
+                      size: 14, color: AppTheme.getTextMuted(context)),
+                  const SizedBox(width: 6),
+                  SizedBox(
+                    width: 20,
+                    child: Text(
+                      trackStr,
+                      style: AppTheme.monoStyle(
+                        fontSize: 10.5,
+                        color: AppTheme.getTextMuted(context),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppTheme.getSurface(context),
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.radiusSm),
+                      border: Border.all(
+                        color: AppTheme.getBorder(context),
+                        width: 0.8,
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: AppCoverImage(
+                      url: upSong.coverUrl,
+                      width: 32,
+                      height: 32,
+                      borderRadius: AppTheme.radiusSm,
+                      iconSize: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        widget.playerService.playSong(upSong);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            upSong.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.getText(context),
+                            ),
+                          ),
+                          const SizedBox(height: 1),
+                          Text(
+                            '${upSong.artist} • ${upSong.formattedDuration}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.monoStyle(
+                              fontSize: 9.5,
+                              color: AppTheme.getTextSecondary(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  BouncingIconButton(
+                    icon: Icon(Icons.close,
+                        size: 15, color: AppTheme.getTextMuted(context)),
+                    onPressed: () {
+                      widget.playerService.removeUpcomingSong(upSong.id);
+                    },
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 

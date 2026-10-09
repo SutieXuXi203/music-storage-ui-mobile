@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/song_model.dart';
 import '../providers/folder_provider.dart';
 import '../core/theme/app_theme.dart';
+import '../services/audio_player_service.dart';
 import '../views/details/song_detail_screen.dart';
 import 'mini_equalizer_widget.dart';
 
@@ -118,6 +119,24 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                   onTap: () {
                     Navigator.pop(ctx);
                     widget.onTap();
+                  },
+                ),
+                ListTile(
+                  dense: true,
+                  leading: Icon(Icons.playlist_play_rounded,
+                      color: AppTheme.getText(context), size: 20),
+                  title: Text('Phát tiếp theo',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.getText(context))),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    audioPlayerService.addToNext(widget.song);
+                    AppTheme.showSnackBar(
+                      context,
+                      'Đã thêm "${widget.song.title}" vào Bài tiếp theo',
+                    );
                   },
                 ),
                 ListTile(

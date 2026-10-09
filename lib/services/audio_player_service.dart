@@ -42,6 +42,10 @@ class AudioPlayerService extends ChangeNotifier {
       (_currentIndex >= 0 && _currentIndex + 1 < _playlist.length)
           ? _playlist[_currentIndex + 1]
           : (_playlist.isNotEmpty ? _playlist.first : null);
+  List<Song> get upcomingSongs {
+    if (_currentIndex < 0 || _currentIndex + 1 >= _playlist.length) return [];
+    return _playlist.sublist(_currentIndex + 1);
+  }
   bool get isLoading =>
       _isLoading ||
       _player.processingState == ProcessingState.buffering ||
@@ -96,6 +100,57 @@ class AudioPlayerService extends ChangeNotifier {
       _playlist.insert(0, song);
       await playSongAtIndex(0);
     }
+  }
+
+  void addToNext(Song song) {
+    if (_playlist.isEmpty || _currentIndex < 0) {
+      playSong(song);
+      return;
+    }
+    final existingIdx = _playlist.indexWhere((s) => s.id == song.id);
+    if (existingIdx >= 0) {
+      if (existingIdx == _currentIndex) return;
+      _playlist.removeAt(existingIdx);
+      if (existingIdx < _currentIndex) {
+        _currentIndex--;
+      }
+    }
+    final insertIdx = (_currentIndex + 1).clamp(0, _playlist.length);
+    _playlist.insert(insertIdx, song);
+    notifyListeners();
+  }
+
+  void removeUpcomingSong(String songId) {
+    final idx = _playlist.indexWhere((s) => s.id == songId);
+    if (idx < 0 || idx == _currentIndex) return;
+    if (idx < _currentIndex) _currentIndex--;
+    _playlist.removeAt(idx);
+    notifyListeners();
+  }
+
+  void clearUpcomingSongs() {
+    if (_currentIndex >= 0 && _currentIndex < _playlist.length) {
+      _playlist = [_playlist[_currentIndex]];
+      _currentIndex = 0;
+    } else {
+      _playlist.clear();
+      _currentIndex = -1;
+    }
+    notifyListeners();
+  }
+
+  void reorderUpcoming(int oldIndex, int newIndex) {
+    final base = _currentIndex + 1;
+    final realOld = base + oldIndex;
+    var realNew = base + newIndex;
+    if (realOld < base || realOld >= _playlist.length) return;
+    if (realNew < base || realNew > _playlist.length) return;
+    if (oldIndex < newIndex) {
+      realNew -= 1;
+    }
+    final item = _playlist.removeAt(realOld);
+    _playlist.insert(realNew, item);
+    notifyListeners();
   }
 
   Future<void> playSongAtIndex(int index) async {
