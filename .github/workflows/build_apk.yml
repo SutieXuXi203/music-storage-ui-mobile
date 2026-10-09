@@ -72,16 +72,20 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.15
-          name: Meowsic App Release v1.0.15
+          tag_name: v1.0.16
+          name: Meowsic App Release v1.0.16
           body: |
-            ## Meowsic Music App Android Release v1.0.15
+            ## Meowsic Music App Android Release v1.0.16
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.15** (Build 16)
-            - **Chuyển tab Library sang bên trái tab Search**: Thanh điều hướng bên dưới hiện theo thứ tự `[Trang chủ (Home), Thư viện (Library), Tìm kiếm (Search)]`.
-            - **Bỏ huy hiệu và ràng buộc Thư mục mặc định**: Tất cả thư mục đều tự do và bình đẳng, người dùng có toàn quyền đổi tên, đổi ảnh bìa hoặc xóa thư mục bất kỳ.
-            - **Đặt ảnh bìa tùy chỉnh cho thư mục**: Hỗ trợ chọn ảnh từ thư viện thiết bị hoặc nhập liên kết ảnh online trực tiếp.
-            - **Đồng nhất bo tròn 4px toàn bộ giao diện**: Chuẩn hóa phong cách thiết kế phẳng tối giản, sắc sảo.
+            - Phiên bản: **v1.0.16** (Build 17)
+            - **Recently Played chuẩn 5 bài nghe gần đây nhất (Cơ chế LRU)**:
+              - Danh sách hiển thị chính xác tối đa 5 bài nhạc được nghe gần đây.
+              - Khi nghe một bài nhạc mới, bài đó sẽ được đẩy lên đầu tiên (vị trí 1), bài nghe sớm nhất ở cuối danh sách sẽ tự động bị thay thế (ví dụ: đang có `1, 2, 3, 4, 5`, nghe bài `6` sẽ đổi thành `6, 1, 2, 3, 4`).
+              - Nếu nghe lại một bài đã có trong danh sách (ví dụ nghe bài `3`), bài đó sẽ lập tức được đẩy lên đầu danh sách (`3, 6, 1, 2, 4`).
+              - Lưu trữ bền vững trên thiết bị qua SharedPreferences, không bị mất danh sách khi đóng/mở lại ứng dụng.
+              - Chạm vào toàn bộ thanh bài hát (hoặc nút play) để phát nhạc ngay tức thì.
+            - **Chuyển tab Library sang bên trái tab Search**: Thanh điều hướng hiện theo thứ tự `[Home, Library, Search]`.
+            - **Bỏ hẳn thư mục mặc định & xóa triệt để tự động tạo lại**: Giờ đây người dùng toàn quyền quản lý thư mục cá nhân.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |

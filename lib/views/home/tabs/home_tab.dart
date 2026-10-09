@@ -126,7 +126,7 @@ class _HomeTabState extends State<HomeTab> {
     final songs = songProvider.songs;
     final folders = folderProvider.folders;
 
-    final recentSongs = songs.length > 5 ? songs.take(5).toList() : songs;
+    final recentSongs = songProvider.recentSongs;
 
     return Scaffold(
       backgroundColor: AppTheme.getBg(context),
@@ -550,7 +550,6 @@ class _HomeTabState extends State<HomeTab> {
   Widget _buildRecentSongTile(BuildContext context, Song song) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: AppTheme.getSurface(context),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -559,101 +558,109 @@ class _HomeTabState extends State<HomeTab> {
           width: 0.8,
         ),
       ),
-      child: Row(
-        children: [
-          // Thumbnail (36x36px)
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppTheme.getSurfaceSubtle(context),
-              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              border: Border.all(
-                color: AppTheme.getBorder(context),
-                width: 0.8,
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                ? Image.network(
-                    song.coverUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
-                  )
-                : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
-          ),
-          const SizedBox(width: 10),
-
-          // Title & Artist
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          onTap: () {
+            final songProv = Provider.of<SongProvider>(context, listen: false);
+            final idx = songProv.songs.indexWhere((s) => s.id == song.id);
+            audioPlayerService.setPlaylist(songProv.songs, initialIndex: idx >= 0 ? idx : 0);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            child: Row(
               children: [
-                Text(
-                  song.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    color: AppTheme.getText(context),
+                // Thumbnail (36x36px)
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.getSurfaceSubtle(context),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: AppTheme.getBorder(context),
+                      width: 0.8,
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: song.coverUrl != null && song.coverUrl!.isNotEmpty
+                      ? Image.network(
+                          song.coverUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                        )
+                      : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                ),
+                const SizedBox(width: 10),
+
+                // Title & Artist
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        song.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: AppTheme.getText(context),
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      Row(
+                        children: [
+                          Text(
+                            song.artist,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.getTextSecondary(context),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            song.formattedDuration,
+                            style: AppTheme.monoStyle(
+                              fontSize: 10,
+                              color: AppTheme.getTextMuted(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 1),
-                Row(
-                  children: [
-                    Text(
-                      song.artist,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppTheme.getTextSecondary(context),
-                      ),
+
+                // Compact Circular Play button (28x28px)
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.getBorder(context),
+                      width: 1.0,
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      song.formattedDuration,
-                      style: AppTheme.monoStyle(
-                        fontSize: 10,
-                        color: AppTheme.getTextMuted(context),
-                      ),
+                    color: Colors.transparent,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.play_arrow,
+                      size: 16,
+                      color: AppTheme.getText(context),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
-
-          // Compact Circular Play button (28x28px)
-          GestureDetector(
-            onTap: () {
-              final songProv = Provider.of<SongProvider>(context, listen: false);
-              final idx = songProv.songs.indexWhere((s) => s.id == song.id);
-              audioPlayerService.setPlaylist(songProv.songs, initialIndex: idx >= 0 ? idx : 0);
-            },
-            child: Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppTheme.getBorder(context),
-                  width: 1.0,
-                ),
-                color: Colors.transparent,
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.play_arrow,
-                  size: 16,
-                  color: AppTheme.getText(context),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

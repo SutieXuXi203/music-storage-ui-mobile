@@ -2,8 +2,29 @@ import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/song_model.dart';
 
+typedef SongPlayedCallback = void Function(Song song);
+
 class AudioPlayerService extends ChangeNotifier {
   final AudioPlayer _player = AudioPlayer();
+  final List<SongPlayedCallback> _songPlayedListeners = [];
+
+  void addSongPlayedListener(SongPlayedCallback listener) {
+    _songPlayedListeners.add(listener);
+  }
+
+  void removeSongPlayedListener(SongPlayedCallback listener) {
+    _songPlayedListeners.remove(listener);
+  }
+
+  void _notifySongPlayed(Song song) {
+    for (final listener in List<SongPlayedCallback>.from(_songPlayedListeners)) {
+      try {
+        listener(song);
+      } catch (e) {
+        debugPrint('[AudioPlayer] Lỗi listener bài hát vừa phát: $e');
+      }
+    }
+  }
 
   List<Song> _playlist = [];
   int _currentIndex = -1;
@@ -75,6 +96,8 @@ class AudioPlayerService extends ChangeNotifier {
     if (index < 0 || index >= _playlist.length) return;
     _currentIndex = index;
     final song = _playlist[index];
+
+    _notifySongPlayed(song);
 
     final streamUrl = song.streamUrl;
     if (streamUrl == null || streamUrl.isEmpty) {
@@ -151,6 +174,7 @@ class AudioPlayerService extends ChangeNotifier {
 
   @override
   void dispose() {
+    _songPlayedListeners.clear();
     _player.dispose();
     super.dispose();
   }
