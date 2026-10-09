@@ -58,7 +58,12 @@ jobs:
 
       - name: Build APK Release
         run: |
-          flutter build apk --release --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
+          API_URL="${{ secrets.API_BASE_URL }}"
+          if [ -z "$API_URL" ]; then
+            API_URL="https://music-storage-backend.fly.dev/api"
+          fi
+          echo "Building APK with API_BASE_URL=$API_URL"
+          flutter build apk --release --dart-define=API_BASE_URL="$API_URL"
           cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/meowsic.apk
           cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/sutorage.apk
 
@@ -72,20 +77,20 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.16
-          name: Meowsic App Release v1.0.16
+          tag_name: v1.0.17
+          name: Meowsic App Release v1.0.17
           body: |
-            ## Meowsic Music App Android Release v1.0.16
+            ## Meowsic Music App Android Release v1.0.17
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.16** (Build 17)
+            - Phiên bản: **v1.0.17** (Build 18)
+            - **Khắc phục triệt để lỗi Connection Timeout (Lỗi kết nối máy chủ)**:
+              - Đảm bảo app luôn kết nối trực tiếp đến máy chủ Production Fly.io (`https://music-storage-backend.fly.dev/api`), loại bỏ hoàn toàn việc fallback nhầm sang IP `10.0.2.2`.
+              - Nâng timeout kết nối mạng lên 45 giây để máy chủ đám mây kịp phản hồi ngay cả khi dùng mạng 4G/di động.
+              - Cập nhật máy chủ Fly.io luôn duy trì ít nhất 1 máy ảo hoạt động liên tục (min_machines_running = 1) để phản hồi tức thì dưới 1 giây.
             - **Recently Played chuẩn 5 bài nghe gần đây nhất (Cơ chế LRU)**:
               - Danh sách hiển thị chính xác tối đa 5 bài nhạc được nghe gần đây.
-              - Khi nghe một bài nhạc mới, bài đó sẽ được đẩy lên đầu tiên (vị trí 1), bài nghe sớm nhất ở cuối danh sách sẽ tự động bị thay thế (ví dụ: đang có `1, 2, 3, 4, 5`, nghe bài `6` sẽ đổi thành `6, 1, 2, 3, 4`).
-              - Nếu nghe lại một bài đã có trong danh sách (ví dụ nghe bài `3`), bài đó sẽ lập tức được đẩy lên đầu danh sách (`3, 6, 1, 2, 4`).
-              - Lưu trữ bền vững trên thiết bị qua SharedPreferences, không bị mất danh sách khi đóng/mở lại ứng dụng.
-              - Chạm vào toàn bộ thanh bài hát (hoặc nút play) để phát nhạc ngay tức thì.
+              - Khi nghe một bài nhạc mới, bài đó sẽ được đẩy lên đầu tiên (vị trí 1), bài nghe sớm nhất ở cuối danh sách sẽ tự động bị thay thế.
             - **Chuyển tab Library sang bên trái tab Search**: Thanh điều hướng hiện theo thứ tự `[Home, Library, Search]`.
-            - **Bỏ hẳn thư mục mặc định & xóa triệt để tự động tạo lại**: Giờ đây người dùng toàn quyền quản lý thư mục cá nhân.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |

@@ -65,12 +65,18 @@ class AuthProvider extends ChangeNotifier {
           return false;
         }
       }
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.sendTimeout || e.type == DioExceptionType.receiveTimeout) {
+          _errorMessage = 'Hết thời gian kết nối đến máy chủ. Máy chủ có thể đang khởi động lại hoặc mạng yếu, vui lòng thử lại sau giây lát.';
+          return false;
+        }
+      }
       if (e.toString().contains('401')) {
         _errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác.';
       } else if (e.toString().contains('422')) {
         _errorMessage = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.';
       } else {
-        _errorMessage = 'Lỗi kết nối máy chủ ($e). Vui lòng kiểm tra lại backend.';
+        _errorMessage = 'Lỗi kết nối máy chủ ($e). Vui lòng thử lại.';
       }
       return false;
     } finally {

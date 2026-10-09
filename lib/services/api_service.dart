@@ -12,7 +12,7 @@ class ApiService {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
-        connectTimeout: const Duration(seconds: 30),
+        connectTimeout: const Duration(seconds: 45),
         receiveTimeout: const Duration(seconds: 120), // Cho phép tải nhạc YouTube mất nhiều thời gian
         headers: {
           'Content-Type': 'application/json',
