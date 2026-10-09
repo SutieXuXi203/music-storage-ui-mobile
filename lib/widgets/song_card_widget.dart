@@ -293,17 +293,9 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                         final ok = await folderProv.addSongToFolder(
                             folder.id, widget.song);
                         if (context.mounted && ok) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Đã chuyển "${widget.song.title}" vào thư mục "${folder.name}"',
-                                style: AppTheme.monoStyle(fontSize: 12),
-                              ),
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor:
-                                  AppTheme.getSurfaceElevated(context),
-                            ),
+                          AppTheme.showSnackBar(
+                            context,
+                            'Đã chuyển "${widget.song.title}" vào thư mục "${folder.name}"',
                           );
                         }
                       },

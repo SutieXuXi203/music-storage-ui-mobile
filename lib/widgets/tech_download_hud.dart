@@ -68,15 +68,9 @@ class _TechDownloadHudState extends State<TechDownloadHud>
     if (matched != null) {
       audioPlayerService.playSong(matched);
     } else if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Bài hát đã được lưu. Mở tab Thư viện để nghe.',
-            style: GoogleFonts.jetBrainsMono(fontSize: 12),
-          ),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppTheme.showSnackBar(
+        context,
+        'Bài hát đã được lưu. Mở tab Thư viện để nghe.',
       );
     }
   }

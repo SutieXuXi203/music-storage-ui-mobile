@@ -163,12 +163,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
               final ok = await folderProv.deleteFolder(folder.id);
               if (mounted && ok) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Đã xóa thư mục "${folder.name}"',
-                        style: AppTheme.monoStyle(fontSize: 12)),
-                    backgroundColor: AppTheme.getSurfaceElevated(context),
-                  ),
+                AppTheme.showSnackBar(
+                  context,
+                  'Đã xóa thư mục "${folder.name}"',
                 );
               }
             },
@@ -256,28 +253,21 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                       final ok = await folderProv.uploadFolderCoverImage(
                           folder.id, bytes, file.name);
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                ok
-                                    ? 'Đã cập nhật ảnh bìa thư mục'
-                                    : 'Không thể cập nhật ảnh bìa',
-                                style: AppTheme.monoStyle(fontSize: 12)),
-                            backgroundColor: ok
-                                ? AppTheme.getSurfaceElevated(context)
-                                : AppTheme.getDanger(context),
-                          ),
+                        AppTheme.showSnackBar(
+                          context,
+                          ok
+                              ? 'Đã cập nhật ảnh bìa thư mục'
+                              : 'Không thể cập nhật ảnh bìa',
+                          isError: !ok,
                         );
                       }
                     }
                   } catch (e) {
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Lỗi chọn ảnh: $e',
-                              style: AppTheme.monoStyle(fontSize: 12)),
-                          backgroundColor: AppTheme.getDanger(context),
-                        ),
+                      AppTheme.showSnackBar(
+                        context,
+                        'Lỗi chọn ảnh: $e',
+                        isError: true,
                       );
                     }
                   }
@@ -353,13 +343,10 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                     final ok =
                         await folderProv.updateFolderCoverUrl(folder.id, null);
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại',
-                              style: AppTheme.monoStyle(fontSize: 12)),
-                          backgroundColor: AppTheme.getSurfaceElevated(context),
-                        ),
+                      AppTheme.showSnackBar(
+                        context,
+                        ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại',
+                        isError: !ok,
                       );
                     }
                   },
@@ -439,15 +426,10 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
               final ok = await folderProv.updateFolderCoverUrl(
                   folder.id, url.isNotEmpty ? url : null);
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại',
-                        style: AppTheme.monoStyle(fontSize: 12)),
-                    backgroundColor: ok
-                        ? AppTheme.getSurfaceElevated(context)
-                        : AppTheme.getDanger(context),
-                  ),
+                AppTheme.showSnackBar(
+                  context,
+                  ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại',
+                  isError: !ok,
                 );
               }
             },
@@ -644,22 +626,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                                               availableSongs.removeAt(idx);
                                             });
                                             if (modalCtx.mounted) {
-                                              ScaffoldMessenger.of(modalCtx)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'Đã thêm "${song.title}" vào thư mục',
-                                                    style: AppTheme.monoStyle(
-                                                        fontSize: 12),
-                                                  ),
-                                                  duration: const Duration(
-                                                      seconds: 1),
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                  backgroundColor: AppTheme
-                                                      .getSurfaceElevated(
-                                                          modalCtx),
-                                                ),
+                                              AppTheme.showSnackBar(
+                                                modalCtx,
+                                                'Đã thêm "${song.title}" vào thư mục',
                                               );
                                             }
                                           }
@@ -834,16 +803,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                     final ok = await folderProv.removeSongFromFolder(
                         folder.id, song.id);
                     if (mounted && ok) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Đã loại bỏ "${song.title}" khỏi thư mục "${folder.name}"',
-                            style: AppTheme.monoStyle(fontSize: 12),
-                          ),
-                          duration: const Duration(seconds: 2),
-                          backgroundColor: AppTheme.getSurfaceElevated(context),
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                      AppTheme.showSnackBar(
+                        context,
+                        'Đã loại bỏ "${song.title}" khỏi thư mục "${folder.name}"',
                       );
                     }
                   },
@@ -943,17 +905,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                           target.id, song,
                           fromFolderId: currentFolder.id);
                       if (mounted && ok) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Đã chuyển "${song.title}" sang thư mục "${target.name}"',
-                              style: AppTheme.monoStyle(fontSize: 12),
-                            ),
-                            duration: const Duration(seconds: 2),
-                            backgroundColor:
-                                AppTheme.getSurfaceElevated(context),
-                            behavior: SnackBarBehavior.floating,
-                          ),
+                        AppTheme.showSnackBar(
+                          context,
+                          'Đã chuyển "${song.title}" sang thư mục "${target.name}"',
                         );
                       }
                     },

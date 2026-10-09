@@ -120,36 +120,12 @@ class _LibraryTabState extends State<LibraryTab> {
                   Provider.of<DownloadProvider>(context, listen: false);
               downloadProv.startDownload(url, songProvider: songProv);
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  backgroundColor: AppTheme.getSurfaceElevated(context),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    side: BorderSide(
-                        color: AppTheme.getBorder(context), width: 0.8),
-                  ),
-                  content: Row(
-                    children: [
-                      const Icon(Icons.downloading_rounded,
-                          size: 18, color: Color(0xFF38BDF8)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Đang tải bài hát từ YouTube. Thiết bị sẽ có thông báo khi hoàn tất.',
-                          style: AppTheme.monoStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.getText(context),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  duration: const Duration(seconds: 3),
-                ),
+              AppTheme.showSnackBar(
+                context,
+                'Đang tải bài hát từ YouTube. Thiết bị sẽ có thông báo khi hoàn tất.',
+                icon: Icons.downloading_rounded,
+                iconColor: const Color(0xFF38BDF8),
+                duration: const Duration(seconds: 3),
               );
             }
           }
@@ -363,26 +339,16 @@ class _LibraryTabState extends State<LibraryTab> {
                 final folder = await folderProv.createFolder(name);
                 if (mounted) {
                   if (folder != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã tạo thư mục "$name"',
-                            style: AppTheme.monoStyle(fontSize: 12)),
-                        duration: const Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: AppTheme.getSurfaceElevated(context),
-                      ),
+                    AppTheme.showSnackBar(
+                      context,
+                      'Đã tạo thư mục "$name"',
                     );
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            folderProv.errorMessage ??
-                                'Tạo thư mục thất bại. Vui lòng thử lại!',
-                            style: AppTheme.monoStyle(fontSize: 12)),
-                        duration: const Duration(seconds: 3),
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: AppTheme.getDanger(context),
-                      ),
+                    AppTheme.showSnackBar(
+                      context,
+                      folderProv.errorMessage ??
+                          'Tạo thư mục thất bại. Vui lòng thử lại!',
+                      isError: true,
                     );
                   }
                 }
@@ -451,12 +417,9 @@ class _LibraryTabState extends State<LibraryTab> {
                     Provider.of<FolderProvider>(context, listen: false);
                 final ok = await folderProv.renameFolder(folder.id, newName);
                 if (mounted && ok) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Đã đổi tên thư mục thành "$newName"',
-                          style: AppTheme.monoStyle(fontSize: 12)),
-                      backgroundColor: AppTheme.getSurfaceElevated(context),
-                    ),
+                  AppTheme.showSnackBar(
+                    context,
+                    'Đã đổi tên thư mục thành "$newName"',
                   );
                 }
               }
@@ -508,12 +471,9 @@ class _LibraryTabState extends State<LibraryTab> {
                   Provider.of<FolderProvider>(context, listen: false);
               final ok = await folderProv.deleteFolder(folder.id);
               if (mounted && ok) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Đã xóa thư mục "${folder.name}"',
-                        style: AppTheme.monoStyle(fontSize: 12)),
-                    backgroundColor: AppTheme.getSurfaceElevated(context),
-                  ),
+                AppTheme.showSnackBar(
+                  context,
+                  'Đã xóa thư mục "${folder.name}"',
                 );
               }
             },
@@ -601,28 +561,21 @@ class _LibraryTabState extends State<LibraryTab> {
                       final ok = await folderProv.uploadFolderCoverImage(
                           folder.id, bytes, file.name);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                ok
-                                    ? 'Đã cập nhật ảnh bìa thư mục'
-                                    : 'Không thể cập nhật ảnh bìa',
-                                style: AppTheme.monoStyle(fontSize: 12)),
-                            backgroundColor: ok
-                                ? AppTheme.getSurfaceElevated(context)
-                                : AppTheme.getDanger(context),
-                          ),
+                        AppTheme.showSnackBar(
+                          context,
+                          ok
+                              ? 'Đã cập nhật ảnh bìa thư mục'
+                              : 'Không thể cập nhật ảnh bìa',
+                          isError: !ok,
                         );
                       }
                     }
                   } catch (e) {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Lỗi chọn ảnh: $e',
-                              style: AppTheme.monoStyle(fontSize: 12)),
-                          backgroundColor: AppTheme.getDanger(context),
-                        ),
+                      AppTheme.showSnackBar(
+                        context,
+                        'Lỗi chọn ảnh: $e',
+                        isError: true,
                       );
                     }
                   }
@@ -698,13 +651,10 @@ class _LibraryTabState extends State<LibraryTab> {
                     final ok =
                         await folderProv.updateFolderCoverUrl(folder.id, null);
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại',
-                              style: AppTheme.monoStyle(fontSize: 12)),
-                          backgroundColor: AppTheme.getSurfaceElevated(context),
-                        ),
+                      AppTheme.showSnackBar(
+                        context,
+                        ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại',
+                        isError: !ok,
                       );
                     }
                   },
@@ -784,15 +734,10 @@ class _LibraryTabState extends State<LibraryTab> {
               final ok = await folderProv.updateFolderCoverUrl(
                   folder.id, url.isNotEmpty ? url : null);
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại',
-                        style: AppTheme.monoStyle(fontSize: 12)),
-                    backgroundColor: ok
-                        ? AppTheme.getSurfaceElevated(context)
-                        : AppTheme.getDanger(context),
-                  ),
+                AppTheme.showSnackBar(
+                  context,
+                  ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại',
+                  isError: !ok,
                 );
               }
             },

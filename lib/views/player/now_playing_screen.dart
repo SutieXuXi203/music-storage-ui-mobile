@@ -108,11 +108,9 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                         fontSize: 13, color: AppTheme.getText(context))),
                 onTap: () {
                   Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Đã thêm "${song.title}" vào playlist!'),
-                      duration: const Duration(seconds: 1),
-                    ),
+                  AppTheme.showSnackBar(
+                    context,
+                    'Đã thêm "${song.title}" vào playlist!',
                   );
                 },
               ),

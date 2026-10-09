@@ -94,26 +94,16 @@ class _HomeTabState extends State<HomeTab> {
                 final folder = await folderProv.createFolder(name);
                 if (context.mounted) {
                   if (folder != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã tạo thư mục "$name"',
-                            style: AppTheme.monoStyle(fontSize: 12)),
-                        duration: const Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: AppTheme.getSurfaceElevated(context),
-                      ),
+                    AppTheme.showSnackBar(
+                      context,
+                      'Đã tạo thư mục "$name"',
                     );
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            folderProv.errorMessage ??
-                                'Tạo thư mục thất bại. Vui lòng thử lại!',
-                            style: AppTheme.monoStyle(fontSize: 12)),
-                        duration: const Duration(seconds: 3),
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: AppTheme.getDanger(context),
-                      ),
+                    AppTheme.showSnackBar(
+                      context,
+                      folderProv.errorMessage ??
+                          'Tạo thư mục thất bại. Vui lòng thử lại!',
+                      isError: true,
                     );
                   }
                 }
@@ -218,15 +208,10 @@ class _HomeTabState extends State<HomeTab> {
                               color: AppTheme.getText(context),
                             ),
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Hệ thống hoạt động bình thường // v1.0 TRỰC TUYẾN',
-                                      style: AppTheme.monoStyle(fontSize: 11)),
-                                  duration: const Duration(seconds: 1),
-                                  backgroundColor:
-                                      AppTheme.getSurfaceElevated(context),
-                                ),
+                              AppTheme.showSnackBar(
+                                context,
+                                'Hệ thống hoạt động bình thường // v1.0 TRỰC TUYẾN',
+                                icon: Icons.info_outline_rounded,
                               );
                             },
                           ),

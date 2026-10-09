@@ -214,6 +214,68 @@ class AppTheme {
     );
   }
 
+  static void showSnackBar(
+    BuildContext context,
+    String message, {
+    IconData? icon,
+    Color? iconColor,
+    Duration duration = const Duration(seconds: 2),
+    bool isError = false,
+  }) {
+    final isDarkMode = isDark(context);
+    final bg = isError
+        ? (isDarkMode ? const Color(0xFF241014) : const Color(0xFFFEF2F2))
+        : (isDarkMode ? const Color(0xFF181818) : lightSurfaceElevated);
+    final textCol = isError
+        ? (isDarkMode ? const Color(0xFFFF6B6B) : lightDanger)
+        : (isDarkMode ? Colors.white : lightTextPrimary);
+    final borderCol = isError
+        ? const Color(0xFFFF4D4F).withValues(alpha: 0.6)
+        : (isDarkMode ? const Color(0xFF383838) : const Color(0xFFD0D0D0));
+    final defaultIcon = isError
+        ? Icons.error_outline_rounded
+        : Icons.check_circle_outline_rounded;
+    final defaultIconColor = isError
+        ? const Color(0xFFFF6B6B)
+        : (isDarkMode ? const Color(0xFF4ADE80) : const Color(0xFF16A34A));
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: duration,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: bg,
+        elevation: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          side: BorderSide(color: borderCol, width: 1.0),
+        ),
+        content: Row(
+          children: [
+            Icon(
+              icon ?? defaultIcon,
+              size: 18,
+              color: iconColor ?? defaultIconColor,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: monoStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: textCol,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   static BoxDecoration pixelBox(
     BuildContext context, {
     Color? color,
@@ -386,6 +448,20 @@ class AppTheme {
               BorderRadius.vertical(top: Radius.circular(radiusSheet)),
         ),
       ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: lightSurfaceElevated,
+        contentTextStyle: GoogleFonts.jetBrainsMono(
+          color: lightTextPrimary,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          side: const BorderSide(color: lightBorder, width: 1.0),
+        ),
+        behavior: SnackBarBehavior.floating,
+        elevation: 8,
+      ),
       dividerTheme: const DividerThemeData(
         color: lightBorder,
         thickness: 1.0,
@@ -527,6 +603,20 @@ class AppTheme {
           borderRadius:
               BorderRadius.vertical(top: Radius.circular(radiusSheet)),
         ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: darkSurfaceElevated,
+        contentTextStyle: GoogleFonts.jetBrainsMono(
+          color: darkTextPrimary,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          side: const BorderSide(color: darkBorder, width: 1.0),
+        ),
+        behavior: SnackBarBehavior.floating,
+        elevation: 8,
       ),
       dividerTheme: const DividerThemeData(
         color: darkBorder,

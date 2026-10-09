@@ -20,16 +20,9 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     await authProvider.refreshProfile();
     if (mounted) {
       setState(() => _isRefreshing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Đã đồng bộ thông tin tài khoản mới nhất',
-            style: AppTheme.monoStyle(fontSize: 12),
-          ),
-          duration: const Duration(seconds: 2),
-          backgroundColor: AppTheme.getSurfaceElevated(context),
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppTheme.showSnackBar(
+        context,
+        'Đã đồng bộ thông tin tài khoản mới nhất',
       );
     }
   }
@@ -215,19 +208,12 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                                 if (!ctx.mounted) return;
                                 Navigator.pop(ctx);
                                 if (!mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      ok
-                                          ? 'Đã cập nhật thông tin thành công'
-                                          : 'Cập nhật thất bại',
-                                      style: AppTheme.monoStyle(fontSize: 12),
-                                    ),
-                                    duration: const Duration(seconds: 2),
-                                    backgroundColor:
-                                        AppTheme.getSurfaceElevated(context),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
+                                AppTheme.showSnackBar(
+                                  context,
+                                  ok
+                                      ? 'Đã cập nhật thông tin thành công'
+                                      : 'Cập nhật thất bại',
+                                  isError: !ok,
                                 );
                               },
                         child: isSaving

@@ -37,26 +37,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Vui lòng nhập tên đăng nhập và mật khẩu')),
+      AppTheme.showSnackBar(
+        context,
+        'Vui lòng nhập tên đăng nhập và mật khẩu',
+        isError: true,
       );
       return;
     }
 
     if (username.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Tên đăng nhập phải có tối thiểu 3 ký tự')),
+      AppTheme.showSnackBar(
+        context,
+        'Tên đăng nhập phải có tối thiểu 3 ký tự',
+        isError: true,
       );
       return;
     }
 
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(username)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Tên đăng nhập chỉ gồm chữ cái không dấu, chữ số và dấu gạch dưới (_)')),
+      AppTheme.showSnackBar(
+        context,
+        'Tên đăng nhập chỉ gồm chữ cái không dấu, chữ số và dấu gạch dưới (_)',
+        isError: true,
       );
       return;
     }
@@ -64,18 +66,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final hasLetters = RegExp(r'[A-Za-z]').hasMatch(password);
     final hasDigits = RegExp(r'[0-9]').hasMatch(password);
     if (password.length < 6 || !hasLetters || !hasDigits) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Mật khẩu phải từ 6 ký tự trở lên, bao gồm cả chữ cái và chữ số')),
+      AppTheme.showSnackBar(
+        context,
+        'Mật khẩu phải từ 6 ký tự trở lên, bao gồm cả chữ cái và chữ số',
+        isError: true,
       );
       return;
     }
 
     if (email.isNotEmpty &&
         !RegExp(r'^[\w\.\+\-]+@[a-zA-Z0-9_\.\-]+$').hasMatch(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email không đúng định dạng hợp lệ')),
+      AppTheme.showSnackBar(
+        context,
+        'Email không đúng định dạng hợp lệ',
+        isError: true,
       );
       return;
     }

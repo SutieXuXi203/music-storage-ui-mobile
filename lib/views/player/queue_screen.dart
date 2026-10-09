@@ -91,10 +91,9 @@ class _QueueScreenState extends State<QueueScreen> {
                       ),
                       BouncingWidget(
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Đã xoá hàng đợi'),
-                                duration: Duration(seconds: 1)),
+                          AppTheme.showSnackBar(
+                            context,
+                            'Đã xoá hàng đợi',
                           );
                         },
                         child: Container(
@@ -281,10 +280,9 @@ class _QueueScreenState extends State<QueueScreen> {
                               ),
                             ),
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Đã lưu vào playlist!'),
-                                    duration: Duration(seconds: 1)),
+                              AppTheme.showSnackBar(
+                                context,
+                                'Đã lưu vào playlist!',
                               );
                             },
                             child: Row(
@@ -322,10 +320,9 @@ class _QueueScreenState extends State<QueueScreen> {
                               ),
                             ),
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Đã dọn dẹp hàng đợi'),
-                                    duration: Duration(seconds: 1)),
+                              AppTheme.showSnackBar(
+                                context,
+                                'Đã dọn dẹp hàng đợi',
                               );
                             },
                             child: Row(
