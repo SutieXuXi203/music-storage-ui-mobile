@@ -139,6 +139,13 @@ class AudioPlayerService extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateCurrentSongMetadata(Song updated) {
+    if (_currentIndex >= 0 && _currentIndex < _playlist.length) {
+      _playlist[_currentIndex] = updated;
+      notifyListeners();
+    }
+  }
+
   void reorderUpcoming(int oldIndex, int newIndex) {
     final base = _currentIndex + 1;
     final realOld = base + oldIndex;

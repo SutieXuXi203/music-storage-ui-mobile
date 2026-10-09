@@ -115,7 +115,7 @@ class _TechDownloadHudState extends State<TechDownloadHud>
           statusLabel = 'LỖI TẢI XUỐNG';
           statusIcon = Icons.error_outline_rounded;
         } else {
-          accentColor = const Color(0xFF38BDF8);
+          accentColor = Colors.white;
           statusLabel = 'ĐANG TẢI XUỐNG';
           statusIcon = Icons.arrow_downward_rounded;
         }
@@ -282,7 +282,7 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF1E232E)
+                            ? Colors.white.withValues(alpha: 0.12)
                             : const Color(0xFFE5E7EB),
                         borderRadius: BorderRadius.circular(3),
                       ),

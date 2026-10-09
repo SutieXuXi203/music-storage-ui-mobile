@@ -63,7 +63,7 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
-    if (authProvider.isLoading) {
+    if (authProvider.isLoading && !authProvider.isLoggedIn) {
       return const Scaffold(
         backgroundColor: AppTheme.background,
         body: Center(

@@ -443,7 +443,7 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: AppCoverImage(
-                    url: folder.coverUrl,
+                    url: folder.effectiveCoverUrl,
                     width: 36,
                     height: 36,
                     borderRadius: AppTheme.radiusSm,
@@ -620,6 +620,7 @@ class _HomeTabState extends State<HomeTab> {
                   clipBehavior: Clip.antiAlias,
                   child: AppCoverImage(
                     url: song.coverUrl,
+                    fallbackUrl: song.fallbackCoverUrl,
                     width: 36,
                     height: 36,
                     borderRadius: AppTheme.radiusSm,
@@ -830,6 +831,7 @@ class _HomeTabState extends State<HomeTab> {
                     clipBehavior: Clip.antiAlias,
                     child: AppCoverImage(
                       url: currentSong.coverUrl,
+                      fallbackUrl: currentSong.fallbackCoverUrl,
                       width: 38,
                       height: 38,
                       borderRadius: AppTheme.radiusSm,

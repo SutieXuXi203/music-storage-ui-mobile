@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/api_constants.dart';
@@ -6,14 +7,31 @@ import '../models/user_model.dart';
 import '../models/folder_model.dart';
 
 class ApiService {
-  late final Dio _dio;
+  static final ApiService _instance = ApiService._internal();
+  factory ApiService() => _instance;
 
-  ApiService() {
+  late final Dio _dio;
+  late final Dio _tokenDio;
+  Completer<String?>? _refreshCompleter;
+
+  ApiService._internal() {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
         connectTimeout: const Duration(seconds: 45),
         receiveTimeout: const Duration(seconds: 120),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
+
+    _tokenDio = Dio(
+      BaseOptions(
+        baseUrl: ApiConstants.baseUrl,
+        connectTimeout: const Duration(seconds: 20),
+        receiveTimeout: const Duration(seconds: 20),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -32,15 +50,82 @@ class ApiService {
           return handler.next(options);
         },
         onError: (DioException error, handler) async {
-          if (error.response?.statusCode == 401) {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.remove('access_token');
+          final path = error.requestOptions.path;
+          final isAuthEndpoint = path.contains('/auth/login') ||
+              path.contains('/auth/register') ||
+              path.contains('/auth/refresh');
+
+          if (error.response?.statusCode == 401 && !isAuthEndpoint) {
+            final newToken = await _handleTokenRefresh();
+            if (newToken != null && newToken.isNotEmpty) {
+              final retryOptions = error.requestOptions;
+              retryOptions.headers['Authorization'] = 'Bearer $newToken';
+              try {
+                final retryRes = await _dio.fetch(retryOptions);
+                return handler.resolve(retryRes);
+              } on DioException catch (retryErr) {
+                return handler.next(retryErr);
+              } catch (_) {
+                return handler.next(error);
+              }
+            } else {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('access_token');
+              await prefs.remove('refresh_token');
+              await prefs.remove('cached_user');
+            }
           }
           return handler.next(error);
         },
       ),
     );
   }
+
+  Future<String?> _handleTokenRefresh() async {
+    if (_refreshCompleter != null) {
+      return _refreshCompleter!.future;
+    }
+
+    _refreshCompleter = Completer<String?>();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final refreshToken = prefs.getString('refresh_token');
+      if (refreshToken == null || refreshToken.isEmpty) {
+        _refreshCompleter!.complete(null);
+        return null;
+      }
+
+      final response = await _tokenDio.post(
+        ApiConstants.refresh,
+        data: {'refresh_token': refreshToken},
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          final newAccessToken = data['access_token'] as String?;
+          final newRefreshToken =
+              (data['refresh_token'] as String?) ?? refreshToken;
+
+          if (newAccessToken != null && newAccessToken.isNotEmpty) {
+            await prefs.setString('access_token', newAccessToken);
+            await prefs.setString('refresh_token', newRefreshToken);
+            _refreshCompleter!.complete(newAccessToken);
+            return newAccessToken;
+          }
+        }
+      }
+      _refreshCompleter!.complete(null);
+      return null;
+    } catch (_) {
+      _refreshCompleter!.complete(null);
+      return null;
+    } finally {
+      _refreshCompleter = null;
+    }
+  }
+
+  Future<String?> refreshToken() => _handleTokenRefresh();
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await _dio.post(
@@ -51,9 +136,14 @@ class ApiService {
       },
     );
     final data = response.data;
-    if (data['access_token'] != null) {
+    if (data is Map<String, dynamic>) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('access_token', data['access_token']);
+      if (data['access_token'] != null) {
+        await prefs.setString('access_token', data['access_token']);
+      }
+      if (data['refresh_token'] != null) {
+        await prefs.setString('refresh_token', data['refresh_token']);
+      }
     }
     return data;
   }
@@ -110,8 +200,13 @@ class ApiService {
   }
 
   Future<void> logout() async {
+    try {
+      await _dio.post('/auth/logout');
+    } catch (_) {}
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
+    await prefs.remove('refresh_token');
+    await prefs.remove('cached_user');
   }
 
   Future<List<Song>> getSongs(
@@ -144,6 +239,22 @@ class ApiService {
   Future<bool> deleteSong(String id) async {
     final response = await _dio.delete('${ApiConstants.songs}/$id');
     return response.statusCode == 200;
+  }
+
+  Future<Map<String, dynamic>?> getSongLyrics(String songId,
+      {bool refresh = false}) async {
+    try {
+      final response = await _dio.get(
+        '${ApiConstants.songs}/$songId/lyrics',
+        queryParameters: {'refresh': refresh},
+      );
+      if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+        return response.data;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>> downloadFromYoutube({

@@ -1,7 +1,7 @@
 name: mobile_ui
 description: "Ứng dụng nghe nhạc Meowsic đa nền tảng kết nối FastAPI & Google Drive"
 publish_to: "none"
-version: 1.0.21+22
+version: 1.0.22+23
 
 environment:
   sdk: ^3.5.0

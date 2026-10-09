@@ -72,6 +72,7 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       clipBehavior: Clip.antiAlias,
                       child: AppCoverImage(
                         url: widget.song.coverUrl,
+                        fallbackUrl: widget.song.fallbackCoverUrl,
                         width: 40,
                         height: 40,
                         iconSize: 18,
@@ -389,6 +390,7 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       clipBehavior: Clip.antiAlias,
                       child: AppCoverImage(
                         url: widget.song.coverUrl,
+                        fallbackUrl: widget.song.fallbackCoverUrl,
                         width: 38,
                         height: 38,
                         borderRadius: AppTheme.radiusSm,

@@ -124,7 +124,7 @@ class _LibraryTabState extends State<LibraryTab> {
                 context,
                 'Đang tải bài hát từ YouTube. Thiết bị sẽ có thông báo khi hoàn tất.',
                 icon: Icons.downloading_rounded,
-                iconColor: const Color(0xFF38BDF8),
+                iconColor: Colors.white,
                 duration: const Duration(seconds: 3),
               );
             }
@@ -151,7 +151,7 @@ class _LibraryTabState extends State<LibraryTab> {
                       fontWeight: FontWeight.w700,
                       fontSize: 13.5,
                       letterSpacing: 0.5,
-                      color: const Color(0xFF38BDF8),
+                      color: Colors.white,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -196,7 +196,7 @@ class _LibraryTabState extends State<LibraryTab> {
                       ),
                       prefixText: '> ',
                       prefixStyle: GoogleFonts.jetBrainsMono(
-                        color: const Color(0xFF38BDF8),
+                        color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
@@ -221,7 +221,7 @@ class _LibraryTabState extends State<LibraryTab> {
                       focusedBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.zero,
                         borderSide:
-                            BorderSide(color: Color(0xFF38BDF8), width: 1.2),
+                            BorderSide(color: Colors.white, width: 1.2),
                       ),
                     ),
                   ),
@@ -242,7 +242,7 @@ class _LibraryTabState extends State<LibraryTab> {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF38BDF8),
+                  backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero),
@@ -980,7 +980,7 @@ class _LibraryTabState extends State<LibraryTab> {
               child: Stack(
                 children: [
                   AppCoverImage(
-                    url: folder.coverUrl,
+                    url: folder.effectiveCoverUrl,
                     width: 44,
                     height: 44,
                     borderRadius: AppTheme.radiusSm,

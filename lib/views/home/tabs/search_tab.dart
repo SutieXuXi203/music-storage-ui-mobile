@@ -156,6 +156,7 @@ class _SearchTabState extends State<SearchTab> {
             clipBehavior: Clip.antiAlias,
             child: AppCoverImage(
               url: song.coverUrl,
+              fallbackUrl: song.fallbackCoverUrl,
               width: 36,
               height: 36,
               borderRadius: AppTheme.radiusSm,

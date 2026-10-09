@@ -4,6 +4,7 @@ import '../../services/audio_player_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/song_model.dart';
 import '../../widgets/tech_playback_controls.dart';
+import '../../widgets/tech_lyrics_view.dart';
 
 class NowPlayingScreen extends StatefulWidget {
   final AudioPlayerService playerService;
@@ -20,6 +21,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
   double _dragOffset = 0.0;
   bool _isDraggingSeek = false;
   double _seekPosition = 0.0;
+  bool _showLyrics = false;
 
   @override
   void initState() {
@@ -169,6 +171,22 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
               ),
               actions: [
                 BouncingIconButton(
+                  icon: Icon(
+                    _showLyrics ? Icons.album_outlined : Icons.lyrics_outlined,
+                    size: 21,
+                    color: _showLyrics
+                        ? Colors.white
+                        : (song.hasLyrics
+                            ? AppTheme.getText(context)
+                            : AppTheme.getTextSecondary(context)),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _showLyrics = !_showLyrics;
+                    });
+                  },
+                ),
+                BouncingIconButton(
                   icon: Icon(Icons.more_horiz,
                       size: 20, color: AppTheme.getText(context)),
                   onPressed: () => _showMoreMenu(context, song),
@@ -188,24 +206,48 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                 child: Column(
                   children: [
                     const SizedBox(height: 12),
-                    Center(
-                      child: Container(
-                        width: 230,
-                        height: 230,
-                        decoration: BoxDecoration(
-                          color: AppTheme.getSurfaceSubtle(context),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusSm),
-                          border: Border.all(
-                              color: AppTheme.getBorder(context), width: 0.8),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: AppCoverImage(
-                          url: song.coverUrl,
+                    AnimatedCrossFade(
+                      duration: const Duration(milliseconds: 250),
+                      crossFadeState: _showLyrics
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                      firstChild: Center(
+                        child: Container(
                           width: 230,
                           height: 230,
-                          borderRadius: AppTheme.radiusSm,
-                          iconSize: 64,
+                          decoration: BoxDecoration(
+                            color: AppTheme.getSurfaceSubtle(context),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 0.8),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: AppCoverImage(
+                            url: song.coverUrl,
+                            fallbackUrl: song.fallbackCoverUrl,
+                            width: 230,
+                            height: 230,
+                            borderRadius: AppTheme.radiusSm,
+                            iconSize: 64,
+                          ),
+                        ),
+                      ),
+                      secondChild: SizedBox(
+                        height: 290,
+                        width: double.infinity,
+                        child: TechLyricsView(
+                          playerService: widget.playerService,
+                          song: song,
+                          onClose: () {
+                            setState(() {
+                              _showLyrics = false;
+                            });
+                          },
+                          onSongUpdated: (updated) {
+                            widget.playerService
+                                .updateCurrentSongMetadata(updated);
+                          },
                         ),
                       ),
                     ),
@@ -294,7 +336,84 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                         playerService: widget.playerService,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
+                    BouncingWidget(
+                      onTap: () {
+                        setState(() {
+                          _showLyrics = !_showLyrics;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.getSurface(context),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSm),
+                          border: Border.all(
+                            color: _showLyrics
+                                ? Colors.white.withValues(alpha: 0.8)
+                                : (song.hasSyncedLyrics
+                                    ? Colors.white.withValues(alpha: 0.3)
+                                    : AppTheme.getBorder(context)),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_showLyrics || song.hasSyncedLyrics) ...[
+                              Container(
+                                width: 2.0,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                              const SizedBox(width: 2.5),
+                              Container(
+                                width: 1.5,
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                            ],
+                            Icon(
+                              _showLyrics
+                                  ? Icons.album_outlined
+                                  : Icons.lyrics_outlined,
+                              size: 13,
+                              color: song.hasSyncedLyrics || _showLyrics
+                                  ? Colors.white
+                                  : AppTheme.getTextSecondary(context),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              _showLyrics
+                                  ? 'QUAY LẠI ĐĨA NHẠC'
+                                  : (song.hasSyncedLyrics
+                                      ? 'LỜI BÀI HÁT ĐỒNG BỘ (LRC)'
+                                      : (song.hasLyrics
+                                          ? 'XEM LỜI BÀI HÁT'
+                                          : 'TÌM LỜI BÀI HÁT')),
+                              style: AppTheme.pixelStyle(
+                                fontSize: 9.5,
+                                letterSpacing: 0.4,
+                                fontWeight: FontWeight.w600,
+                                color: song.hasSyncedLyrics || _showLyrics
+                                    ? Colors.white
+                                    : AppTheme.getText(context),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     Text(
                       '${song.format.toUpperCase()}  |  ${song.bitrate.toUpperCase()}  |  44.1 KHZ',
                       style: AppTheme.monoStyle(
@@ -454,6 +573,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                     clipBehavior: Clip.antiAlias,
                     child: AppCoverImage(
                       url: upSong.coverUrl,
+                      fallbackUrl: upSong.fallbackCoverUrl,
                       width: 32,
                       height: 32,
                       borderRadius: AppTheme.radiusSm,

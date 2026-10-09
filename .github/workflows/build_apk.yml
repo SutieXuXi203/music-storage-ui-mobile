@@ -76,22 +76,24 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.21
-          name: Meowsic App Release v1.0.21
+          tag_name: v1.0.22
+          name: Meowsic App Release v1.0.22
           body: |
-            ## Meowsic Music App Android Release v1.0.21
+            ## Meowsic Music App Android Release v1.0.22
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.21** (Build 22)
-            - **Thiết kế lại công tắc Phát nhạc trong nền nhỏ gọn & vuông vắn (TechSwitch)**:
-              - Thay thế công tắc tròn to bản Material mặc định bằng công tắc công nghệ `TechSwitch` với kích thước nhỏ gọn `36x20 dp`.
-              - Thiết kế góc bo nhẹ sắc sảo (`3.0 dp` cho track, `2.0 dp` cho thumb vuông `16x16 dp`), tương phản cao, chuyển động trượt mượt mà kèm phản hồi xúc giác.
-              - Hỗ trợ thao tác chạm linh hoạt trên toàn bộ hàng cài đặt để bật/tắt nhanh chóng.
-            - **Kế thừa các cải tiến ổn định từ v1.0.20**:
-              - Ảnh thumbnail chuẩn tỷ lệ tự nhiên, không bị co giãn/méo hình.
-              - Khung "Bài tiếp theo" tích hợp trực tiếp vào màn hình phát nhạc thay cho màn hình hàng đợi riêng biệt.
-              - Thêm "Phát tiếp theo" vào menu 3 chấm của mỗi bài hát.
-              - Mục "Nhóm đang phát" hiển thị trực tiếp ở Trang Chủ khi tạm dừng nghe nhạc.
-              - Hộp thoại hỏi ý kiến phát nhạc trong nền khi thoát ứng dụng.
+            - Phiên bản: **v1.0.22** (Build 23)
+            - **Lời bài hát đồng bộ công nghệ (TechLyricsView)**:
+              - Giao diện monochrome trắng thuần tối giản, loại bỏ chi tiết thừa.
+              - Vạch sáng công nghệ căn giữa chính xác theo dòng thời gian bài hát.
+              - Nút "Làm mới" đặt góc trên bên phải để tải lại lời bất kỳ lúc nào.
+            - **Khôi phục hiển thị ảnh bìa thumbnail (Cover Art)**:
+              - Tối ưu `AppCoverImage` với cơ chế hiển thị bản địa, loại bỏ lỗi gián đoạn CanvasKit trên Web.
+              - Ưu tiên link ảnh tốc độ cao Google CDN LH3, kèm cơ chế tự động nạp link dự phòng nếu link chính gặp sự cố.
+              - Hỗ trợ hiển thị ảnh bìa thông minh cho Thư mục/Playlist (lấy ảnh bài hát đầu tiên nếu chưa có ảnh riêng).
+            - **Duy trì phiên đăng nhập lâu dài**:
+              - Tự động kiểm tra và phục hồi phiên đăng nhập khi mở app, không bắt đăng nhập lại.
+            - **HUD tiến trình tải nhạc công nghệ**:
+              - Đổi sang tông màu trắng công nghệ, giữ màu xanh lá khi tải hoàn tất.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |

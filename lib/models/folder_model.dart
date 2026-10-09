@@ -27,6 +27,20 @@ class Playlist {
     this.songs = const [],
   });
 
+  String? get effectiveCoverUrl {
+    if (coverUrl != null && coverUrl!.trim().isNotEmpty) {
+      return coverUrl!.trim();
+    }
+    if (songs.isNotEmpty) {
+      for (final s in songs) {
+        if (s.coverUrl != null && s.coverUrl!.trim().isNotEmpty) {
+          return s.coverUrl!.trim();
+        }
+      }
+    }
+    return null;
+  }
+
   factory Playlist.fromJson(Map<String, dynamic> json) {
     final rawSongIds = json['song_ids'];
     List<String> parsedSongIds = [];

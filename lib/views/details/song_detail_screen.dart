@@ -49,6 +49,7 @@ class SongDetailScreen extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: AppCoverImage(
                     url: song.coverUrl,
+                    fallbackUrl: song.fallbackCoverUrl,
                     width: 180,
                     height: 180,
                     borderRadius: AppTheme.radiusMd,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +8,7 @@ import '../services/audio_player_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   User? _user;
-  bool _isLoading = false;
+  bool _isLoading = true;
   String? _errorMessage;
 
   User? get user => _user;
@@ -22,17 +23,55 @@ class AuthProvider extends ChangeNotifier {
   Future<void> checkAuth() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
-    if (token != null) {
+    final refreshToken = prefs.getString('refresh_token');
+    final cachedUserJson = prefs.getString('cached_user');
+
+    // 1. Phục hồi user từ bộ nhớ đệm ngay tức khắc để tránh nháy màn hình đăng nhập
+    if (cachedUserJson != null && cachedUserJson.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(cachedUserJson);
+        if (decoded is Map<String, dynamic>) {
+          _user = User.fromJson(decoded);
+          notifyListeners();
+        }
+      } catch (_) {}
+    }
+
+    // 2. Nếu có token, kiểm tra và làm mới dữ liệu từ server
+    if (token != null || refreshToken != null) {
       _isLoading = true;
       notifyListeners();
       try {
-        _user = await apiService.getMe();
+        final serverUser = await apiService.getMe();
+        if (serverUser != null) {
+          _user = serverUser;
+          await prefs.setString('cached_user', jsonEncode(serverUser.toJson()));
+        } else if (_user == null) {
+          // Token cũ có thể đã hết hạn, gọi refresh token
+          final newToken = await apiService.refreshToken();
+          if (newToken != null) {
+            final refreshedUser = await apiService.getMe();
+            if (refreshedUser != null) {
+              _user = refreshedUser;
+              await prefs.setString(
+                  'cached_user', jsonEncode(refreshedUser.toJson()));
+            }
+          } else {
+            // Không thể làm mới token, phiên đăng nhập đã hết hạn hoàn toàn
+            _user = null;
+            await prefs.remove('cached_user');
+          }
+        }
       } catch (_) {
-        _user = null;
+        // Gặp lỗi mạng khi khởi động: Giữ nguyên _user từ cache để người dùng tiếp tục sử dụng app
       } finally {
         _isLoading = false;
         notifyListeners();
       }
+    } else {
+      _isLoading = false;
+      _user = null;
+      notifyListeners();
     }
   }
 
@@ -51,6 +90,8 @@ class AuthProvider extends ChangeNotifier {
           email: '',
           fullName: username,
         );
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_user', jsonEncode(_user!.toJson()));
         notifyListeners();
         return true;
       }
@@ -145,6 +186,8 @@ class AuthProvider extends ChangeNotifier {
       final updated = await apiService.getMe();
       if (updated != null) {
         _user = updated;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_user', jsonEncode(updated.toJson()));
         notifyListeners();
       }
     } catch (_) {}
@@ -176,6 +219,8 @@ class AuthProvider extends ChangeNotifier {
     await audioPlayerService.stopAndReset();
     await apiService.logout();
     _user = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('cached_user');
     notifyListeners();
   }
 }

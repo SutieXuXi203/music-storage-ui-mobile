@@ -563,6 +563,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                                         clipBehavior: Clip.antiAlias,
                                         child: AppCoverImage(
                                           url: song.coverUrl,
+                                          fallbackUrl: song.fallbackCoverUrl,
                                           width: 38,
                                           height: 38,
                                           iconSize: 16,
@@ -700,6 +701,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                       clipBehavior: Clip.antiAlias,
                       child: AppCoverImage(
                         url: song.coverUrl,
+                        fallbackUrl: song.fallbackCoverUrl,
                         width: 40,
                         height: 40,
                         iconSize: 18,
@@ -1043,7 +1045,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                         ),
                         clipBehavior: Clip.antiAlias,
                         child: AppCoverImage(
-                          url: folder.coverUrl,
+                          url: folder.effectiveCoverUrl,
                           width: 160,
                           height: 160,
                           borderRadius: AppTheme.radiusMd,
@@ -1229,6 +1231,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                           clipBehavior: Clip.antiAlias,
                           child: AppCoverImage(
                             url: song.coverUrl,
+                            fallbackUrl: song.fallbackCoverUrl,
                             width: 38,
                             height: 38,
                             iconSize: 18,
