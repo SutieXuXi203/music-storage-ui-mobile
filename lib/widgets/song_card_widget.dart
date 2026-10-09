@@ -38,7 +38,8 @@ class _SongCardWidgetState extends State<SongCardWidget> {
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) {
         return SafeArea(
@@ -47,17 +48,16 @@ class _SongCardWidgetState extends State<SongCardWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Top handle
                 Container(
                   width: 32,
                   height: 3,
                   margin: const EdgeInsets.only(bottom: 14),
                   decoration: BoxDecoration(
-                    color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    color:
+                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                // Header track preview
                 Row(
                   children: [
                     Container(
@@ -65,16 +65,22 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                        border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                        border: Border.all(
+                            color: AppTheme.getBorder(context), width: 0.8),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: widget.song.coverUrl != null && widget.song.coverUrl!.isNotEmpty
+                      child: widget.song.coverUrl != null &&
+                              widget.song.coverUrl!.isNotEmpty
                           ? Image.network(
                               widget.song.coverUrl!,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
+                              errorBuilder: (_, __, ___) => Icon(
+                                  Icons.music_note,
+                                  color: AppTheme.getTextMuted(context),
+                                  size: 18),
                             )
-                          : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
+                          : Icon(Icons.music_note,
+                              color: AppTheme.getTextMuted(context), size: 18),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -94,7 +100,9 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                           const SizedBox(height: 2),
                           Text(
                             '${widget.song.artist} • ${widget.song.formattedDuration}',
-                            style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: AppTheme.getTextSecondary(context)),
                           ),
                         ],
                       ),
@@ -104,12 +112,15 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 const SizedBox(height: 12),
                 Divider(color: AppTheme.getBorder(context), height: 1),
                 const SizedBox(height: 4),
-
-                // Options list (compact)
                 ListTile(
                   dense: true,
-                  leading: Icon(Icons.play_arrow_outlined, color: AppTheme.getText(context), size: 20),
-                  title: Text('Phát bài hát', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  leading: Icon(Icons.play_arrow_outlined,
+                      color: AppTheme.getText(context), size: 20),
+                  title: Text('Phát bài hát',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.getText(context))),
                   onTap: () {
                     Navigator.pop(ctx);
                     widget.onTap();
@@ -117,8 +128,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 ),
                 ListTile(
                   dense: true,
-                  leading: Icon(Icons.info_outline, color: AppTheme.getText(context), size: 20),
-                  title: Text('Xem chi tiết bài hát', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  leading: Icon(Icons.info_outline,
+                      color: AppTheme.getText(context), size: 20),
+                  title: Text('Xem chi tiết bài hát',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.getText(context))),
                   onTap: () {
                     Navigator.pop(ctx);
                     Navigator.push(
@@ -131,8 +147,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 ),
                 ListTile(
                   dense: true,
-                  leading: Icon(Icons.drive_file_move_outlined, color: AppTheme.getText(context), size: 20),
-                  title: Text('Chuyển vào thư mục', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  leading: Icon(Icons.drive_file_move_outlined,
+                      color: AppTheme.getText(context), size: 20),
+                  title: Text('Chuyển vào thư mục',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.getText(context))),
                   onTap: () {
                     Navigator.pop(ctx);
                     _showAddToFolderModal(context);
@@ -141,8 +162,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 if (widget.onDelete != null)
                   ListTile(
                     dense: true,
-                    leading: Icon(Icons.delete_outline, color: AppTheme.getDanger(context), size: 20),
-                    title: Text('Xoá khỏi kho nhạc', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getDanger(context))),
+                    leading: Icon(Icons.delete_outline,
+                        color: AppTheme.getDanger(context), size: 20),
+                    title: Text('Xoá khỏi kho nhạc',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: AppTheme.getDanger(context))),
                     onTap: () {
                       Navigator.pop(ctx);
                       widget.onDelete!();
@@ -164,7 +190,8 @@ class _SongCardWidgetState extends State<SongCardWidget> {
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) {
         return SafeArea(
@@ -180,7 +207,8 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                     height: 3,
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                      color:
+                          AppTheme.getTextMuted(context).withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -198,14 +226,17 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.close, size: 20, color: AppTheme.getTextSecondary(context)),
+                      icon: Icon(Icons.close,
+                          size: 20, color: AppTheme.getTextSecondary(context)),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
                 ),
                 Text(
                   'Chọn thư mục để chuyển bài hát "${widget.song.title}" vào',
-                  style: TextStyle(fontSize: 11.5, color: AppTheme.getTextSecondary(context)),
+                  style: TextStyle(
+                      fontSize: 11.5,
+                      color: AppTheme.getTextSecondary(context)),
                 ),
                 const SizedBox(height: 10),
                 Divider(color: AppTheme.getBorder(context), height: 1),
@@ -216,7 +247,9 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                     child: Center(
                       child: Text(
                         'Chưa có thư mục nào. Hãy tạo thư mục ở tab Thư viện trước.',
-                        style: TextStyle(fontSize: 12, color: AppTheme.getTextMuted(context)),
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.getTextMuted(context)),
                       ),
                     ),
                   )
@@ -230,10 +263,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                         height: 34,
                         decoration: BoxDecoration(
                           color: AppTheme.getSurface(context),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                          border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSm),
+                          border: Border.all(
+                              color: AppTheme.getBorder(context), width: 0.8),
                         ),
-                        child: Icon(Icons.folder_outlined, size: 18, color: AppTheme.getText(context)),
+                        child: Icon(Icons.folder_outlined,
+                            size: 18, color: AppTheme.getText(context)),
                       ),
                       title: Text(
                         folder.name,
@@ -245,17 +281,23 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       ),
                       subtitle: Text(
                         '${folder.songCount} bài hát',
-                        style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.getTextSecondary(context)),
                       ),
                       trailing: isAlreadyIn
                           ? Text(
                               'ĐÃ CÓ',
-                              style: AppTheme.monoStyle(fontSize: 10, color: AppTheme.getTextMuted(context)),
+                              style: AppTheme.monoStyle(
+                                  fontSize: 10,
+                                  color: AppTheme.getTextMuted(context)),
                             )
-                          : Icon(Icons.add, size: 18, color: AppTheme.getText(context)),
+                          : Icon(Icons.add,
+                              size: 18, color: AppTheme.getText(context)),
                       onTap: () async {
                         Navigator.pop(ctx);
-                        final ok = await folderProv.addSongToFolder(folder.id, widget.song);
+                        final ok = await folderProv.addSongToFolder(
+                            folder.id, widget.song);
                         if (context.mounted && ok) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -265,7 +307,8 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                               ),
                               duration: const Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
-                              backgroundColor: AppTheme.getSurfaceElevated(context),
+                              backgroundColor:
+                                  AppTheme.getSurfaceElevated(context),
                             ),
                           );
                         }
@@ -293,7 +336,9 @@ class _SongCardWidgetState extends State<SongCardWidget> {
         color: cardBg,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: widget.isCurrent ? AppTheme.getText(context).withValues(alpha: 0.3) : AppTheme.getBorder(context),
+          color: widget.isCurrent
+              ? AppTheme.getText(context).withValues(alpha: 0.3)
+              : AppTheme.getBorder(context),
           width: 0.8,
         ),
       ),
@@ -306,7 +351,6 @@ class _SongCardWidgetState extends State<SongCardWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
-                // Track number (if enabled)
                 if (widget.showTrackNumber) ...[
                   SizedBox(
                     width: 22,
@@ -315,14 +359,14 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       style: AppTheme.monoStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: widget.isCurrent ? AppTheme.getText(context) : AppTheme.getTextMuted(context),
+                        color: widget.isCurrent
+                            ? AppTheme.getText(context)
+                            : AppTheme.getTextMuted(context),
                       ),
                     ),
                   ),
                   const SizedBox(width: 4),
                 ],
-
-                // Thumbnail (38x38, compact, radius 8)
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -338,7 +382,8 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                         ),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: widget.song.coverUrl != null && widget.song.coverUrl!.isNotEmpty
+                      child: widget.song.coverUrl != null &&
+                              widget.song.coverUrl!.isNotEmpty
                           ? Image.network(
                               widget.song.coverUrl!,
                               fit: BoxFit.cover,
@@ -360,14 +405,16 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                         height: 38,
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSm),
                         ),
                         child: Center(
                           child: widget.isBuffering
                               ? const SizedBox(
                                   width: 14,
                                   height: 14,
-                                  child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.white),
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 1.5, color: Colors.white),
                                 )
                               : (widget.isPlaying
                                   ? const MiniEqualizerWidget(
@@ -377,16 +424,14 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                                       barCount: 3,
                                       color: Colors.white,
                                     )
-                                  : const Icon(Icons.pause, color: Colors.white, size: 16)),
+                                  : const Icon(Icons.pause,
+                                      color: Colors.white, size: 16)),
                         ),
                       ),
                     ],
                   ],
                 ),
-
                 const SizedBox(width: 10),
-
-                // Title & Artist
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,7 +443,9 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: widget.isCurrent ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight: widget.isCurrent
+                              ? FontWeight.w700
+                              : FontWeight.w600,
                           color: AppTheme.getText(context),
                         ),
                       ),
@@ -430,13 +477,11 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                     ],
                   ),
                 ),
-
                 const SizedBox(width: 4),
-
-                // Compact options 3-dots
                 IconButton(
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
                   icon: Icon(
                     Icons.more_vert,
                     size: 18,

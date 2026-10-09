@@ -2,8 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 
-/// Dải sóng equalizer mini (3 hoặc 4 cột) render siêu mượt qua GPU CustomPainter.
-/// Nhảy nhót theo sóng sin liên tục không giật lag.
 class MiniEqualizerWidget extends StatefulWidget {
   final bool isPlaying;
   final Color color;
@@ -24,7 +22,8 @@ class MiniEqualizerWidget extends StatefulWidget {
   State<MiniEqualizerWidget> createState() => _MiniEqualizerWidgetState();
 }
 
-class _MiniEqualizerWidgetState extends State<MiniEqualizerWidget> with SingleTickerProviderStateMixin {
+class _MiniEqualizerWidgetState extends State<MiniEqualizerWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -94,14 +93,17 @@ class _EqualizerPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final barWidth = (size.width / barCount) - 1.2;
-    final gap = barCount > 1 ? (size.width - (barWidth * barCount)) / (barCount - 1) : 0.0;
+    final gap = barCount > 1
+        ? (size.width - (barWidth * barCount)) / (barCount - 1)
+        : 0.0;
 
     for (int i = 0; i < barCount; i++) {
       double factor;
       if (isPlaying) {
         final phase = i * (math.pi / 2.2);
         final freq = 1.0 + (i % 2) * 0.4;
-        final wave = (math.sin((progress * 2 * math.pi * freq) + phase) + 1.0) / 2.0;
+        final wave =
+            (math.sin((progress * 2 * math.pi * freq) + phase) + 1.0) / 2.0;
         factor = 0.22 + wave * 0.78;
       } else {
         factor = 0.22;

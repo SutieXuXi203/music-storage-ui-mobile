@@ -26,10 +26,6 @@ class ReIcon extends StatelessWidget {
   }
 }
 
-/// Nút bấm tương tác phong cách Terminal:
-/// - KHÔNG hiển thị màu hình nền khi hover
-/// - KHÔNG bo tròn (BorderRadius.zero)
-/// - CHỈ đổi màu văn bản/icon/viền khi hover
 class TerminalActionBtn extends StatefulWidget {
   final Widget? icon;
   final String? label;
@@ -47,7 +43,7 @@ class TerminalActionBtn extends StatefulWidget {
     this.label,
     this.onTap,
     this.defaultColor = const Color(0xFFCCCCCC),
-    this.hoverColor = const Color(0xFF00FF66), // Xanh terminal khi hover
+    this.hoverColor = const Color(0xFF00FF66),
     this.defaultBorderColor,
     this.hoverBorderColor,
     this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -72,14 +68,22 @@ class _TerminalActionBtnState extends State<TerminalActionBtn> {
         : Colors.transparent;
 
     return MouseRegion(
-      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      cursor: widget.onTap != null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        onTapDown: widget.onTap != null ? (_) => setState(() => _isPressed = true) : null,
-        onTapUp: widget.onTap != null ? (_) => setState(() => _isPressed = false) : null,
-        onTapCancel: widget.onTap != null ? () => setState(() => _isPressed = false) : null,
+        onTapDown: widget.onTap != null
+            ? (_) => setState(() => _isPressed = true)
+            : null,
+        onTapUp: widget.onTap != null
+            ? (_) => setState(() => _isPressed = false)
+            : null,
+        onTapCancel: widget.onTap != null
+            ? () => setState(() => _isPressed = false)
+            : null,
         behavior: HitTestBehavior.opaque,
         child: AnimatedScale(
           scale: _isPressed ? 0.96 : 1.0,
@@ -90,7 +94,9 @@ class _TerminalActionBtnState extends State<TerminalActionBtn> {
             curve: Curves.easeOutCubic,
             padding: widget.padding,
             decoration: BoxDecoration(
-              color: _isPressed ? widget.hoverColor.withValues(alpha: 0.08) : Colors.transparent,
+              color: _isPressed
+                  ? widget.hoverColor.withValues(alpha: 0.08)
+                  : Colors.transparent,
               borderRadius: BorderRadius.zero,
               border: widget.hasBorder
                   ? Border.all(color: activeBorderColor, width: 1.0)

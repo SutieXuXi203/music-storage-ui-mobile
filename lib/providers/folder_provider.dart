@@ -42,7 +42,8 @@ class FolderProvider extends ChangeNotifier {
     try {
       _folders = await apiService.getFolders();
     } catch (e) {
-      _errorMessage = 'Không thể tải danh sách thư mục: ${apiService.lastErrorMessage ?? e}';
+      _errorMessage =
+          'Không thể tải danh sách thư mục: ${apiService.lastErrorMessage ?? e}';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -60,7 +61,8 @@ class FolderProvider extends ChangeNotifier {
         notifyListeners();
         return newFolder;
       }
-      _errorMessage = apiService.lastErrorMessage ?? 'Tạo thư mục thất bại. Vui lòng kiểm tra lại.';
+      _errorMessage = apiService.lastErrorMessage ??
+          'Tạo thư mục thất bại. Vui lòng kiểm tra lại.';
       notifyListeners();
       return null;
     } catch (e) {
@@ -72,17 +74,18 @@ class FolderProvider extends ChangeNotifier {
 
   Future<Playlist?> createPlaylist(String name) => createFolder(name);
 
-
   Future<bool> renameFolder(String folderId, String newName) async {
     try {
       final ok = await apiService.renameFolder(folderId, newName);
       if (ok) {
         final idx = _folders.indexWhere((f) => f.id == folderId);
         if (idx != -1) {
-          _folders[idx] = _folders[idx].copyWith(name: newName, updatedAt: DateTime.now());
+          _folders[idx] =
+              _folders[idx].copyWith(name: newName, updatedAt: DateTime.now());
         }
         if (_currentFolder?.id == folderId) {
-          _currentFolder = _currentFolder!.copyWith(name: newName, updatedAt: DateTime.now());
+          _currentFolder = _currentFolder!
+              .copyWith(name: newName, updatedAt: DateTime.now());
         }
         notifyListeners();
         return true;
@@ -99,10 +102,12 @@ class FolderProvider extends ChangeNotifier {
       if (ok) {
         final idx = _folders.indexWhere((f) => f.id == folderId);
         if (idx != -1) {
-          _folders[idx] = _folders[idx].copyWith(coverUrl: coverUrl, updatedAt: DateTime.now());
+          _folders[idx] = _folders[idx]
+              .copyWith(coverUrl: coverUrl, updatedAt: DateTime.now());
         }
         if (_currentFolder?.id == folderId) {
-          _currentFolder = _currentFolder!.copyWith(coverUrl: coverUrl, updatedAt: DateTime.now());
+          _currentFolder = _currentFolder!
+              .copyWith(coverUrl: coverUrl, updatedAt: DateTime.now());
         }
         notifyListeners();
         return true;
@@ -113,9 +118,11 @@ class FolderProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> uploadFolderCoverImage(String folderId, List<int> bytes, String filename) async {
+  Future<bool> uploadFolderCoverImage(
+      String folderId, List<int> bytes, String filename) async {
     try {
-      final updated = await apiService.uploadFolderCoverImage(folderId, bytes, filename);
+      final updated =
+          await apiService.uploadFolderCoverImage(folderId, bytes, filename);
       if (updated != null) {
         final idx = _folders.indexWhere((f) => f.id == folderId);
         if (idx != -1) {
@@ -158,7 +165,6 @@ class FolderProvider extends ChangeNotifier {
       final detailed = await apiService.getFolderDetails(folderId);
       if (detailed != null) {
         _currentFolder = detailed;
-        // Cập nhật lại trong danh sách _folders nếu có
         final idx = _folders.indexWhere((f) => f.id == folderId);
         if (idx != -1) {
           _folders[idx] = detailed;
@@ -173,11 +179,12 @@ class FolderProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> addSongToFolder(String folderId, Song song, {String? fromFolderId}) async {
+  Future<bool> addSongToFolder(String folderId, Song song,
+      {String? fromFolderId}) async {
     try {
-      final ok = await apiService.addSongToFolder(folderId, song.id, fromFolderId: fromFolderId);
+      final ok = await apiService.addSongToFolder(folderId, song.id,
+          fromFolderId: fromFolderId);
       if (ok) {
-        // Cập nhật thư mục đích
         final idx = _folders.indexWhere((f) => f.id == folderId);
         if (idx != -1) {
           final target = _folders[idx];
@@ -192,7 +199,6 @@ class FolderProvider extends ChangeNotifier {
           );
         }
 
-        // Nếu đang xem chi tiết thư mục đích, thêm bài vào list songs
         if (_currentFolder?.id == folderId) {
           final currentSongs = List<Song>.from(_currentFolder!.songs);
           if (!currentSongs.any((s) => s.id == song.id)) {
@@ -210,20 +216,22 @@ class FolderProvider extends ChangeNotifier {
           );
         }
 
-        // Nếu chuyển từ thư mục khác, cập nhật thư mục cũ
         if (fromFolderId != null && fromFolderId.isNotEmpty) {
           final fromIdx = _folders.indexWhere((f) => f.id == fromFolderId);
           if (fromIdx != -1) {
             final fromFolder = _folders[fromIdx];
-            final updatedFromIds = List<String>.from(fromFolder.songIds)..remove(song.id);
+            final updatedFromIds = List<String>.from(fromFolder.songIds)
+              ..remove(song.id);
             _folders[fromIdx] = fromFolder.copyWith(
               songIds: updatedFromIds,
               songCount: updatedFromIds.length,
             );
           }
           if (_currentFolder?.id == fromFolderId) {
-            final currentSongs = List<Song>.from(_currentFolder!.songs)..removeWhere((s) => s.id == song.id);
-            final updatedFromIds = List<String>.from(_currentFolder!.songIds)..remove(song.id);
+            final currentSongs = List<Song>.from(_currentFolder!.songs)
+              ..removeWhere((s) => s.id == song.id);
+            final updatedFromIds = List<String>.from(_currentFolder!.songIds)
+              ..remove(song.id);
             _currentFolder = _currentFolder!.copyWith(
               songs: currentSongs,
               songIds: updatedFromIds,
@@ -256,13 +264,16 @@ class FolderProvider extends ChangeNotifier {
         }
 
         if (_currentFolder?.id == folderId) {
-          final updatedSongs = List<Song>.from(_currentFolder!.songs)..removeWhere((s) => s.id == songId);
-          final updatedIds = List<String>.from(_currentFolder!.songIds)..remove(songId);
+          final updatedSongs = List<Song>.from(_currentFolder!.songs)
+            ..removeWhere((s) => s.id == songId);
+          final updatedIds = List<String>.from(_currentFolder!.songIds)
+            ..remove(songId);
           _currentFolder = _currentFolder!.copyWith(
             songs: updatedSongs,
             songIds: updatedIds,
             songCount: updatedSongs.length,
-            coverUrl: updatedSongs.isNotEmpty ? updatedSongs.first.coverUrl : null,
+            coverUrl:
+                updatedSongs.isNotEmpty ? updatedSongs.first.coverUrl : null,
           );
         }
 
@@ -276,6 +287,4 @@ class FolderProvider extends ChangeNotifier {
   }
 }
 
-// Tương thích ngược
 typedef PlaylistProvider = FolderProvider;
-

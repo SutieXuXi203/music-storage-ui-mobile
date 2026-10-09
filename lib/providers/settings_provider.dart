@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum WaveMusicType {
-  spectrumBars, // Mặc định như trong ảnh (Cột phổ tần số đáy)
-  mirroredWave, // Loại 2: Sóng âm đối xứng tâm
-  oscilloscope, // Loại 3: Máy hiện sóng quét Analog Sine
+  spectrumBars,
+  mirroredWave,
+  oscilloscope,
 }
 
 extension WaveMusicTypeExt on WaveMusicType {
@@ -108,14 +108,16 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefThemeModeKey, mode == ThemeMode.light ? 'light' : 'dark');
+      await prefs.setString(
+          _prefThemeModeKey, mode == ThemeMode.light ? 'light' : 'dark');
     } catch (e) {
       debugPrint('[SettingsProvider] Lỗi lưu cài đặt theme: $e');
     }
   }
 
   void toggleTheme() {
-    setThemeMode(_themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+    setThemeMode(
+        _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
   }
 
   void cycleWaveType() {

@@ -13,7 +13,7 @@ class QueueScreen extends StatefulWidget {
 }
 
 class _QueueScreenState extends State<QueueScreen> {
-  int _selectedTab = 0; // 0: Up Next, 1: Playlist
+  int _selectedTab = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,8 @@ class _QueueScreenState extends State<QueueScreen> {
             backgroundColor: AppTheme.getBg(context),
             elevation: 0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: AppTheme.getText(context), size: 20),
+              icon: Icon(Icons.arrow_back,
+                  color: AppTheme.getText(context), size: 20),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
@@ -47,7 +48,8 @@ class _QueueScreenState extends State<QueueScreen> {
             ),
             actions: [
               IconButton(
-                icon: Icon(Icons.more_horiz, color: AppTheme.getText(context), size: 20),
+                icon: Icon(Icons.more_horiz,
+                    color: AppTheme.getText(context), size: 20),
                 onPressed: () {},
               ),
             ],
@@ -55,9 +57,9 @@ class _QueueScreenState extends State<QueueScreen> {
           body: SafeArea(
             child: Column(
               children: [
-                // 1. Tabs: [ Up Next ] [ Playlist ]
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: Row(
                     children: [
                       _buildPillTab(
@@ -74,10 +76,7 @@ class _QueueScreenState extends State<QueueScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
-                // 2. Info Row: 12 tracks · 52m | [ Xóa tất cả ]
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -93,14 +92,19 @@ class _QueueScreenState extends State<QueueScreen> {
                       GestureDetector(
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đã xoá hàng đợi'), duration: Duration(seconds: 1)),
+                            const SnackBar(
+                                content: Text('Đã xoá hàng đợi'),
+                                duration: Duration(seconds: 1)),
                           );
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 3),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 0.8),
                           ),
                           child: Text(
                             'Xóa tất cả',
@@ -115,44 +119,52 @@ class _QueueScreenState extends State<QueueScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
-                // 3. Queue List
                 Expanded(
                   child: playlist.isEmpty
                       ? Center(
                           child: Text(
                             'Hàng đợi đang trống',
-                            style: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12),
+                            style: TextStyle(
+                                color: AppTheme.getTextMuted(context),
+                                fontSize: 12),
                           ),
                         )
                       : ListView.separated(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
                           itemCount: playlist.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 6),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 6),
                           itemBuilder: (context, index) {
                             final song = playlist[index];
                             final isCurrent = currentSong?.id == song.id;
-                            final trackStr = (index + 1).toString().padLeft(2, '0');
+                            final trackStr =
+                                (index + 1).toString().padLeft(2, '0');
 
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 7),
                               decoration: BoxDecoration(
-                                color: isCurrent ? AppTheme.getSurfaceSubtle(context) : AppTheme.getSurface(context),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                color: isCurrent
+                                    ? AppTheme.getSurfaceSubtle(context)
+                                    : AppTheme.getSurface(context),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusSm),
                                 border: Border.all(
-                                  color: isCurrent ? AppTheme.getText(context).withValues(alpha: 0.3) : AppTheme.getBorder(context),
+                                  color: isCurrent
+                                      ? AppTheme.getText(context)
+                                          .withValues(alpha: 0.3)
+                                      : AppTheme.getBorder(context),
                                   width: 0.8,
                                 ),
                               ),
                               child: Row(
                                 children: [
-                                  // Drag handle icon
-                                  Icon(Icons.drag_handle, size: 16, color: AppTheme.getTextMuted(context)),
+                                  Icon(Icons.drag_handle,
+                                      size: 16,
+                                      color: AppTheme.getTextMuted(context)),
                                   const SizedBox(width: 8),
-
-                                  // Track number: 01, 02...
                                   SizedBox(
                                     width: 20,
                                     child: Text(
@@ -164,31 +176,39 @@ class _QueueScreenState extends State<QueueScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-
-                                  // Thumbnail (36x36)
                                   Container(
                                     width: 36,
                                     height: 36,
                                     decoration: BoxDecoration(
                                       color: AppTheme.getSurfaceSubtle(context),
-                                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                                      border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                                      borderRadius: BorderRadius.circular(
+                                          AppTheme.radiusSm),
+                                      border: Border.all(
+                                          color: AppTheme.getBorder(context),
+                                          width: 0.8),
                                     ),
                                     clipBehavior: Clip.antiAlias,
-                                    child: song.coverUrl != null && song.coverUrl!.isNotEmpty
+                                    child: song.coverUrl != null &&
+                                            song.coverUrl!.isNotEmpty
                                         ? Image.network(
                                             song.coverUrl!,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                                            errorBuilder: (_, __, ___) => Icon(
+                                                Icons.music_note,
+                                                color: AppTheme.getTextMuted(
+                                                    context),
+                                                size: 16),
                                           )
-                                        : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                                        : Icon(Icons.music_note,
+                                            color:
+                                                AppTheme.getTextMuted(context),
+                                            size: 16),
                                   ),
                                   const SizedBox(width: 10),
-
-                                  // Title & Artist
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
@@ -209,35 +229,43 @@ class _QueueScreenState extends State<QueueScreen> {
                                                 song.artist,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                                                style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: AppTheme
+                                                        .getTextSecondary(
+                                                            context)),
                                               ),
                                             ),
                                             const SizedBox(width: 6),
                                             Text(
                                               song.formattedDuration,
-                                              style: AppTheme.monoStyle(fontSize: 10, color: AppTheme.getTextMuted(context)),
+                                              style: AppTheme.monoStyle(
+                                                  fontSize: 10,
+                                                  color: AppTheme.getTextMuted(
+                                                      context)),
                                             ),
                                           ],
                                         ),
                                       ],
                                     ),
                                   ),
-
-                                  // Trailing 3-dots
-                                  Icon(Icons.more_vert, size: 18, color: AppTheme.getTextMuted(context)),
+                                  Icon(Icons.more_vert,
+                                      size: 18,
+                                      color: AppTheme.getTextMuted(context)),
                                 ],
                               ),
                             );
                           },
                         ),
                 ),
-
-                // 4. Bottom Action Bar: [ + Thêm vào playlist ] [ ✕ Xóa ]
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
                     color: AppTheme.getSurface(context),
-                    border: Border(top: BorderSide(color: AppTheme.getBorder(context), width: 0.8)),
+                    border: Border(
+                        top: BorderSide(
+                            color: AppTheme.getBorder(context), width: 0.8)),
                   ),
                   child: Row(
                     children: [
@@ -248,24 +276,33 @@ class _QueueScreenState extends State<QueueScreen> {
                             style: OutlinedButton.styleFrom(
                               backgroundColor: AppTheme.getSurface(context),
                               foregroundColor: AppTheme.getText(context),
-                              side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                              side: BorderSide(
+                                  color: AppTheme.getBorder(context),
+                                  width: 0.8),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusSm),
                               ),
                             ),
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Đã lưu vào playlist!'), duration: Duration(seconds: 1)),
+                                const SnackBar(
+                                    content: Text('Đã lưu vào playlist!'),
+                                    duration: Duration(seconds: 1)),
                               );
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add, size: 16, color: AppTheme.getText(context)),
+                                Icon(Icons.add,
+                                    size: 16, color: AppTheme.getText(context)),
                                 const SizedBox(width: 6),
                                 Text(
                                   'Thêm vào playlist',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.getText(context)),
                                 ),
                               ],
                             ),
@@ -280,24 +317,33 @@ class _QueueScreenState extends State<QueueScreen> {
                             style: OutlinedButton.styleFrom(
                               backgroundColor: AppTheme.getSurface(context),
                               foregroundColor: AppTheme.getText(context),
-                              side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                              side: BorderSide(
+                                  color: AppTheme.getBorder(context),
+                                  width: 0.8),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusSm),
                               ),
                             ),
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Đã dọn dẹp hàng đợi'), duration: Duration(seconds: 1)),
+                                const SnackBar(
+                                    content: Text('Đã dọn dẹp hàng đợi'),
+                                    duration: Duration(seconds: 1)),
                               );
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.close, size: 16, color: AppTheme.getText(context)),
+                                Icon(Icons.close,
+                                    size: 16, color: AppTheme.getText(context)),
                                 const SizedBox(width: 6),
                                 Text(
                                   'Xóa',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.getText(context)),
                                 ),
                               ],
                             ),

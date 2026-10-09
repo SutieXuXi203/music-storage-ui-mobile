@@ -13,7 +13,7 @@ class ApiService {
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
         connectTimeout: const Duration(seconds: 45),
-        receiveTimeout: const Duration(seconds: 120), // Cho phép tải nhạc YouTube mất nhiều thời gian
+        receiveTimeout: const Duration(seconds: 120),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -32,7 +32,6 @@ class ApiService {
           return handler.next(options);
         },
         onError: (DioException error, handler) async {
-          // Xử lý khi token hết hạn
           if (error.response?.statusCode == 401) {
             final prefs = await SharedPreferences.getInstance();
             await prefs.remove('access_token');
@@ -43,7 +42,6 @@ class ApiService {
     );
   }
 
-  // --- AUTHENTICATION ---
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await _dio.post(
       ApiConstants.login,
@@ -111,14 +109,13 @@ class ApiService {
     }
   }
 
-
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
   }
 
-  // --- SONGS ---
-  Future<List<Song>> getSongs({String? search, int skip = 0, int limit = 50}) async {
+  Future<List<Song>> getSongs(
+      {String? search, int skip = 0, int limit = 50}) async {
     final queryParams = <String, dynamic>{
       'skip': skip,
       'limit': limit,
@@ -149,7 +146,6 @@ class ApiService {
     return response.statusCode == 200;
   }
 
-  // --- YOUTUBE INGESTION ---
   Future<Map<String, dynamic>> downloadFromYoutube({
     required String url,
     String format = 'mp3',
@@ -180,7 +176,9 @@ class ApiService {
             _lastErrorMessage = d['detail'];
             return;
           } else if (d['detail'] is List) {
-            _lastErrorMessage = (d['detail'] as List).map((i) => i['msg'] ?? i.toString()).join(', ');
+            _lastErrorMessage = (d['detail'] as List)
+                .map((i) => i['msg'] ?? i.toString())
+                .join(', ');
             return;
           }
         }
@@ -189,13 +187,13 @@ class ApiService {
           return;
         }
       }
-      _lastErrorMessage = e.message ?? 'Lỗi kết nối máy chủ (${res?.statusCode ?? 'network'})';
+      _lastErrorMessage =
+          e.message ?? 'Lỗi kết nối máy chủ (${res?.statusCode ?? 'network'})';
     } else {
       _lastErrorMessage = e.toString();
     }
   }
 
-  // --- FOLDERS (Thư mục bộ sưu tập) ---
   Future<List<Folder>> getFolders() async {
     try {
       _lastErrorMessage = null;
@@ -218,7 +216,8 @@ class ApiService {
       if (response.data['data'] != null) {
         return Folder.fromJson(response.data['data']);
       }
-      _lastErrorMessage = response.data['message'] ?? 'Không nhận được dữ liệu phản hồi';
+      _lastErrorMessage =
+          response.data['message'] ?? 'Không nhận được dữ liệu phản hồi';
       return null;
     } catch (e) {
       _extractError(e);
@@ -268,7 +267,8 @@ class ApiService {
     }
   }
 
-  Future<Folder?> uploadFolderCoverImage(String folderId, List<int> bytes, String filename) async {
+  Future<Folder?> uploadFolderCoverImage(
+      String folderId, List<int> bytes, String filename) async {
     try {
       _lastErrorMessage = null;
       final formData = FormData.fromMap({
@@ -299,7 +299,8 @@ class ApiService {
     }
   }
 
-  Future<bool> addSongToFolder(String folderId, String songId, {String? fromFolderId}) async {
+  Future<bool> addSongToFolder(String folderId, String songId,
+      {String? fromFolderId}) async {
     try {
       _lastErrorMessage = null;
       final data = <String, dynamic>{
@@ -322,14 +323,14 @@ class ApiService {
   Future<bool> removeSongFromFolder(String folderId, String songId) async {
     try {
       _lastErrorMessage = null;
-      final response = await _dio.delete('${ApiConstants.folders}/$folderId/songs/$songId');
+      final response =
+          await _dio.delete('${ApiConstants.folders}/$folderId/songs/$songId');
       return response.statusCode == 200;
     } catch (e) {
       _extractError(e);
       return false;
     }
   }
-
 }
 
 final apiService = ApiService();

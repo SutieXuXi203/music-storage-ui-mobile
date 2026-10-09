@@ -57,7 +57,6 @@ class Playlist {
       id: id,
       name: json['name']?.toString() ?? 'Thư mục không tên',
       userId: json['user_id']?.toString() ?? '',
-
       driveFolderId: json['drive_folder_id']?.toString(),
       isDefault: json['is_default'] == true,
       songIds: parsedSongIds,
@@ -113,6 +112,4 @@ class Playlist {
   }
 }
 
-// Tương thích ngược
 typedef Folder = Playlist;
-

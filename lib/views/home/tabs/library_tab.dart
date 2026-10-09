@@ -29,7 +29,8 @@ class _LibraryTabState extends State<LibraryTab> {
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) {
         return SafeArea(
@@ -43,12 +44,14 @@ class _LibraryTabState extends State<LibraryTab> {
                   height: 3,
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    color:
+                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -68,13 +71,17 @@ class _LibraryTabState extends State<LibraryTab> {
                     title: Text(
                       opt,
                       style: TextStyle(
-                        color: isSelected ? AppTheme.getText(context) : AppTheme.getTextSecondary(context),
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected
+                            ? AppTheme.getText(context)
+                            : AppTheme.getTextSecondary(context),
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         fontSize: 13,
                       ),
                     ),
                     trailing: isSelected
-                        ? Icon(Icons.check, color: AppTheme.getText(context), size: 18)
+                        ? Icon(Icons.check,
+                            color: AppTheme.getText(context), size: 18)
                         : null,
                     onTap: () {
                       setState(() => _sortOption = opt);
@@ -98,29 +105,36 @@ class _LibraryTabState extends State<LibraryTab> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) {
           final screenWidth = MediaQuery.of(ctx).size.width;
-          // Cố định chiều rộng chuẩn Terminal, không bị co giãn hay vỡ layout khi paste URL dài
           final dialogWidth = (screenWidth * 0.9).clamp(320.0, 440.0);
 
           void submit() {
-            final url = urlController.text.replaceAll('\r', '').replaceAll('\n', '').trim();
+            final url = urlController.text
+                .replaceAll('\r', '')
+                .replaceAll('\n', '')
+                .trim();
             if (url.isNotEmpty) {
               Navigator.pop(ctx);
-              final songProv = Provider.of<SongProvider>(context, listen: false);
-              final downloadProv = Provider.of<DownloadProvider>(context, listen: false);
+              final songProv =
+                  Provider.of<SongProvider>(context, listen: false);
+              final downloadProv =
+                  Provider.of<DownloadProvider>(context, listen: false);
               downloadProv.startDownload(url, songProvider: songProv);
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   backgroundColor: AppTheme.getSurfaceElevated(context),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                    side: BorderSide(
+                        color: AppTheme.getBorder(context), width: 0.8),
                   ),
                   content: Row(
                     children: [
-                      const Icon(Icons.downloading_rounded, size: 18, color: Color(0xFF38BDF8)),
+                      const Icon(Icons.downloading_rounded,
+                          size: 18, color: Color(0xFF38BDF8)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -143,12 +157,14 @@ class _LibraryTabState extends State<LibraryTab> {
           return AlertDialog(
             backgroundColor: AppTheme.getSurfaceElevated(context),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero, // Góc vuông chuẩn Terminal
+              borderRadius: BorderRadius.zero,
               side: BorderSide(color: AppTheme.getBorder(context), width: 1.0),
             ),
-            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            insetPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             titlePadding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
             title: Row(
               children: [
@@ -220,14 +236,17 @@ class _LibraryTabState extends State<LibraryTab> {
                               },
                             )
                           : null,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 12),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.zero,
-                        borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                        borderSide: BorderSide(
+                            color: AppTheme.getBorder(context), width: 0.8),
                       ),
                       focusedBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.zero,
-                        borderSide: BorderSide(color: Color(0xFF38BDF8), width: 1.2),
+                        borderSide:
+                            BorderSide(color: Color(0xFF38BDF8), width: 1.2),
                       ),
                     ),
                   ),
@@ -250,7 +269,8 @@ class _LibraryTabState extends State<LibraryTab> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF38BDF8),
                   foregroundColor: Colors.black,
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero),
                   elevation: 0,
                 ),
                 onPressed: submit,
@@ -283,7 +303,10 @@ class _LibraryTabState extends State<LibraryTab> {
         ),
         title: Text(
           'Tạo thư mục mới',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: SizedBox(
           width: (MediaQuery.of(ctx).size.width * 0.9).clamp(320.0, 420.0),
@@ -293,23 +316,27 @@ class _LibraryTabState extends State<LibraryTab> {
             children: [
               Text(
                 'Đặt tên cho thư mục bài hát của bạn:',
-                style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: nameController,
                 autofocus: true,
                 maxLines: 1,
-                style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
+                style:
+                    TextStyle(color: AppTheme.getText(context), fontSize: 13),
                 decoration: InputDecoration(
                   hintText: 'Ví dụ: Nhạc Acoustic, Lofi, EDM...',
-                  hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                  hintStyle: TextStyle(
+                      color: AppTheme.getTextMuted(context), fontSize: 12.5),
                   isDense: true,
                   filled: true,
                   fillColor: AppTheme.getSurface(context),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                    borderSide: BorderSide(
+                        color: AppTheme.getBorder(context), width: 0.8),
                   ),
                 ),
               ),
@@ -319,7 +346,9 @@ class _LibraryTabState extends State<LibraryTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -330,13 +359,15 @@ class _LibraryTabState extends State<LibraryTab> {
               final name = nameController.text.trim();
               if (name.isNotEmpty) {
                 Navigator.pop(ctx);
-                final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                final folderProv =
+                    Provider.of<FolderProvider>(context, listen: false);
                 final folder = await folderProv.createFolder(name);
                 if (mounted) {
                   if (folder != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
+                        content: Text('Đã tạo thư mục "$name"',
+                            style: AppTheme.monoStyle(fontSize: 12)),
                         duration: const Duration(seconds: 2),
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: AppTheme.getSurfaceElevated(context),
@@ -345,7 +376,10 @@ class _LibraryTabState extends State<LibraryTab> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(folderProv.errorMessage ?? 'Tạo thư mục thất bại. Vui lòng thử lại!', style: AppTheme.monoStyle(fontSize: 12)),
+                        content: Text(
+                            folderProv.errorMessage ??
+                                'Tạo thư mục thất bại. Vui lòng thử lại!',
+                            style: AppTheme.monoStyle(fontSize: 12)),
                         duration: const Duration(seconds: 3),
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: AppTheme.getDanger(context),
@@ -355,13 +389,13 @@ class _LibraryTabState extends State<LibraryTab> {
                 }
               }
             },
-            child: const Text('Tạo', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Tạo',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
     );
   }
-
 
   void _showRenameFolderDialog(Folder folder) {
     final controller = TextEditingController(text: folder.name);
@@ -375,7 +409,10 @@ class _LibraryTabState extends State<LibraryTab> {
         ),
         title: Text(
           'Đổi tên thư mục',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: TextField(
           controller: controller,
@@ -383,20 +420,24 @@ class _LibraryTabState extends State<LibraryTab> {
           style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
           decoration: InputDecoration(
             hintText: 'Nhập tên thư mục mới...',
-            hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
+            hintStyle:
+                TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
             isDense: true,
             filled: true,
             fillColor: AppTheme.getSurface(context),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+              borderSide:
+                  BorderSide(color: AppTheme.getBorder(context), width: 0.8),
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -407,19 +448,22 @@ class _LibraryTabState extends State<LibraryTab> {
               final newName = controller.text.trim();
               if (newName.isNotEmpty) {
                 Navigator.pop(ctx);
-                final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                final folderProv =
+                    Provider.of<FolderProvider>(context, listen: false);
                 final ok = await folderProv.renameFolder(folder.id, newName);
                 if (mounted && ok) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Đã đổi tên thư mục thành "$newName"', style: AppTheme.monoStyle(fontSize: 12)),
+                      content: Text('Đã đổi tên thư mục thành "$newName"',
+                          style: AppTheme.monoStyle(fontSize: 12)),
                       backgroundColor: AppTheme.getSurfaceElevated(context),
                     ),
                   );
                 }
               }
             },
-            child: const Text('Lưu', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Lưu',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -437,16 +481,22 @@ class _LibraryTabState extends State<LibraryTab> {
         ),
         title: Text(
           'Xóa thư mục?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: Text(
           'Bạn có chắc chắn muốn xóa thư mục "${folder.name}"? Các bài hát vẫn sẽ được giữ an toàn trong kho nhạc chính.',
-          style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5),
+          style: TextStyle(
+              color: AppTheme.getTextSecondary(context), fontSize: 12.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -455,18 +505,21 @@ class _LibraryTabState extends State<LibraryTab> {
             ),
             onPressed: () async {
               Navigator.pop(ctx);
-              final folderProv = Provider.of<FolderProvider>(context, listen: false);
+              final folderProv =
+                  Provider.of<FolderProvider>(context, listen: false);
               final ok = await folderProv.deleteFolder(folder.id);
               if (mounted && ok) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Đã xóa thư mục "${folder.name}"', style: AppTheme.monoStyle(fontSize: 12)),
+                    content: Text('Đã xóa thư mục "${folder.name}"',
+                        style: AppTheme.monoStyle(fontSize: 12)),
                     backgroundColor: AppTheme.getSurfaceElevated(context),
                   ),
                 );
               }
             },
-            child: const Text('Xóa', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Xóa',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -478,7 +531,8 @@ class _LibraryTabState extends State<LibraryTab> {
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
@@ -493,7 +547,8 @@ class _LibraryTabState extends State<LibraryTab> {
                   height: 3,
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    color:
+                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                 ),
@@ -516,32 +571,47 @@ class _LibraryTabState extends State<LibraryTab> {
                   decoration: BoxDecoration(
                     color: AppTheme.getSurface(context),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                    border: Border.all(
+                        color: AppTheme.getBorder(context), width: 0.8),
                   ),
-                  child: Icon(Icons.photo_library_outlined, size: 18, color: AppTheme.getText(context)),
+                  child: Icon(Icons.photo_library_outlined,
+                      size: 18, color: AppTheme.getText(context)),
                 ),
                 title: Text(
                   'Chọn ảnh từ thiết bị',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.getText(context)),
                 ),
                 subtitle: Text(
                   'Tải lên ảnh từ thư viện của máy',
-                  style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                  style: TextStyle(
+                      fontSize: 11, color: AppTheme.getTextSecondary(context)),
                 ),
                 onTap: () async {
                   Navigator.pop(ctx);
-                  final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                  final folderProv =
+                      Provider.of<FolderProvider>(context, listen: false);
                   try {
                     final picker = ImagePicker();
-                    final XFile? file = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+                    final XFile? file = await picker.pickImage(
+                        source: ImageSource.gallery, imageQuality: 85);
                     if (file != null) {
                       final bytes = await file.readAsBytes();
-                      final ok = await folderProv.uploadFolderCoverImage(folder.id, bytes, file.name);
+                      final ok = await folderProv.uploadFolderCoverImage(
+                          folder.id, bytes, file.name);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(ok ? 'Đã cập nhật ảnh bìa thư mục' : 'Không thể cập nhật ảnh bìa', style: AppTheme.monoStyle(fontSize: 12)),
-                            backgroundColor: ok ? AppTheme.getSurfaceElevated(context) : AppTheme.getDanger(context),
+                            content: Text(
+                                ok
+                                    ? 'Đã cập nhật ảnh bìa thư mục'
+                                    : 'Không thể cập nhật ảnh bìa',
+                                style: AppTheme.monoStyle(fontSize: 12)),
+                            backgroundColor: ok
+                                ? AppTheme.getSurfaceElevated(context)
+                                : AppTheme.getDanger(context),
                           ),
                         );
                       }
@@ -550,7 +620,8 @@ class _LibraryTabState extends State<LibraryTab> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Lỗi chọn ảnh: $e', style: AppTheme.monoStyle(fontSize: 12)),
+                          content: Text('Lỗi chọn ảnh: $e',
+                              style: AppTheme.monoStyle(fontSize: 12)),
                           backgroundColor: AppTheme.getDanger(context),
                         ),
                       );
@@ -568,17 +639,23 @@ class _LibraryTabState extends State<LibraryTab> {
                   decoration: BoxDecoration(
                     color: AppTheme.getSurface(context),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                    border: Border.all(
+                        color: AppTheme.getBorder(context), width: 0.8),
                   ),
-                  child: Icon(Icons.link_outlined, size: 18, color: AppTheme.getText(context)),
+                  child: Icon(Icons.link_outlined,
+                      size: 18, color: AppTheme.getText(context)),
                 ),
                 title: Text(
                   'Nhập đường link ảnh (URL)',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.getText(context)),
                 ),
                 subtitle: Text(
                   'Dán liên kết ảnh trực tiếp từ web',
-                  style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                  style: TextStyle(
+                      fontSize: 11, color: AppTheme.getTextSecondary(context)),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -596,26 +673,37 @@ class _LibraryTabState extends State<LibraryTab> {
                     decoration: BoxDecoration(
                       color: AppTheme.getSurface(context),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                      border: Border.all(
+                          color: AppTheme.getBorder(context), width: 0.8),
                     ),
-                    child: Icon(Icons.delete_outline, size: 18, color: AppTheme.getDanger(context)),
+                    child: Icon(Icons.delete_outline,
+                        size: 18, color: AppTheme.getDanger(context)),
                   ),
                   title: Text(
                     'Gỡ ảnh bìa tùy chỉnh',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getDanger(context)),
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.getDanger(context)),
                   ),
                   subtitle: Text(
                     'Khôi phục ảnh bìa theo bài hát',
-                    style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.getTextSecondary(context)),
                   ),
                   onTap: () async {
                     Navigator.pop(ctx);
-                    final folderProv = Provider.of<FolderProvider>(context, listen: false);
-                    final ok = await folderProv.updateFolderCoverUrl(folder.id, null);
+                    final folderProv =
+                        Provider.of<FolderProvider>(context, listen: false);
+                    final ok =
+                        await folderProv.updateFolderCoverUrl(folder.id, null);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại', style: AppTheme.monoStyle(fontSize: 12)),
+                          content: Text(
+                              ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại',
+                              style: AppTheme.monoStyle(fontSize: 12)),
                           backgroundColor: AppTheme.getSurfaceElevated(context),
                         ),
                       );
@@ -642,7 +730,10 @@ class _LibraryTabState extends State<LibraryTab> {
         ),
         title: Text(
           'Đổi ảnh bìa thư mục',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -650,7 +741,8 @@ class _LibraryTabState extends State<LibraryTab> {
           children: [
             Text(
               'Dán liên kết hình ảnh trực tiếp (JPG, PNG, WebP):',
-              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+              style: TextStyle(
+                  color: AppTheme.getTextSecondary(context), fontSize: 12),
             ),
             const SizedBox(height: 10),
             TextField(
@@ -659,13 +751,15 @@ class _LibraryTabState extends State<LibraryTab> {
               style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
               decoration: InputDecoration(
                 hintText: 'https://example.com/cover.jpg',
-                hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                hintStyle: TextStyle(
+                    color: AppTheme.getTextMuted(context), fontSize: 12.5),
                 isDense: true,
                 filled: true,
                 fillColor: AppTheme.getSurface(context),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                  borderSide: BorderSide(
+                      color: AppTheme.getBorder(context), width: 0.8),
                 ),
               ),
             ),
@@ -674,7 +768,9 @@ class _LibraryTabState extends State<LibraryTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -684,18 +780,25 @@ class _LibraryTabState extends State<LibraryTab> {
             onPressed: () async {
               final url = controller.text.trim();
               Navigator.pop(ctx);
-              final folderProv = Provider.of<FolderProvider>(context, listen: false);
-              final ok = await folderProv.updateFolderCoverUrl(folder.id, url.isNotEmpty ? url : null);
+              final folderProv =
+                  Provider.of<FolderProvider>(context, listen: false);
+              final ok = await folderProv.updateFolderCoverUrl(
+                  folder.id, url.isNotEmpty ? url : null);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại', style: AppTheme.monoStyle(fontSize: 12)),
-                    backgroundColor: ok ? AppTheme.getSurfaceElevated(context) : AppTheme.getDanger(context),
+                    content: Text(
+                        ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại',
+                        style: AppTheme.monoStyle(fontSize: 12)),
+                    backgroundColor: ok
+                        ? AppTheme.getSurfaceElevated(context)
+                        : AppTheme.getDanger(context),
                   ),
                 );
               }
             },
-            child: const Text('Lưu', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Lưu',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -725,7 +828,8 @@ class _LibraryTabState extends State<LibraryTab> {
         actions: [
           if (_selectedCategory == 'Thư mục')
             IconButton(
-              icon: Icon(Icons.create_new_folder_outlined, color: AppTheme.getText(context), size: 22),
+              icon: Icon(Icons.create_new_folder_outlined,
+                  color: AppTheme.getText(context), size: 22),
               tooltip: 'Tạo thư mục mới',
               onPressed: _showCreateFolderDialog,
             )
@@ -742,7 +846,6 @@ class _LibraryTabState extends State<LibraryTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Filter Tabs: [ Bài hát | Thư mục ]
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -758,12 +861,18 @@ class _LibraryTabState extends State<LibraryTab> {
                     child: GestureDetector(
                       onTap: () => setState(() => _selectedCategory = cat),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: isSelected ? activeBg : AppTheme.getSurface(context),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                          color: isSelected
+                              ? activeBg
+                              : AppTheme.getSurface(context),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusPill),
                           border: Border.all(
-                            color: isSelected ? activeBg : AppTheme.getBorder(context),
+                            color: isSelected
+                                ? activeBg
+                                : AppTheme.getBorder(context),
                             width: 0.8,
                           ),
                         ),
@@ -772,7 +881,9 @@ class _LibraryTabState extends State<LibraryTab> {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            color: isSelected ? activeText : AppTheme.getTextSecondary(context),
+                            color: isSelected
+                                ? activeText
+                                : AppTheme.getTextSecondary(context),
                           ),
                         ),
                       ),
@@ -781,8 +892,6 @@ class _LibraryTabState extends State<LibraryTab> {
                 }).toList(),
               ),
             ),
-
-            // 2. Sort Bar: Sắp xếp: Gần đây nhất
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -821,8 +930,6 @@ class _LibraryTabState extends State<LibraryTab> {
                 ],
               ),
             ),
-
-            // 3. Main Content
             Expanded(
               child: _selectedCategory == 'Thư mục'
                   ? _buildFoldersContent(context, folderProvider)
@@ -834,7 +941,8 @@ class _LibraryTabState extends State<LibraryTab> {
     );
   }
 
-  Widget _buildFoldersContent(BuildContext context, FolderProvider folderProvider) {
+  Widget _buildFoldersContent(
+      BuildContext context, FolderProvider folderProvider) {
     if (folderProvider.isLoading && folderProvider.folders.isEmpty) {
       return Center(
         child: CircularProgressIndicator(
@@ -857,9 +965,11 @@ class _LibraryTabState extends State<LibraryTab> {
               decoration: BoxDecoration(
                 color: AppTheme.getSurface(context),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                border:
+                    Border.all(color: AppTheme.getBorder(context), width: 0.8),
               ),
-              child: Icon(Icons.folder_open_outlined, size: 24, color: AppTheme.getTextMuted(context)),
+              child: Icon(Icons.folder_open_outlined,
+                  size: 24, color: AppTheme.getTextMuted(context)),
             ),
             const SizedBox(height: 12),
             Text(
@@ -881,7 +991,8 @@ class _LibraryTabState extends State<LibraryTab> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                 backgroundColor: AppTheme.getText(context),
                 foregroundColor: AppTheme.getBg(context),
                 shape: RoundedRectangleBorder(
@@ -891,7 +1002,8 @@ class _LibraryTabState extends State<LibraryTab> {
               icon: Icon(Icons.add, size: 16, color: AppTheme.getBg(context)),
               label: Text(
                 'Tạo thư mục mới',
-                style: AppTheme.monoStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                style: AppTheme.monoStyle(
+                    fontSize: 12, fontWeight: FontWeight.w600),
               ),
               onPressed: _showCreateFolderDialog,
             ),
@@ -915,7 +1027,8 @@ class _LibraryTabState extends State<LibraryTab> {
           ),
           child: ListTile(
             dense: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             leading: GestureDetector(
               onTap: () => _showChangeCoverDialog(context, folder),
               child: Stack(
@@ -926,24 +1039,26 @@ class _LibraryTabState extends State<LibraryTab> {
                     decoration: BoxDecoration(
                       color: AppTheme.getSurfaceElevated(context),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                      border: Border.all(
+                          color: AppTheme.getBorder(context), width: 0.8),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: folder.coverUrl != null && folder.coverUrl!.isNotEmpty
-                        ? Image.network(
-                            folder.coverUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.folder_outlined,
-                              color: AppTheme.getText(context),
-                              size: 22,
-                            ),
-                          )
-                        : Icon(
-                            Icons.folder_outlined,
-                            color: AppTheme.getText(context),
-                            size: 22,
-                          ),
+                    child:
+                        folder.coverUrl != null && folder.coverUrl!.isNotEmpty
+                            ? Image.network(
+                                folder.coverUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(
+                                  Icons.folder_outlined,
+                                  color: AppTheme.getText(context),
+                                  size: 22,
+                                ),
+                              )
+                            : Icon(
+                                Icons.folder_outlined,
+                                color: AppTheme.getText(context),
+                                size: 22,
+                              ),
                   ),
                   Positioned(
                     bottom: 0,
@@ -951,10 +1066,12 @@ class _LibraryTabState extends State<LibraryTab> {
                     child: Container(
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        color: AppTheme.getSurface(context).withValues(alpha: 0.85),
+                        color: AppTheme.getSurface(context)
+                            .withValues(alpha: 0.85),
                         borderRadius: BorderRadius.circular(2),
                       ),
-                      child: Icon(Icons.camera_alt, size: 8, color: AppTheme.getTextSecondary(context)),
+                      child: Icon(Icons.camera_alt,
+                          size: 8, color: AppTheme.getTextSecondary(context)),
                     ),
                   ),
                 ],
@@ -978,11 +1095,13 @@ class _LibraryTabState extends State<LibraryTab> {
               ),
             ),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, size: 18, color: AppTheme.getTextSecondary(context)),
+              icon: Icon(Icons.more_vert,
+                  size: 18, color: AppTheme.getTextSecondary(context)),
               color: AppTheme.getSurfaceElevated(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                side:
+                    BorderSide(color: AppTheme.getBorder(context), width: 0.8),
               ),
               onSelected: (val) {
                 if (val == 'rename') {
@@ -998,9 +1117,12 @@ class _LibraryTabState extends State<LibraryTab> {
                   value: 'rename',
                   child: Row(
                     children: [
-                      Icon(Icons.edit_outlined, size: 16, color: AppTheme.getText(context)),
+                      Icon(Icons.edit_outlined,
+                          size: 16, color: AppTheme.getText(context)),
                       const SizedBox(width: 8),
-                      Text('Đổi tên', style: TextStyle(fontSize: 12, color: AppTheme.getText(context))),
+                      Text('Đổi tên',
+                          style: TextStyle(
+                              fontSize: 12, color: AppTheme.getText(context))),
                     ],
                   ),
                 ),
@@ -1008,9 +1130,12 @@ class _LibraryTabState extends State<LibraryTab> {
                   value: 'cover',
                   child: Row(
                     children: [
-                      Icon(Icons.image_outlined, size: 16, color: AppTheme.getText(context)),
+                      Icon(Icons.image_outlined,
+                          size: 16, color: AppTheme.getText(context)),
                       const SizedBox(width: 8),
-                      Text('Đổi ảnh bìa', style: TextStyle(fontSize: 12, color: AppTheme.getText(context))),
+                      Text('Đổi ảnh bìa',
+                          style: TextStyle(
+                              fontSize: 12, color: AppTheme.getText(context))),
                     ],
                   ),
                 ),
@@ -1018,15 +1143,18 @@ class _LibraryTabState extends State<LibraryTab> {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline, size: 16, color: AppTheme.getDanger(context)),
+                      Icon(Icons.delete_outline,
+                          size: 16, color: AppTheme.getDanger(context)),
                       const SizedBox(width: 8),
-                      Text('Xóa thư mục', style: TextStyle(fontSize: 12, color: AppTheme.getDanger(context))),
+                      Text('Xóa thư mục',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.getDanger(context))),
                     ],
                   ),
                 ),
               ],
             ),
-
             onTap: () {
               Navigator.push(
                 context,
@@ -1052,12 +1180,16 @@ class _LibraryTabState extends State<LibraryTab> {
           children: [
             Text(
               'Kho nhạc của bạn đang trống.',
-              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 13, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                  color: AppTheme.getTextSecondary(context),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 4),
             Text(
               'Thêm bài hát đầu tiên từ YouTube.',
-              style: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 11.5),
+              style: TextStyle(
+                  color: AppTheme.getTextMuted(context), fontSize: 11.5),
             ),
           ],
         ),
@@ -1082,7 +1214,8 @@ class _LibraryTabState extends State<LibraryTab> {
             audioPlayerService.setPlaylist(songs, initialIndex: index);
           },
           onDelete: () {
-            Provider.of<SongProvider>(context, listen: false).deleteSong(song.id);
+            Provider.of<SongProvider>(context, listen: false)
+                .deleteSong(song.id);
           },
         );
       },

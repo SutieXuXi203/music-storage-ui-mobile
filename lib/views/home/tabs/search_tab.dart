@@ -44,26 +44,31 @@ class _SearchTabState extends State<SearchTab> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
           children: [
-            // 1. Search Bar Input (height 42px)
             Container(
               height: 42,
               decoration: BoxDecoration(
                 color: AppTheme.getSurface(context),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                border:
+                    Border.all(color: AppTheme.getBorder(context), width: 1.0),
               ),
               child: TextField(
                 controller: _searchController,
-                style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+                style:
+                    TextStyle(fontSize: 13, color: AppTheme.getText(context)),
                 decoration: InputDecoration(
                   isDense: true,
                   hintText: 'Tìm kiếm bài hát, nghệ sĩ, album...',
-                  hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
-                  prefixIcon: Icon(Icons.search, size: 18, color: AppTheme.getTextMuted(context)),
+                  hintStyle: TextStyle(
+                      color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                  prefixIcon: Icon(Icons.search,
+                      size: 18, color: AppTheme.getTextMuted(context)),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
                           padding: EdgeInsets.zero,
-                          icon: Icon(Icons.close, size: 16, color: AppTheme.getTextSecondary(context)),
+                          icon: Icon(Icons.close,
+                              size: 16,
+                              color: AppTheme.getTextSecondary(context)),
                           onPressed: () {
                             _searchController.clear();
                             songProvider.fetchSongs(query: '');
@@ -82,10 +87,7 @@ class _SearchTabState extends State<SearchTab> {
                 },
               ),
             ),
-
             const SizedBox(height: 18),
-
-            // Section: Danh sách bài hát
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -109,20 +111,19 @@ class _SearchTabState extends State<SearchTab> {
               ],
             ),
             const SizedBox(height: 8),
-
             if (songs.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Center(
                   child: Text(
                     'Không tìm thấy bài hát nào',
-                    style: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                    style: TextStyle(
+                        color: AppTheme.getTextMuted(context), fontSize: 12.5),
                   ),
                 ),
               )
             else
               ...songs.map((song) => _buildSongTile(context, song)),
-
             const SizedBox(height: 120),
           ],
         ),
@@ -147,19 +148,21 @@ class _SearchTabState extends State<SearchTab> {
             decoration: BoxDecoration(
               color: AppTheme.getSurfaceSubtle(context),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+              border:
+                  Border.all(color: AppTheme.getBorder(context), width: 0.8),
             ),
             clipBehavior: Clip.antiAlias,
             child: song.coverUrl != null && song.coverUrl!.isNotEmpty
                 ? Image.network(
                     song.coverUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                    errorBuilder: (_, __, ___) => Icon(Icons.music_note,
+                        color: AppTheme.getTextMuted(context), size: 16),
                   )
-                : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                : Icon(Icons.music_note,
+                    color: AppTheme.getTextMuted(context), size: 16),
           ),
           const SizedBox(width: 10),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +185,9 @@ class _SearchTabState extends State<SearchTab> {
                       song.artist,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.getTextSecondary(context)),
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -197,23 +202,26 @@ class _SearchTabState extends State<SearchTab> {
               ],
             ),
           ),
-
           GestureDetector(
             onTap: () {
-              final songProv = Provider.of<SongProvider>(context, listen: false);
+              final songProv =
+                  Provider.of<SongProvider>(context, listen: false);
               final idx = songProv.songs.indexWhere((s) => s.id == song.id);
-              audioPlayerService.setPlaylist(songProv.songs, initialIndex: idx >= 0 ? idx : 0);
+              audioPlayerService.setPlaylist(songProv.songs,
+                  initialIndex: idx >= 0 ? idx : 0);
             },
             child: Container(
               width: 28,
               height: 28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                border:
+                    Border.all(color: AppTheme.getBorder(context), width: 1.0),
                 color: Colors.transparent,
               ),
               child: Center(
-                child: Icon(Icons.play_arrow, size: 16, color: AppTheme.getText(context)),
+                child: Icon(Icons.play_arrow,
+                    size: 16, color: AppTheme.getText(context)),
               ),
             ),
           ),

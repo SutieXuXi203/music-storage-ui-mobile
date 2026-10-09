@@ -47,13 +47,17 @@ class Song {
 
   factory Song.fromJson(Map<String, dynamic> json) {
     final songId = json['id'] ?? json['_id'] ?? '';
-    // Luôn ưu tiên dùng backend stream proxy để phát nhạc mượt mà trên mọi nền tảng (Web/Mobile) không lỗi CORS
-    final proxyStreamUrl = songId.isNotEmpty ? '${ApiConstants.baseUrl}/songs/$songId/stream' : null;
+    final proxyStreamUrl = songId.isNotEmpty
+        ? '${ApiConstants.baseUrl}/songs/$songId/stream'
+        : null;
 
-    final coverDriveId = json['cover_drive_file_id'] ?? json['thumbnail_drive_file_id'];
+    final coverDriveId =
+        json['cover_drive_file_id'] ?? json['thumbnail_drive_file_id'];
     final proxyCoverUrl = songId.isNotEmpty && coverDriveId != null
         ? '${ApiConstants.baseUrl}/songs/$songId/cover'
-        : (coverDriveId != null ? 'https://lh3.googleusercontent.com/d/$coverDriveId' : null);
+        : (coverDriveId != null
+            ? 'https://lh3.googleusercontent.com/d/$coverDriveId'
+            : null);
 
     return Song(
       id: songId,
@@ -73,9 +77,10 @@ class Song {
       webViewLink: json['web_view_link'],
       userId: json['user_id'],
       userUsername: json['user_username'],
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
     );
-
   }
 
   Map<String, dynamic> toJson() {

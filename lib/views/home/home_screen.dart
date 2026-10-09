@@ -102,14 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
           bottomNavigationBar: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // High-Tech Download Process HUD
               const TechDownloadHud(),
-
-              // Mini Player Dock
               if (hasActiveSong)
                 MiniPlayerWidget(playerService: audioPlayerService),
-
-              // Bottom Navigation Bar with Gradient Blur (top-to-bottom blur & fade)
               ClipRect(
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -139,9 +134,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
-                            _buildNavItem(1, Icons.library_music_outlined, Icons.library_music, 'Library'),
-                            _buildNavItem(2, Icons.search_outlined, Icons.search, 'Search'),
+                            _buildNavItem(
+                                0, Icons.home_outlined, Icons.home, 'Home'),
+                            _buildNavItem(1, Icons.library_music_outlined,
+                                Icons.library_music, 'Library'),
+                            _buildNavItem(2, Icons.search_outlined,
+                                Icons.search, 'Search'),
                           ],
                         ),
                       ),
@@ -156,7 +154,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData iconOutline, IconData iconFilled, String label) {
+  Widget _buildNavItem(
+      int index, IconData iconOutline, IconData iconFilled, String label) {
     final isSelected = _currentIndex == index;
     final activeColor = AppTheme.getText(context);
     final inactiveColor = AppTheme.getTextMuted(context);

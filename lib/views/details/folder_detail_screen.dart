@@ -28,7 +28,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<FolderProvider>(context, listen: false).fetchFolderDetails(widget.folderId);
+      Provider.of<FolderProvider>(context, listen: false)
+          .fetchFolderDetails(widget.folderId);
     });
   }
 
@@ -44,7 +45,10 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
         ),
         title: Text(
           'Đổi tên thư mục',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: TextField(
           controller: controller,
@@ -52,20 +56,24 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
           style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
           decoration: InputDecoration(
             hintText: 'Nhập tên mới...',
-            hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
+            hintStyle:
+                TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
             isDense: true,
             filled: true,
             fillColor: AppTheme.getSurface(context),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+              borderSide:
+                  BorderSide(color: AppTheme.getBorder(context), width: 0.8),
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -76,11 +84,13 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
               final newName = controller.text.trim();
               if (newName.isNotEmpty) {
                 Navigator.pop(ctx);
-                final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                final folderProv =
+                    Provider.of<FolderProvider>(context, listen: false);
                 await folderProv.renameFolder(folder.id, newName);
               }
             },
-            child: const Text('Lưu', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Lưu',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -98,16 +108,22 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
         ),
         title: Text(
           'Xóa thư mục?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: Text(
           'Bạn có chắc chắn muốn xóa thư mục "${folder.name}"? Các bài hát bên trong vẫn sẽ được giữ an toàn trong kho nhạc của bạn.',
-          style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5),
+          style: TextStyle(
+              color: AppTheme.getTextSecondary(context), fontSize: 12.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -116,19 +132,22 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
             ),
             onPressed: () async {
               Navigator.pop(ctx);
-              final folderProv = Provider.of<FolderProvider>(context, listen: false);
+              final folderProv =
+                  Provider.of<FolderProvider>(context, listen: false);
               final ok = await folderProv.deleteFolder(folder.id);
               if (mounted && ok) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Đã xóa thư mục "${folder.name}"', style: AppTheme.monoStyle(fontSize: 12)),
+                    content: Text('Đã xóa thư mục "${folder.name}"',
+                        style: AppTheme.monoStyle(fontSize: 12)),
                     backgroundColor: AppTheme.getSurfaceElevated(context),
                   ),
                 );
               }
             },
-            child: const Text('Xóa', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Xóa',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -140,7 +159,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
@@ -155,7 +175,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   height: 3,
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    color:
+                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                 ),
@@ -178,32 +199,47 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   decoration: BoxDecoration(
                     color: AppTheme.getSurface(context),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                    border: Border.all(
+                        color: AppTheme.getBorder(context), width: 0.8),
                   ),
-                  child: Icon(Icons.photo_library_outlined, size: 18, color: AppTheme.getText(context)),
+                  child: Icon(Icons.photo_library_outlined,
+                      size: 18, color: AppTheme.getText(context)),
                 ),
                 title: Text(
                   'Chọn ảnh từ thiết bị',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.getText(context)),
                 ),
                 subtitle: Text(
                   'Tải lên ảnh từ thư viện của máy',
-                  style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                  style: TextStyle(
+                      fontSize: 11, color: AppTheme.getTextSecondary(context)),
                 ),
                 onTap: () async {
                   Navigator.pop(ctx);
-                  final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                  final folderProv =
+                      Provider.of<FolderProvider>(context, listen: false);
                   try {
                     final picker = ImagePicker();
-                    final XFile? file = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+                    final XFile? file = await picker.pickImage(
+                        source: ImageSource.gallery, imageQuality: 85);
                     if (file != null) {
                       final bytes = await file.readAsBytes();
-                      final ok = await folderProv.uploadFolderCoverImage(folder.id, bytes, file.name);
+                      final ok = await folderProv.uploadFolderCoverImage(
+                          folder.id, bytes, file.name);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(ok ? 'Đã cập nhật ảnh bìa thư mục' : 'Không thể cập nhật ảnh bìa', style: AppTheme.monoStyle(fontSize: 12)),
-                            backgroundColor: ok ? AppTheme.getSurfaceElevated(context) : AppTheme.getDanger(context),
+                            content: Text(
+                                ok
+                                    ? 'Đã cập nhật ảnh bìa thư mục'
+                                    : 'Không thể cập nhật ảnh bìa',
+                                style: AppTheme.monoStyle(fontSize: 12)),
+                            backgroundColor: ok
+                                ? AppTheme.getSurfaceElevated(context)
+                                : AppTheme.getDanger(context),
                           ),
                         );
                       }
@@ -212,7 +248,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Lỗi chọn ảnh: $e', style: AppTheme.monoStyle(fontSize: 12)),
+                          content: Text('Lỗi chọn ảnh: $e',
+                              style: AppTheme.monoStyle(fontSize: 12)),
                           backgroundColor: AppTheme.getDanger(context),
                         ),
                       );
@@ -230,17 +267,23 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   decoration: BoxDecoration(
                     color: AppTheme.getSurface(context),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                    border: Border.all(
+                        color: AppTheme.getBorder(context), width: 0.8),
                   ),
-                  child: Icon(Icons.link_outlined, size: 18, color: AppTheme.getText(context)),
+                  child: Icon(Icons.link_outlined,
+                      size: 18, color: AppTheme.getText(context)),
                 ),
                 title: Text(
                   'Nhập đường link ảnh (URL)',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.getText(context)),
                 ),
                 subtitle: Text(
                   'Dán liên kết ảnh trực tiếp từ web',
-                  style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                  style: TextStyle(
+                      fontSize: 11, color: AppTheme.getTextSecondary(context)),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -258,26 +301,37 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                     decoration: BoxDecoration(
                       color: AppTheme.getSurface(context),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                      border: Border.all(
+                          color: AppTheme.getBorder(context), width: 0.8),
                     ),
-                    child: Icon(Icons.delete_outline, size: 18, color: AppTheme.getDanger(context)),
+                    child: Icon(Icons.delete_outline,
+                        size: 18, color: AppTheme.getDanger(context)),
                   ),
                   title: Text(
                     'Gỡ ảnh bìa tùy chỉnh',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getDanger(context)),
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.getDanger(context)),
                   ),
                   subtitle: Text(
                     'Khôi phục ảnh bìa theo bài hát',
-                    style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.getTextSecondary(context)),
                   ),
                   onTap: () async {
                     Navigator.pop(ctx);
-                    final folderProv = Provider.of<FolderProvider>(context, listen: false);
-                    final ok = await folderProv.updateFolderCoverUrl(folder.id, null);
+                    final folderProv =
+                        Provider.of<FolderProvider>(context, listen: false);
+                    final ok =
+                        await folderProv.updateFolderCoverUrl(folder.id, null);
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại', style: AppTheme.monoStyle(fontSize: 12)),
+                          content: Text(
+                              ok ? 'Đã gỡ ảnh bìa' : 'Thao tác thất bại',
+                              style: AppTheme.monoStyle(fontSize: 12)),
                           backgroundColor: AppTheme.getSurfaceElevated(context),
                         ),
                       );
@@ -304,7 +358,10 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
         ),
         title: Text(
           'Đổi ảnh bìa thư mục',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -312,7 +369,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
           children: [
             Text(
               'Dán liên kết hình ảnh trực tiếp (JPG, PNG, WebP):',
-              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+              style: TextStyle(
+                  color: AppTheme.getTextSecondary(context), fontSize: 12),
             ),
             const SizedBox(height: 10),
             TextField(
@@ -321,13 +379,15 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
               style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
               decoration: InputDecoration(
                 hintText: 'https://example.com/cover.jpg',
-                hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                hintStyle: TextStyle(
+                    color: AppTheme.getTextMuted(context), fontSize: 12.5),
                 isDense: true,
                 filled: true,
                 fillColor: AppTheme.getSurface(context),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                  borderSide: BorderSide(
+                      color: AppTheme.getBorder(context), width: 0.8),
                 ),
               ),
             ),
@@ -336,7 +396,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -346,18 +408,25 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
             onPressed: () async {
               final url = controller.text.trim();
               Navigator.pop(ctx);
-              final folderProv = Provider.of<FolderProvider>(context, listen: false);
-              final ok = await folderProv.updateFolderCoverUrl(folder.id, url.isNotEmpty ? url : null);
+              final folderProv =
+                  Provider.of<FolderProvider>(context, listen: false);
+              final ok = await folderProv.updateFolderCoverUrl(
+                  folder.id, url.isNotEmpty ? url : null);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại', style: AppTheme.monoStyle(fontSize: 12)),
-                    backgroundColor: ok ? AppTheme.getSurfaceElevated(context) : AppTheme.getDanger(context),
+                    content: Text(
+                        ok ? 'Đã lưu ảnh bìa thư mục' : 'Cập nhật thất bại',
+                        style: AppTheme.monoStyle(fontSize: 12)),
+                    backgroundColor: ok
+                        ? AppTheme.getSurfaceElevated(context)
+                        : AppTheme.getDanger(context),
                   ),
                 );
               }
             },
-            child: const Text('Lưu', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Lưu',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -368,14 +437,16 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
     final songProvider = Provider.of<SongProvider>(context, listen: false);
     final allSongs = songProvider.songs;
     final folderSongIds = folder.songIds.toSet();
-    final availableSongs = allSongs.where((s) => !folderSongIds.contains(s.id)).toList();
+    final availableSongs =
+        allSongs.where((s) => !folderSongIds.contains(s.id)).toList();
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) {
         return StatefulBuilder(
@@ -385,7 +456,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * 0.75,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -394,7 +466,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                        color: AppTheme.getTextMuted(context)
+                            .withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -411,7 +484,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.close, size: 20, color: AppTheme.getTextSecondary(context)),
+                          icon: Icon(Icons.close,
+                              size: 20,
+                              color: AppTheme.getTextSecondary(context)),
                           onPressed: () => Navigator.pop(ctx),
                         ),
                       ],
@@ -421,7 +496,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Chọn bài hát từ kho nhạc để thêm vào thư mục "${folder.name}"',
-                        style: TextStyle(fontSize: 11.5, color: AppTheme.getTextSecondary(context)),
+                        style: TextStyle(
+                            fontSize: 11.5,
+                            color: AppTheme.getTextSecondary(context)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -433,26 +510,36 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.check_circle_outline, size: 36, color: AppTheme.getTextMuted(context)),
+                                  Icon(Icons.check_circle_outline,
+                                      size: 36,
+                                      color: AppTheme.getTextMuted(context)),
                                   const SizedBox(height: 8),
                                   Text(
                                     'Tất cả bài hát đã có trong thư mục này.',
-                                    style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5),
+                                    style: TextStyle(
+                                        color:
+                                            AppTheme.getTextSecondary(context),
+                                        fontSize: 12.5),
                                   ),
                                 ],
                               ),
                             )
                           : ListView.separated(
                               itemCount: availableSongs.length,
-                              separatorBuilder: (_, __) => const SizedBox(height: 6),
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 6),
                               itemBuilder: (context, idx) {
                                 final song = availableSongs[idx];
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
                                   decoration: BoxDecoration(
                                     color: AppTheme.getSurface(context),
-                                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                                    border: Border.all(color: AppTheme.getBorder(context), width: 0.6),
+                                    borderRadius: BorderRadius.circular(
+                                        AppTheme.radiusSm),
+                                    border: Border.all(
+                                        color: AppTheme.getBorder(context),
+                                        width: 0.6),
                                   ),
                                   child: Row(
                                     children: [
@@ -460,26 +547,35 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                                         width: 36,
                                         height: 36,
                                         decoration: BoxDecoration(
-                                          color: AppTheme.getSurfaceElevated(context),
-                                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                          color: AppTheme.getSurfaceElevated(
+                                              context),
+                                          borderRadius: BorderRadius.circular(
+                                              AppTheme.radiusSm),
                                         ),
                                         clipBehavior: Clip.antiAlias,
-                                        child: song.coverUrl != null && song.coverUrl!.isNotEmpty
+                                        child: song.coverUrl != null &&
+                                                song.coverUrl!.isNotEmpty
                                             ? Image.network(
                                                 song.coverUrl!,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => Icon(
+                                                errorBuilder: (_, __, ___) =>
+                                                    Icon(
                                                   Icons.music_note,
-                                                  color: AppTheme.getTextMuted(context),
+                                                  color: AppTheme.getTextMuted(
+                                                      context),
                                                   size: 16,
                                                 ),
                                               )
-                                            : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                                            : Icon(Icons.music_note,
+                                                color: AppTheme.getTextMuted(
+                                                    context),
+                                                size: 16),
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               song.title,
@@ -488,13 +584,18 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w600,
-                                                color: AppTheme.getText(context),
+                                                color:
+                                                    AppTheme.getText(context),
                                               ),
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
                                               '${song.artist} • ${song.formattedDuration}',
-                                              style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                                              style: TextStyle(
+                                                  fontSize: 11,
+                                                  color:
+                                                      AppTheme.getTextSecondary(
+                                                          context)),
                                             ),
                                           ],
                                         ),
@@ -502,31 +603,47 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                                       const SizedBox(width: 8),
                                       OutlinedButton(
                                         style: OutlinedButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
                                           minimumSize: Size.zero,
-                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                          side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          side: BorderSide(
+                                              color:
+                                                  AppTheme.getBorder(context),
+                                              width: 0.8),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                            borderRadius: BorderRadius.circular(
+                                                AppTheme.radiusSm),
                                           ),
                                         ),
                                         onPressed: () async {
-                                          final folderProv = Provider.of<FolderProvider>(modalCtx, listen: false);
-                                          final ok = await folderProv.addSongToFolder(folder.id, song);
+                                          final folderProv =
+                                              Provider.of<FolderProvider>(
+                                                  modalCtx,
+                                                  listen: false);
+                                          final ok = await folderProv
+                                              .addSongToFolder(folder.id, song);
                                           if (ok) {
                                             setModalState(() {
                                               availableSongs.removeAt(idx);
                                             });
                                             if (modalCtx.mounted) {
-                                              ScaffoldMessenger.of(modalCtx).showSnackBar(
+                                              ScaffoldMessenger.of(modalCtx)
+                                                  .showSnackBar(
                                                 SnackBar(
                                                   content: Text(
                                                     'Đã thêm "${song.title}" vào thư mục',
-                                                    style: AppTheme.monoStyle(fontSize: 12),
+                                                    style: AppTheme.monoStyle(
+                                                        fontSize: 12),
                                                   ),
-                                                  duration: const Duration(seconds: 1),
-                                                  behavior: SnackBarBehavior.floating,
-                                                  backgroundColor: AppTheme.getSurfaceElevated(modalCtx),
+                                                  duration: const Duration(
+                                                      seconds: 1),
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  backgroundColor: AppTheme
+                                                      .getSurfaceElevated(
+                                                          modalCtx),
                                                 ),
                                               );
                                             }
@@ -559,13 +676,15 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
 
   void _showSongOptions(Folder folder, Song song) {
     final folderProv = Provider.of<FolderProvider>(context, listen: false);
-    final otherFolders = folderProv.folders.where((f) => f.id != folder.id).toList();
+    final otherFolders =
+        folderProv.folders.where((f) => f.id != folder.id).toList();
 
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) {
         return SafeArea(
@@ -579,7 +698,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   height: 3,
                   margin: const EdgeInsets.only(bottom: 14),
                   decoration: BoxDecoration(
-                    color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    color:
+                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -590,16 +710,21 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                        border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                        border: Border.all(
+                            color: AppTheme.getBorder(context), width: 0.8),
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: song.coverUrl != null && song.coverUrl!.isNotEmpty
                           ? Image.network(
                               song.coverUrl!,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
+                              errorBuilder: (_, __, ___) => Icon(
+                                  Icons.music_note,
+                                  color: AppTheme.getTextMuted(context),
+                                  size: 18),
                             )
-                          : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
+                          : Icon(Icons.music_note,
+                              color: AppTheme.getTextMuted(context), size: 18),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -619,7 +744,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                           const SizedBox(height: 2),
                           Text(
                             '${song.artist} • ${song.formattedDuration}',
-                            style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: AppTheme.getTextSecondary(context)),
                           ),
                         ],
                       ),
@@ -629,22 +756,32 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                 const SizedBox(height: 12),
                 Divider(color: AppTheme.getBorder(context), height: 1),
                 const SizedBox(height: 4),
-
                 ListTile(
                   dense: true,
-                  leading: Icon(Icons.play_arrow_outlined, color: AppTheme.getText(context), size: 20),
-                  title: Text('Phát bài hát', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  leading: Icon(Icons.play_arrow_outlined,
+                      color: AppTheme.getText(context), size: 20),
+                  title: Text('Phát bài hát',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.getText(context))),
                   onTap: () {
                     Navigator.pop(ctx);
                     final songs = folder.songs;
                     final idx = songs.indexWhere((s) => s.id == song.id);
-                    audioPlayerService.setPlaylist(songs, initialIndex: idx != -1 ? idx : 0);
+                    audioPlayerService.setPlaylist(songs,
+                        initialIndex: idx != -1 ? idx : 0);
                   },
                 ),
                 ListTile(
                   dense: true,
-                  leading: Icon(Icons.info_outline, color: AppTheme.getText(context), size: 20),
-                  title: Text('Xem chi tiết bài hát', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                  leading: Icon(Icons.info_outline,
+                      color: AppTheme.getText(context), size: 20),
+                  title: Text('Xem chi tiết bài hát',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.getText(context))),
                   onTap: () {
                     Navigator.pop(ctx);
                     Navigator.push(
@@ -658,8 +795,13 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                 if (otherFolders.isNotEmpty)
                   ListTile(
                     dense: true,
-                    leading: Icon(Icons.drive_file_move_outlined, color: AppTheme.getText(context), size: 20),
-                    title: Text('Chuyển sang thư mục khác', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getText(context))),
+                    leading: Icon(Icons.drive_file_move_outlined,
+                        color: AppTheme.getText(context), size: 20),
+                    title: Text('Chuyển sang thư mục khác',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: AppTheme.getText(context))),
                     onTap: () {
                       Navigator.pop(ctx);
                       _showMoveToOtherFolderSheet(folder, song, otherFolders);
@@ -667,14 +809,19 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   ),
                 ListTile(
                   dense: true,
-                  leading: Icon(Icons.folder_delete_outlined, color: AppTheme.getDanger(context), size: 20),
+                  leading: Icon(Icons.folder_delete_outlined,
+                      color: AppTheme.getDanger(context), size: 20),
                   title: Text(
                     'Loại bỏ khỏi thư mục này',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppTheme.getDanger(context)),
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.getDanger(context)),
                   ),
                   onTap: () async {
                     Navigator.pop(ctx);
-                    final ok = await folderProv.removeSongFromFolder(folder.id, song.id);
+                    final ok = await folderProv.removeSongFromFolder(
+                        folder.id, song.id);
                     if (mounted && ok) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -698,12 +845,14 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
     );
   }
 
-  void _showMoveToOtherFolderSheet(Folder currentFolder, Song song, List<Folder> otherFolders) {
+  void _showMoveToOtherFolderSheet(
+      Folder currentFolder, Song song, List<Folder> otherFolders) {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) {
         return SafeArea(
@@ -719,7 +868,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                     height: 3,
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                      color:
+                          AppTheme.getTextMuted(context).withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -736,7 +886,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                 const SizedBox(height: 4),
                 Text(
                   'Bài hát sẽ được chuyển từ "${currentFolder.name}" sang thư mục được chọn',
-                  style: TextStyle(fontSize: 11.5, color: AppTheme.getTextSecondary(context)),
+                  style: TextStyle(
+                      fontSize: 11.5,
+                      color: AppTheme.getTextSecondary(context)),
                 ),
                 const SizedBox(height: 12),
                 Divider(color: AppTheme.getBorder(context), height: 1),
@@ -750,9 +902,11 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                       decoration: BoxDecoration(
                         color: AppTheme.getSurface(context),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                        border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                        border: Border.all(
+                            color: AppTheme.getBorder(context), width: 0.8),
                       ),
-                      child: Icon(Icons.folder_outlined, size: 16, color: AppTheme.getText(context)),
+                      child: Icon(Icons.folder_outlined,
+                          size: 16, color: AppTheme.getText(context)),
                     ),
                     title: Text(
                       target.name,
@@ -764,13 +918,19 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                     ),
                     subtitle: Text(
                       '${target.songCount} bài hát',
-                      style: TextStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.getTextSecondary(context)),
                     ),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 13, color: AppTheme.getTextMuted(context)),
+                    trailing: Icon(Icons.arrow_forward_ios,
+                        size: 13, color: AppTheme.getTextMuted(context)),
                     onTap: () async {
                       Navigator.pop(ctx);
-                      final folderProv = Provider.of<FolderProvider>(context, listen: false);
-                      final ok = await folderProv.addSongToFolder(target.id, song, fromFolderId: currentFolder.id);
+                      final folderProv =
+                          Provider.of<FolderProvider>(context, listen: false);
+                      final ok = await folderProv.addSongToFolder(
+                          target.id, song,
+                          fromFolderId: currentFolder.id);
                       if (mounted && ok) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -779,7 +939,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                               style: AppTheme.monoStyle(fontSize: 12),
                             ),
                             duration: const Duration(seconds: 2),
-                            backgroundColor: AppTheme.getSurfaceElevated(context),
+                            backgroundColor:
+                                AppTheme.getSurfaceElevated(context),
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
@@ -817,7 +978,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppTheme.getText(context), size: 20),
+          icon: Icon(Icons.arrow_back,
+              color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -830,7 +992,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_horiz, color: AppTheme.getText(context), size: 20),
+            icon: Icon(Icons.more_horiz,
+                color: AppTheme.getText(context), size: 20),
             color: AppTheme.getSurfaceElevated(context),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -850,9 +1013,12 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                 value: 'rename',
                 child: Row(
                   children: [
-                    Icon(Icons.edit_outlined, size: 16, color: AppTheme.getText(context)),
+                    Icon(Icons.edit_outlined,
+                        size: 16, color: AppTheme.getText(context)),
                     const SizedBox(width: 8),
-                    Text('Đổi tên thư mục', style: TextStyle(fontSize: 12.5, color: AppTheme.getText(context))),
+                    Text('Đổi tên thư mục',
+                        style: TextStyle(
+                            fontSize: 12.5, color: AppTheme.getText(context))),
                   ],
                 ),
               ),
@@ -860,9 +1026,12 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                 value: 'cover',
                 child: Row(
                   children: [
-                    Icon(Icons.image_outlined, size: 16, color: AppTheme.getText(context)),
+                    Icon(Icons.image_outlined,
+                        size: 16, color: AppTheme.getText(context)),
                     const SizedBox(width: 8),
-                    Text('Đổi ảnh bìa', style: TextStyle(fontSize: 12.5, color: AppTheme.getText(context))),
+                    Text('Đổi ảnh bìa',
+                        style: TextStyle(
+                            fontSize: 12.5, color: AppTheme.getText(context))),
                   ],
                 ),
               ),
@@ -870,9 +1039,13 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline, size: 16, color: AppTheme.getDanger(context)),
+                    Icon(Icons.delete_outline,
+                        size: 16, color: AppTheme.getDanger(context)),
                     const SizedBox(width: 8),
-                    Text('Xóa thư mục', style: TextStyle(fontSize: 12.5, color: AppTheme.getDanger(context))),
+                    Text('Xóa thư mục',
+                        style: TextStyle(
+                            fontSize: 12.5,
+                            color: AppTheme.getDanger(context))),
                   ],
                 ),
               ),
@@ -886,7 +1059,6 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Cover (Tappable to change cover)
               Center(
                 child: GestureDetector(
                   onTap: () => _showChangeCoverDialog(folder),
@@ -897,11 +1069,14 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                         height: 160,
                         decoration: BoxDecoration(
                           color: AppTheme.getSurfaceSubtle(context),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                          border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusMd),
+                          border: Border.all(
+                              color: AppTheme.getBorder(context), width: 1.0),
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: folder.coverUrl != null && folder.coverUrl!.isNotEmpty
+                        child: folder.coverUrl != null &&
+                                folder.coverUrl!.isNotEmpty
                             ? Image.network(
                                 folder.coverUrl!,
                                 fit: BoxFit.cover,
@@ -921,18 +1096,26 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                         bottom: 6,
                         right: 6,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 3.5),
                           decoration: BoxDecoration(
-                            color: AppTheme.getSurface(context).withValues(alpha: 0.88),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                            color: AppTheme.getSurface(context)
+                                .withValues(alpha: 0.88),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 0.8),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.camera_alt, size: 11, color: AppTheme.getText(context)),
+                              Icon(Icons.camera_alt,
+                                  size: 11, color: AppTheme.getText(context)),
                               const SizedBox(width: 4),
-                              Text('Đổi ảnh', style: AppTheme.monoStyle(fontSize: 10, color: AppTheme.getText(context))),
+                              Text('Đổi ảnh',
+                                  style: AppTheme.monoStyle(
+                                      fontSize: 10,
+                                      color: AppTheme.getText(context))),
                             ],
                           ),
                         ),
@@ -941,9 +1124,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 14),
-
               Text(
                 folder.name,
                 textAlign: TextAlign.center,
@@ -962,64 +1143,71 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   color: AppTheme.getTextSecondary(context),
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 10),
                       backgroundColor: AppTheme.getText(context),
                       foregroundColor: AppTheme.getBg(context),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusPill),
                       ),
                     ),
-                    icon: Icon(Icons.play_arrow, size: 18, color: AppTheme.getBg(context)),
+                    icon: Icon(Icons.play_arrow,
+                        size: 18, color: AppTheme.getBg(context)),
                     label: Text(
                       'Phát tất cả',
-                      style: AppTheme.monoStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      style: AppTheme.monoStyle(
+                          fontSize: 12, fontWeight: FontWeight.w700),
                     ),
                     onPressed: songs.isEmpty
                         ? null
                         : () {
-                            audioPlayerService.setPlaylist(songs, initialIndex: 0);
+                            audioPlayerService.setPlaylist(songs,
+                                initialIndex: 0);
                           },
                   ),
                   const SizedBox(width: 10),
                   OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      side: BorderSide(
+                          color: AppTheme.getBorder(context), width: 0.8),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusPill),
                       ),
                     ),
-                    icon: Icon(Icons.add, size: 16, color: AppTheme.getText(context)),
+                    icon: Icon(Icons.add,
+                        size: 16, color: AppTheme.getText(context)),
                     label: Text(
                       'Thêm bài hát',
-                      style: AppTheme.monoStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.getText(context)),
+                      style: AppTheme.monoStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.getText(context)),
                     ),
                     onPressed: () => _showAddSongsModal(folder),
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
               Divider(color: AppTheme.getBorder(context), height: 1),
               const SizedBox(height: 12),
-
-              // Song List or Empty State
               if (songs.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Center(
                     child: Column(
                       children: [
-                        Icon(Icons.folder_open_outlined, size: 44, color: AppTheme.getTextMuted(context)),
+                        Icon(Icons.folder_open_outlined,
+                            size: 44, color: AppTheme.getTextMuted(context)),
                         const SizedBox(height: 10),
                         Text(
                           'Thư mục đang trống.',
@@ -1049,35 +1237,49 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 6),
                   itemBuilder: (context, index) {
                     final song = songs[index];
-                    final isCurrent = audioPlayerService.currentSong?.id == song.id;
+                    final isCurrent =
+                        audioPlayerService.currentSong?.id == song.id;
 
                     return Container(
                       decoration: BoxDecoration(
-                        color: isCurrent ? AppTheme.getSurfaceElevated(context) : AppTheme.getSurface(context),
+                        color: isCurrent
+                            ? AppTheme.getSurfaceElevated(context)
+                            : AppTheme.getSurface(context),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                         border: Border.all(
-                          color: isCurrent ? AppTheme.getText(context).withValues(alpha: 0.4) : AppTheme.getBorder(context),
+                          color: isCurrent
+                              ? AppTheme.getText(context).withValues(alpha: 0.4)
+                              : AppTheme.getBorder(context),
                           width: 0.8,
                         ),
                       ),
                       child: ListTile(
                         dense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 2),
                         leading: Container(
                           width: 38,
                           height: 38,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 0.8),
                           ),
                           clipBehavior: Clip.antiAlias,
-                          child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                              ? Image.network(
-                                  song.coverUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
-                                )
-                              : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 18),
+                          child:
+                              song.coverUrl != null && song.coverUrl!.isNotEmpty
+                                  ? Image.network(
+                                      song.coverUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Icon(
+                                          Icons.music_note,
+                                          color: AppTheme.getTextMuted(context),
+                                          size: 18),
+                                    )
+                                  : Icon(Icons.music_note,
+                                      color: AppTheme.getTextMuted(context),
+                                      size: 18),
                         ),
                         title: Text(
                           song.title,
@@ -1085,7 +1287,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                            fontWeight:
+                                isCurrent ? FontWeight.w700 : FontWeight.w600,
                             color: AppTheme.getText(context),
                           ),
                         ),
@@ -1097,17 +1300,19 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                           ),
                         ),
                         trailing: IconButton(
-                          icon: Icon(Icons.more_vert, size: 18, color: AppTheme.getTextSecondary(context)),
+                          icon: Icon(Icons.more_vert,
+                              size: 18,
+                              color: AppTheme.getTextSecondary(context)),
                           onPressed: () => _showSongOptions(folder, song),
                         ),
                         onTap: () {
-                          audioPlayerService.setPlaylist(songs, initialIndex: index);
+                          audioPlayerService.setPlaylist(songs,
+                              initialIndex: index);
                         },
                       ),
                     );
                   },
                 ),
-
               const SizedBox(height: 100),
             ],
           ),

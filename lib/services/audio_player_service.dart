@@ -17,7 +17,8 @@ class AudioPlayerService extends ChangeNotifier {
   }
 
   void _notifySongPlayed(Song song) {
-    for (final listener in List<SongPlayedCallback>.from(_songPlayedListeners)) {
+    for (final listener
+        in List<SongPlayedCallback>.from(_songPlayedListeners)) {
       try {
         listener(song);
       } catch (e) {
@@ -33,10 +34,14 @@ class AudioPlayerService extends ChangeNotifier {
   AudioPlayer get player => _player;
   List<Song> get playlist => _playlist;
   int get currentIndex => _currentIndex;
-  Song? get currentSong => _currentIndex >= 0 && _currentIndex < _playlist.length ? _playlist[_currentIndex] : null;
-  Song? get nextSong => (_currentIndex >= 0 && _currentIndex + 1 < _playlist.length)
-      ? _playlist[_currentIndex + 1]
-      : (_playlist.isNotEmpty ? _playlist.first : null);
+  Song? get currentSong =>
+      _currentIndex >= 0 && _currentIndex < _playlist.length
+          ? _playlist[_currentIndex]
+          : null;
+  Song? get nextSong =>
+      (_currentIndex >= 0 && _currentIndex + 1 < _playlist.length)
+          ? _playlist[_currentIndex + 1]
+          : (_playlist.isNotEmpty ? _playlist.first : null);
   bool get isLoading =>
       _isLoading ||
       _player.processingState == ProcessingState.buffering ||
@@ -66,7 +71,7 @@ class AudioPlayerService extends ChangeNotifier {
   void _initStreams() {
     _player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
-        next(); // Tự động phát bài tiếp theo
+        next();
       }
       notifyListeners();
     });
@@ -77,7 +82,9 @@ class AudioPlayerService extends ChangeNotifier {
 
   Future<void> setPlaylist(List<Song> songs, {int initialIndex = 0}) async {
     _playlist = List.from(songs);
-    if (_playlist.isNotEmpty && initialIndex >= 0 && initialIndex < _playlist.length) {
+    if (_playlist.isNotEmpty &&
+        initialIndex >= 0 &&
+        initialIndex < _playlist.length) {
       await playSongAtIndex(initialIndex);
     }
   }

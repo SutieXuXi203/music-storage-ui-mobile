@@ -11,7 +11,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('DownloadTask Model Tests', () {
-    test('Initializes correctly with default values and unique positive notificationId', () {
+    test(
+        'Initializes correctly with default values and unique positive notificationId',
+        () {
       final task1 = DownloadTask(
         id: 'TASK_123456',
         url: 'https://youtube.com/watch?v=abc',
@@ -150,23 +152,21 @@ void main() {
       expect(provider.selectedIndex, 1);
       expect(provider.primaryTask?.id, 'TASK_2');
 
-      // Chuyển sang task trước (Task 1 - Completed)
       provider.prevTask();
       expect(provider.selectedIndex, 0);
       expect(provider.primaryTask?.id, 'TASK_1');
 
-      // Chuyển sang task tiếp theo (Task 2 - Extracting)
       provider.nextTask();
       expect(provider.selectedIndex, 1);
       expect(provider.primaryTask?.id, 'TASK_2');
 
-      // Chọn task trực tiếp theo index
       provider.selectTask(0);
       expect(provider.selectedIndex, 0);
       expect(provider.primaryTask?.id, 'TASK_1');
     });
 
-    test('clearCompleted removes only completed tasks and updates selection', () {
+    test('clearCompleted removes only completed tasks and updates selection',
+        () {
       final provider = DownloadProvider();
       final taskCompleted = DownloadTask(
         id: 'TASK_DONE',
@@ -190,7 +190,9 @@ void main() {
   });
 
   group('NotificationService Event Stream & Invocation Safety', () {
-    test('NotificationService records progress, completed, failed, and cancel events', () async {
+    test(
+        'NotificationService records progress, completed, failed, and cancel events',
+        () async {
       final service = NotificationService.instance;
       final events = <DownloadNotificationRecord>[];
 
@@ -225,26 +227,22 @@ void main() {
 
       expect(events.length, 4);
 
-      // 1. Progress event
       expect(events[0].type, NotificationEventType.progress);
       expect(events[0].id, 999);
       expect(events[0].title, 'Hát Với Chú Ve Con');
       expect(events[0].progress, 60);
 
-      // 2. Completed event
       expect(events[1].type, NotificationEventType.completed);
       expect(events[1].id, 999);
       expect(events[1].title, contains('Đã tải xong'));
       expect(events[1].body, contains('Thanh Lam'));
       expect(events[1].payload, 'SONG_ID_999');
 
-      // 3. Failed event
       expect(events[2].type, NotificationEventType.failed);
       expect(events[2].id, 888);
       expect(events[2].title, contains('Tải không thành công'));
       expect(events[2].body, 'Video không tồn tại');
 
-      // 4. Cancel event
       expect(events[3].type, NotificationEventType.cancelled);
       expect(events[3].id, 999);
     });
@@ -255,24 +253,23 @@ void main() {
         tappedPayloads.add(payload);
       });
 
-      // Bắn sự kiện người dùng bấm vào thông báo
       NotificationService.instance.showDownloadCompleted(
         id: 123,
         title: 'Demo Song',
         payload: 'SONG_PAYLOAD_ABC',
       );
 
-      // Giả lập tap callback
       final tapCallbackField = NotificationService.onNotificationTapped;
       expect(tapCallbackField, isNotNull);
 
       await sub.cancel();
     });
 
-    test('NotificationService.init() safely initializes without unhandled crashes', () async {
+    test(
+        'NotificationService.init() safely initializes without unhandled crashes',
+        () async {
       final service = NotificationService.instance;
       await service.init();
-      // Should not throw even in headless test environment
     });
   });
 
@@ -284,7 +281,8 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: downloadProv),
-            ChangeNotifierProvider(create: (_) => SongProvider(autoFetch: false)),
+            ChangeNotifierProvider(
+                create: (_) => SongProvider(autoFetch: false)),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -299,7 +297,8 @@ void main() {
       expect(find.text('TẢI HOÀN TẤT'), findsNothing);
     });
 
-    testWidgets('Renders active downloading state with cancel button', (tester) async {
+    testWidgets('Renders active downloading state with cancel button',
+        (tester) async {
       final downloadProv = DownloadProvider();
       downloadProv.addTestTask(
         DownloadTask(
@@ -316,7 +315,8 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: downloadProv),
-            ChangeNotifierProvider(create: (_) => SongProvider(autoFetch: false)),
+            ChangeNotifierProvider(
+                create: (_) => SongProvider(autoFetch: false)),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -333,7 +333,6 @@ void main() {
       expect(find.textContaining('Bài Hát Đang Tải'), findsOneWidget);
       expect(find.text('HỦY'), findsOneWidget);
 
-      // Nhấn HỦY
       await tester.tap(find.text('HỦY'));
       await tester.pump();
 
@@ -341,7 +340,9 @@ void main() {
       expect(find.text('ĐANG TẢI XUỐNG'), findsNothing);
     });
 
-    testWidgets('Renders multi-task switcher and allows switching between tasks', (tester) async {
+    testWidgets(
+        'Renders multi-task switcher and allows switching between tasks',
+        (tester) async {
       final downloadProv = DownloadProvider();
       final task1 = DownloadTask(
         id: 'TASK_1',
@@ -365,7 +366,8 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: downloadProv),
-            ChangeNotifierProvider(create: (_) => SongProvider(autoFetch: false)),
+            ChangeNotifierProvider(
+                create: (_) => SongProvider(autoFetch: false)),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -377,11 +379,9 @@ void main() {
 
       await tester.pump();
 
-      // Hiện bộ đếm 2/2 vì task2 vừa được thêm vào
       expect(find.text('2/2'), findsOneWidget);
       expect(find.text('ĐANG TẢI XUỐNG'), findsOneWidget);
 
-      // Bấm nút chuyển về task trước (Task 1)
       await tester.tap(find.byIcon(Icons.chevron_left_rounded));
       await tester.pump();
 
@@ -390,7 +390,8 @@ void main() {
       expect(find.text('PHÁT'), findsOneWidget);
     });
 
-    testWidgets('Renders completed download state with PHÁT and ĐÓNG buttons', (tester) async {
+    testWidgets('Renders completed download state with PHÁT and ĐÓNG buttons',
+        (tester) async {
       final downloadProv = DownloadProvider();
       downloadProv.addTestTask(
         DownloadTask(
@@ -408,7 +409,8 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: downloadProv),
-            ChangeNotifierProvider(create: (_) => SongProvider(autoFetch: false)),
+            ChangeNotifierProvider(
+                create: (_) => SongProvider(autoFetch: false)),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -425,7 +427,6 @@ void main() {
       expect(find.text('PHÁT'), findsOneWidget);
       expect(find.text('ĐÓNG'), findsOneWidget);
 
-      // Bấm ĐÓNG đóng task thành công
       await tester.tap(find.text('ĐÓNG'));
       await tester.pump();
 
@@ -433,7 +434,8 @@ void main() {
       expect(find.text('TẢI HOÀN TẤT'), findsNothing);
     });
 
-    testWidgets('Renders failed download state with THỬ LẠI button', (tester) async {
+    testWidgets('Renders failed download state with THỬ LẠI button',
+        (tester) async {
       final downloadProv = DownloadProvider();
       downloadProv.addTestTask(
         DownloadTask(
@@ -449,7 +451,8 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: downloadProv),
-            ChangeNotifierProvider(create: (_) => SongProvider(autoFetch: false)),
+            ChangeNotifierProvider(
+                create: (_) => SongProvider(autoFetch: false)),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -467,7 +470,8 @@ void main() {
       expect(find.text('Video bị bản quyền từ YouTube'), findsOneWidget);
     });
 
-    testWidgets('Tapping PHÁT on completed task dismisses HUD task safely', (tester) async {
+    testWidgets('Tapping PHÁT on completed task dismisses HUD task safely',
+        (tester) async {
       final downloadProv = DownloadProvider();
       downloadProv.addTestTask(
         DownloadTask(
@@ -484,7 +488,8 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: downloadProv),
-            ChangeNotifierProvider(create: (_) => SongProvider(autoFetch: false)),
+            ChangeNotifierProvider(
+                create: (_) => SongProvider(autoFetch: false)),
           ],
           child: const MaterialApp(
             home: Scaffold(

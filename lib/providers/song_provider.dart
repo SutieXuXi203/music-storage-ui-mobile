@@ -21,7 +21,6 @@ class SongProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String get searchQuery => _searchQuery;
 
-  /// Danh sách đúng tối đa 5 bài hát được nghe gần đây nhất theo thứ tự LRU (Mới nghe nhất ở đầu)
   List<Song> get recentSongs {
     if (_songs.isEmpty) return [];
 
@@ -35,7 +34,6 @@ class SongProvider extends ChangeNotifier {
       }
     }
 
-    // Nếu vừa mở app và chưa kịp tải prefs, trả về tạm 5 bài đầu
     if (result.isEmpty && !_isRecentLoaded && _songs.isNotEmpty) {
       return _songs.take(5).toList();
     }
@@ -52,11 +50,8 @@ class SongProvider extends ChangeNotifier {
   }
 
   void _handleSongPlayed(Song song) {
-    // 1. Gỡ bài hát nếu đã có trong danh sách để đưa lên đầu
     _recentSongIds.remove(song.id);
-    // 2. Chèn vào vị trí đầu tiên (vừa nghe)
     _recentSongIds.insert(0, song.id);
-    // 3. Luôn giữ tối đa đúng 5 bài (bài nghe sớm nhất ở cuối sẽ bị đẩy ra)
     if (_recentSongIds.length > 5) {
       _recentSongIds = _recentSongIds.sublist(0, 5);
     }
@@ -106,11 +101,13 @@ class SongProvider extends ChangeNotifier {
 
     try {
       _searchQuery = query ?? _searchQuery;
-      _songs = await apiService.getSongs(search: _searchQuery.isNotEmpty ? _searchQuery : null);
+      _songs = await apiService.getSongs(
+          search: _searchQuery.isNotEmpty ? _searchQuery : null);
 
-      // Nếu người dùng chưa từng nghe bài nào (lần đầu dùng), khởi tạo 5 bài đầu tiên
       final prefs = await SharedPreferences.getInstance();
-      if (!prefs.containsKey(_recentStorageKey) && _recentSongIds.isEmpty && _songs.isNotEmpty) {
+      if (!prefs.containsKey(_recentStorageKey) &&
+          _recentSongIds.isEmpty &&
+          _songs.isNotEmpty) {
         _recentSongIds = _songs.take(5).map((s) => s.id).toList();
         await prefs.setStringList(_recentStorageKey, _recentSongIds);
       }
@@ -130,8 +127,8 @@ class SongProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await apiService.downloadFromYoutube(url: url, format: 'mp3', saveToDrive: true);
-      // Làm mới danh sách bài hát sau khi tải xong
+      final res = await apiService.downloadFromYoutube(
+          url: url, format: 'mp3', saveToDrive: true);
       await fetchSongs();
       return res['status'] == 'success' || res['saved_to_drive'] == true;
     } catch (e) {

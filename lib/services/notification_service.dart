@@ -50,20 +50,20 @@ class NotificationService {
   static const String downloadCompletedChannelDesc =
       'Thông báo khi bài hát đã tải xuống thành công và lưu vào thư viện';
 
-  // Stream thông báo cho ứng dụng và thanh trạng thái
-  static final StreamController<DownloadNotificationRecord> _notificationRecordController =
+  static final StreamController<DownloadNotificationRecord>
+      _notificationRecordController =
       StreamController<DownloadNotificationRecord>.broadcast();
   static Stream<DownloadNotificationRecord> get onNotificationRecord =>
       _notificationRecordController.stream;
 
-  // Stream khi người dùng bấm vào thông báo hệ thống trên thiết bị
   static final StreamController<String> _onNotificationTappedController =
       StreamController<String>.broadcast();
   static Stream<String> get onNotificationTapped =>
       _onNotificationTappedController.stream;
 
   @visibleForTesting
-  void setPluginForTesting(FlutterLocalNotificationsPlugin plugin, {bool initialized = true}) {
+  void setPluginForTesting(FlutterLocalNotificationsPlugin plugin,
+      {bool initialized = true}) {
     _notificationsPlugin = plugin;
     _initialized = initialized;
   }
@@ -84,7 +84,8 @@ class NotificationService {
             Platform.isWindows ||
             Platform.isLinux)) {
       try {
-        const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+        const androidInit =
+            AndroidInitializationSettings('@mipmap/ic_launcher');
         const darwinInit = DarwinInitializationSettings(
           requestAlertPermission: true,
           requestBadgePermission: true,
@@ -117,14 +118,12 @@ class NotificationService {
           },
         );
 
-        // Tạo Notification Channels và xin quyền trên Android
         if (Platform.isAndroid) {
-          final androidPlatform = _notificationsPlugin
-              .resolvePlatformSpecificImplementation<
+          final androidPlatform =
+              _notificationsPlugin.resolvePlatformSpecificImplementation<
                   AndroidFlutterLocalNotificationsPlugin>();
 
           if (androidPlatform != null) {
-            // Channel 1: Tiến trình tải nhạc (Silent, Low importance)
             const progressChannel = AndroidNotificationChannel(
               downloadChannelId,
               downloadChannelName,
@@ -136,7 +135,6 @@ class NotificationService {
             );
             await androidPlatform.createNotificationChannel(progressChannel);
 
-            // Channel 2: Tải hoàn tất (Alert, High importance, Sound + Vibration)
             const completedChannel = AndroidNotificationChannel(
               downloadCompletedChannelId,
               downloadCompletedChannelName,
@@ -148,20 +146,19 @@ class NotificationService {
             );
             await androidPlatform.createNotificationChannel(completedChannel);
 
-            // Xin cấp quyền hiển thị thông báo (bắt buộc từ Android 13 / Tiramisu)
             await androidPlatform.requestNotificationsPermission();
           }
         }
 
         _initialized = initialized ?? true;
       } catch (e) {
-        debugPrint('[NotificationService] Lưu ý: Thông báo nền hệ thống chưa khả dụng: $e');
+        debugPrint(
+            '[NotificationService] Lưu ý: Thông báo nền hệ thống chưa khả dụng: $e');
         _initialized = false;
       }
     }
   }
 
-  /// Hiển thị thanh tiến trình tải bài hát trên thanh thông báo của thiết bị
   Future<void> showDownloadProgress({
     required int id,
     required String title,
@@ -227,7 +224,6 @@ class NotificationService {
     }
   }
 
-  /// Thông báo bài hát đã được tải và đồng bộ hoàn tất từ thiết bị đang sử dụng
   Future<void> showDownloadCompleted({
     required int id,
     required String title,
@@ -252,7 +248,6 @@ class NotificationService {
     if (!_initialized) return;
 
     try {
-      // Hủy bỏ thanh tiến trình đang hiển thị
       await _notificationsPlugin.cancel(id: id);
 
       const androidDetails = AndroidNotificationDetails(
@@ -299,7 +294,6 @@ class NotificationService {
     }
   }
 
-  /// Thông báo tải bài hát gặp lỗi
   Future<void> showDownloadFailed({
     required int id,
     required String title,
@@ -361,7 +355,6 @@ class NotificationService {
     }
   }
 
-  /// Hủy thông báo theo ID
   Future<void> cancel(int id) async {
     _notificationRecordController.add(
       DownloadNotificationRecord(

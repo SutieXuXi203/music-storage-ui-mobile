@@ -16,7 +16,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -87,7 +88,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final authProvider = Provider.of<AuthProvider>(context);
 
-    if (authProvider.errorMessage != null && authProvider.errorMessage != _lastErrorMessage) {
+    if (authProvider.errorMessage != null &&
+        authProvider.errorMessage != _lastErrorMessage) {
       _lastErrorMessage = authProvider.errorMessage;
       _shakeController.forward(from: 0.0);
     } else if (authProvider.errorMessage == null) {
@@ -100,7 +102,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: math.max(0, constraints.maxHeight - 40.0),
@@ -112,7 +115,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Code comment syntax & Brand
                         Text(
                           '///',
                           style: AppTheme.monoStyle(
@@ -141,24 +143,21 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-
                         const SizedBox(height: 22),
-
-                        // Isometric 3D Wireframe Cubes (compact ~105px)
                         IsometricCubesWidget(
                           size: 105,
                           isDark: isDark,
                         ),
-
                         const SizedBox(height: 16),
-
-                        // Tech system authorization notice
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             color: AppTheme.getSurface(context),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 0.8),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -184,16 +183,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
-                        // Error Message
                         if (authProvider.errorMessage != null)
                           AnimatedBuilder(
                             animation: _shakeController,
                             builder: (context, child) {
                               final decay = 1.0 - _shakeController.value;
-                              final offset = math.sin(_shakeController.value * math.pi * 4) * 4 * decay;
+                              final offset = math.sin(
+                                      _shakeController.value * math.pi * 4) *
+                                  4 *
+                                  decay;
                               return Transform.translate(
                                 offset: Offset(offset, 0),
                                 child: child,
@@ -201,46 +200,60 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             },
                             child: Container(
                               margin: const EdgeInsets.only(bottom: 14),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
-                                border: Border.all(color: AppTheme.getDanger(context), width: 1.0),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                border: Border.all(
+                                    color: AppTheme.getDanger(context),
+                                    width: 1.0),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusSm),
                                 color: AppTheme.getSurface(context),
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.error_outline, size: 15, color: AppTheme.getDanger(context)),
+                                  Icon(Icons.error_outline,
+                                      size: 15,
+                                      color: AppTheme.getDanger(context)),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       authProvider.errorMessage!,
-                                      style: TextStyle(color: AppTheme.getDanger(context), fontSize: 11.5),
+                                      style: TextStyle(
+                                          color: AppTheme.getDanger(context),
+                                          fontSize: 11.5),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-
-                        // Username / Email input (compact 44px)
                         Container(
                           height: 44,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: AppTheme.getSurface(context),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 1.0),
                           ),
                           child: TextField(
                             controller: _usernameController,
                             textAlignVertical: TextAlignVertical.center,
-                            style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+                            style: TextStyle(
+                                fontSize: 13, color: AppTheme.getText(context)),
                             decoration: InputDecoration(
                               isDense: true,
                               hintText: 'Username or email',
-                              hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
-                              prefixIcon: Icon(Icons.person_outline, size: 18, color: AppTheme.getTextSecondary(context)),
-                              prefixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+                              hintStyle: TextStyle(
+                                  color: AppTheme.getTextMuted(context),
+                                  fontSize: 12.5),
+                              prefixIcon: Icon(Icons.person_outline,
+                                  size: 18,
+                                  color: AppTheme.getTextSecondary(context)),
+                              prefixIconConstraints: const BoxConstraints(
+                                  minWidth: 42, minHeight: 44),
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -248,39 +261,48 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 10),
-
-                        // Password input (compact 44px)
                         Container(
                           height: 44,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: AppTheme.getSurface(context),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 1.0),
                           ),
                           child: TextField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
                             textAlignVertical: TextAlignVertical.center,
-                            style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+                            style: TextStyle(
+                                fontSize: 13, color: AppTheme.getText(context)),
                             decoration: InputDecoration(
                               isDense: true,
                               hintText: 'Password',
-                              hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
-                              prefixIcon: Icon(Icons.lock_outline, size: 18, color: AppTheme.getTextSecondary(context)),
-                              prefixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+                              hintStyle: TextStyle(
+                                  color: AppTheme.getTextMuted(context),
+                                  fontSize: 12.5),
+                              prefixIcon: Icon(Icons.lock_outline,
+                                  size: 18,
+                                  color: AppTheme.getTextSecondary(context)),
+                              prefixIconConstraints: const BoxConstraints(
+                                  minWidth: 42, minHeight: 44),
                               suffixIcon: IconButton(
                                 padding: EdgeInsets.zero,
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  _obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
                                   size: 18,
                                   color: AppTheme.getTextMuted(context),
                                 ),
-                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword),
                               ),
-                              suffixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 44),
+                              suffixIconConstraints: const BoxConstraints(
+                                  minWidth: 42, minHeight: 44),
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -288,10 +310,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 18),
-
-                        // Action Button: → ENTER_SYSTEM (44px)
                         SizedBox(
                           width: double.infinity,
                           height: 44,
@@ -301,10 +320,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               foregroundColor: AppTheme.getActionText(context),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusSm),
                               ),
                             ),
-                            onPressed: _isLoggingIn ? null : () => _handleLogin(authProvider),
+                            onPressed: _isLoggingIn
+                                ? null
+                                : () => _handleLogin(authProvider),
                             child: _isLoggingIn
                                 ? SizedBox(
                                     width: 18,
@@ -325,15 +347,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   ),
                           ),
                         ),
-
                         const SizedBox(height: 12),
-
-                        // Secondary: + CREATE_NEW_ACCOUNT
                         TextButton(
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                              MaterialPageRoute(
+                                  builder: (_) => const RegisterScreen()),
                             );
                           },
                           child: Text(

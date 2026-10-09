@@ -45,7 +45,6 @@ class AuthProvider extends ChangeNotifier {
       final res = await apiService.login(username, password);
       if (res['access_token'] != null) {
         _user = await apiService.getMe();
-        // Fallback tạo user tạm thời nếu getMe chưa kịp trả về
         _user ??= User(
           id: 'user_id',
           username: username,
@@ -60,14 +59,19 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       if (e is DioException && e.response?.data != null) {
         final data = e.response!.data;
-        if (data is Map && data.containsKey('detail') && data['detail'] is String) {
+        if (data is Map &&
+            data.containsKey('detail') &&
+            data['detail'] is String) {
           _errorMessage = data['detail'];
           return false;
         }
       }
       if (e is DioException) {
-        if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.sendTimeout || e.type == DioExceptionType.receiveTimeout) {
-          _errorMessage = 'Hết thời gian kết nối đến máy chủ. Máy chủ có thể đang khởi động lại hoặc mạng yếu, vui lòng thử lại sau giây lát.';
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          _errorMessage =
+              'Hết thời gian kết nối đến máy chủ. Máy chủ có thể đang khởi động lại hoặc mạng yếu, vui lòng thử lại sau giây lát.';
           return false;
         }
       }
@@ -102,7 +106,6 @@ class AuthProvider extends ChangeNotifier {
         password: password,
         fullName: fullName,
       );
-      // Đăng nhập luôn sau khi đăng ký
       return await login(username, password);
     } catch (e) {
       if (e is DioException && e.response?.data != null) {
@@ -124,7 +127,8 @@ class AuthProvider extends ChangeNotifier {
             _errorMessage = 'Dữ liệu không hợp lệ (mã 422).';
           }
         } else {
-          _errorMessage = 'Đăng ký thất bại (${e.response?.statusCode ?? 'Lỗi mạng'}).';
+          _errorMessage =
+              'Đăng ký thất bại (${e.response?.statusCode ?? 'Lỗi mạng'}).';
         }
       } else {
         _errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
@@ -151,7 +155,8 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     try {
-      final ok = await apiService.updateProfile(fullName: fullName, email: email);
+      final ok =
+          await apiService.updateProfile(fullName: fullName, email: email);
       if (ok) {
         await refreshProfile();
         return true;

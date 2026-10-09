@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Hệ thống Design System: Music Storage Minimal Monochrome (Version 1.0 Spec)
-/// - Bảng màu đen, trắng, grayscale thuần khiết
-/// - Không neon green, không gradients, không glassmorphism
-/// - Đường viền mỏng tinh tế (1.0px: #2A2A2A dark / #E5E5E5 light)
-/// - Không dùng bóng đổ khối cứng; giao diện phẳng, tối giản, thanh lịch
-/// - Độc quyền sử dụng phông chữ JetBrains Mono cho toàn bộ ứng dụng (Developer Monospace style)
-/// - Kích thước phần tử UI/UX nhỏ gọn, tinh tế (compact controls, tight vertical rhythm)
 class AppTheme {
-  // Spacing Scale (Section 4)
   static const double space4 = 4.0;
   static const double space8 = 8.0;
   static const double space12 = 12.0;
@@ -18,7 +10,6 @@ class AppTheme {
   static const double space24 = 24.0;
   static const double space32 = 32.0;
 
-  // Corner Radius Constants (Section 5) - Đồng nhất bo tròn theo 4.0px (px nhỏ nhất trong giao diện)
   static const double radiusXs = 4.0;
   static const double radiusSm = 4.0;
   static const double radiusMd = 4.0;
@@ -26,7 +17,6 @@ class AppTheme {
   static const double radiusSheet = 4.0;
   static const double radiusPill = 4.0;
 
-  // Light Theme Colors (Section 2.2)
   static const Color lightBg = Color(0xFFFFFFFF);
   static const Color lightSurface = Color(0xFFF7F7F7);
   static const Color lightSurfaceElevated = Color(0xFFFFFFFF);
@@ -38,7 +28,6 @@ class AppTheme {
   static const Color lightActionText = Color(0xFFFFFFFF);
   static const Color lightDanger = Color(0xFFD92D20);
 
-  // Dark Theme Colors (Section 2.2 - Default Product Theme)
   static const Color darkBg = Color(0xFF000000);
   static const Color darkSurface = Color(0xFF0B0B0B);
   static const Color darkSurfaceElevated = Color(0xFF111111);
@@ -50,7 +39,6 @@ class AppTheme {
   static const Color darkActionText = Color(0xFF000000);
   static const Color darkDanger = Color(0xFFFF4D4F);
 
-  // Backward compatibility constants
   static const Color background = darkBg;
   static const Color backgroundColor = darkBg;
   static const Color surface = darkSurface;
@@ -68,7 +56,6 @@ class AppTheme {
   static const Color terminalGreen = Color(0xFF22C55E);
   static const Color error = darkDanger;
 
-  // Theme Helpers
   static bool isDark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
 
@@ -108,7 +95,6 @@ class AppTheme {
   static Color getDanger(BuildContext context) =>
       isDark(context) ? darkDanger : lightDanger;
 
-  /// Phông chữ Monospace kỹ thuật (JetBrains Mono)
   static TextStyle monoStyle({
     double fontSize = 11,
     FontWeight fontWeight = FontWeight.w500,
@@ -123,7 +109,6 @@ class AppTheme {
     );
   }
 
-  /// Huy hiệu trạng thái kỹ thuật / Badge tech
   static Widget techBadge({
     required BuildContext context,
     required String label,
@@ -171,17 +156,16 @@ class AppTheme {
     );
   }
 
-  /// Đường viền tinh tế thanh lịch (1.0px)
-  static Border subtleBorder(BuildContext context, {double width = 1.0, Color? color}) {
+  static Border subtleBorder(BuildContext context,
+      {double width = 1.0, Color? color}) {
     return Border.all(color: color ?? getBorder(context), width: width);
   }
 
-  /// Alias for backward compatibility
-  static Border neoBorder(BuildContext context, {double width = 1.0, Color? color}) {
+  static Border neoBorder(BuildContext context,
+      {double width = 1.0, Color? color}) {
     return subtleBorder(context, width: width, color: color);
   }
 
-  /// Hộp trang trí tối giản (No hard shadows, subtle border, rounded radius)
   static BoxDecoration cardBox(
     BuildContext context, {
     Color? color,
@@ -211,7 +195,6 @@ class AppTheme {
     );
   }
 
-  /// Alias neoBox for backward compatibility
   static BoxDecoration neoBox(
     BuildContext context, {
     Color? color,
@@ -232,9 +215,9 @@ class AppTheme {
     );
   }
 
-  /// Giao diện Trắng (Light Theme)
   static ThemeData get lightTheme {
-    final baseTextTheme = GoogleFonts.jetBrainsMonoTextTheme(ThemeData.light().textTheme);
+    final baseTextTheme =
+        GoogleFonts.jetBrainsMonoTextTheme(ThemeData.light().textTheme);
 
     return ThemeData(
       brightness: Brightness.light,
@@ -333,8 +316,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: lightSurface,
-        hintStyle: GoogleFonts.jetBrainsMono(color: lightTextMuted, fontSize: 13),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        hintStyle:
+            GoogleFonts.jetBrainsMono(color: lightTextMuted, fontSize: 13),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusSm),
           borderSide: const BorderSide(color: lightBorder, width: 1.0),
@@ -360,7 +345,8 @@ class AppTheme {
         backgroundColor: lightSurfaceElevated,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(radiusSheet)),
+          borderRadius:
+              BorderRadius.vertical(top: Radius.circular(radiusSheet)),
         ),
       ),
       dividerTheme: const DividerThemeData(
@@ -371,9 +357,9 @@ class AppTheme {
     );
   }
 
-  /// Giao diện Tối (Dark Theme - Default)
   static ThemeData get darkTheme {
-    final baseTextTheme = GoogleFonts.jetBrainsMonoTextTheme(ThemeData.dark().textTheme);
+    final baseTextTheme =
+        GoogleFonts.jetBrainsMonoTextTheme(ThemeData.dark().textTheme);
 
     return ThemeData(
       brightness: Brightness.dark,
@@ -472,8 +458,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: darkSurface,
-        hintStyle: GoogleFonts.jetBrainsMono(color: darkTextMuted, fontSize: 13),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        hintStyle:
+            GoogleFonts.jetBrainsMono(color: darkTextMuted, fontSize: 13),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusSm),
           borderSide: const BorderSide(color: darkBorder, width: 1.0),
@@ -499,7 +487,8 @@ class AppTheme {
         backgroundColor: darkSurfaceElevated,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(radiusSheet)),
+          borderRadius:
+              BorderRadius.vertical(top: Radius.circular(radiusSheet)),
         ),
       ),
       dividerTheme: const DividerThemeData(

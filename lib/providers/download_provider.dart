@@ -70,10 +70,10 @@ class DownloadProvider extends ChangeNotifier {
           task.elapsedSeconds += 1;
           changed = true;
 
-          // Cập nhật tiến trình và stage mô phỏng theo thời gian thực thi
           if (task.elapsedSeconds <= 3) {
             task.stage = DownloadStage.connecting;
-            task.progress = (0.05 + task.elapsedSeconds * 0.05).clamp(0.0, 0.20);
+            task.progress =
+                (0.05 + task.elapsedSeconds * 0.05).clamp(0.0, 0.20);
           } else if (task.elapsedSeconds <= 12) {
             task.stage = DownloadStage.extracting;
             final ratio = (task.elapsedSeconds - 3) / 9.0;
@@ -84,10 +84,10 @@ class DownloadProvider extends ChangeNotifier {
             task.progress = (0.60 + ratio * 0.28).clamp(0.60, 0.88);
           } else {
             task.stage = DownloadStage.indexingDb;
-            task.progress = (0.88 + ((task.elapsedSeconds - 24) * 0.01)).clamp(0.88, 0.96);
+            task.progress =
+                (0.88 + ((task.elapsedSeconds - 24) * 0.01)).clamp(0.88, 0.96);
           }
 
-          // Cập nhật thanh tiến trình lên thông báo hệ thống (chu kỳ 3s hoặc mốc quan trọng)
           final percent = (task.progress * 100).round().clamp(0, 100);
           final shouldNotify = task.elapsedSeconds == 1 ||
               (task.elapsedSeconds % 3 == 0) ||
@@ -119,7 +119,8 @@ class DownloadProvider extends ChangeNotifier {
     final cleanUrl = url.trim();
     if (cleanUrl.isEmpty) return false;
 
-    final taskId = 'TASK_${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+    final taskId =
+        'TASK_${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
     final task = DownloadTask(
       id: taskId,
       url: cleanUrl,
@@ -132,7 +133,6 @@ class DownloadProvider extends ChangeNotifier {
     _ensureTimer();
     notifyListeners();
 
-    // Hiển thị ngay thông báo bắt đầu tải lên hệ thống của thiết bị
     NotificationService.instance.showDownloadProgress(
       id: task.notificationId,
       title: 'Đang kết nối YouTube...',
@@ -147,7 +147,6 @@ class DownloadProvider extends ChangeNotifier {
         saveToDrive: true,
       );
 
-      // Nếu người dùng đã hủy task trong lúc đang tải
       if (!_tasks.any((t) => t.id == task.id)) {
         return false;
       }
@@ -160,7 +159,6 @@ class DownloadProvider extends ChangeNotifier {
         task.songId = res['song_id']?.toString();
         notifyListeners();
 
-        // Báo cho thiết bị biết tải thành công (Chuông / Rung / Heads-up notification)
         await NotificationService.instance.showDownloadCompleted(
           id: task.notificationId,
           title: task.title ?? 'Bài hát mới',
@@ -168,12 +166,11 @@ class DownloadProvider extends ChangeNotifier {
           payload: task.songId,
         );
 
-        // Tự động làm mới danh sách bài hát trong thư viện
         await songProvider.fetchSongs();
 
-        // Tự động đóng HUD sau 12 giây nếu người dùng không bấm play/dismiss
         Future.delayed(const Duration(seconds: 12), () {
-          if (_tasks.any((t) => t.id == task.id && t.stage == DownloadStage.completed)) {
+          if (_tasks.any(
+              (t) => t.id == task.id && t.stage == DownloadStage.completed)) {
             dismissTask(task.id);
           }
         });
@@ -181,7 +178,8 @@ class DownloadProvider extends ChangeNotifier {
         return true;
       } else {
         task.stage = DownloadStage.failed;
-        task.errorMessage = res['message']?.toString() ?? 'Lỗi không xác định từ máy chủ';
+        task.errorMessage =
+            res['message']?.toString() ?? 'Lỗi không xác định từ máy chủ';
         notifyListeners();
 
         await NotificationService.instance.showDownloadFailed(

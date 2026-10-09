@@ -41,7 +41,6 @@ class _TechDownloadHudState extends State<TechDownloadHud>
   ) {
     Song? matched;
 
-    // 1. Tìm chính xác theo songId từ cơ sở dữ liệu
     if (task.songId != null && task.songId!.isNotEmpty) {
       for (final song in songProv.songs) {
         if (song.id == task.songId) {
@@ -51,7 +50,6 @@ class _TechDownloadHudState extends State<TechDownloadHud>
       }
     }
 
-    // 2. Tìm theo tên bài hát nếu không khớp id
     if (matched == null) {
       final taskTitle = task.title?.trim().toLowerCase();
       if (taskTitle != null && taskTitle.isNotEmpty) {
@@ -67,7 +65,6 @@ class _TechDownloadHudState extends State<TechDownloadHud>
       }
     }
 
-    // 3. Phát nếu tìm thấy, hoặc thông báo nếu không tìm thấy trong thư viện
     if (matched != null) {
       audioPlayerService.playSong(matched);
     } else if (context.mounted) {
@@ -116,15 +113,15 @@ class _TechDownloadHudState extends State<TechDownloadHud>
         IconData statusIcon;
 
         if (task.stage == DownloadStage.completed) {
-          accentColor = const Color(0xFF10B981); // Emerald Green
+          accentColor = const Color(0xFF10B981);
           statusLabel = 'TẢI HOÀN TẤT';
           statusIcon = Icons.check_circle_outline_rounded;
         } else if (task.stage == DownloadStage.failed) {
-          accentColor = const Color(0xFFEF4444); // Crimson Red
+          accentColor = const Color(0xFFEF4444);
           statusLabel = 'LỖI TẢI XUỐNG';
           statusIcon = Icons.error_outline_rounded;
         } else {
-          accentColor = const Color(0xFF38BDF8); // Cyber Cyan
+          accentColor = const Color(0xFF38BDF8);
           statusLabel = 'ĐANG TẢI XUỐNG';
           statusIcon = Icons.arrow_downward_rounded;
         }
@@ -158,7 +155,6 @@ class _TechDownloadHudState extends State<TechDownloadHud>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Thanh tiêu đề: [Icon + Trạng thái] ... [Bộ đếm đa tác vụ + Timer + % + Nút đóng]
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -172,7 +168,8 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                               builder: (context, _) {
                                 return Opacity(
                                   opacity: 0.4 + (_pulseController.value * 0.6),
-                                  child: Icon(statusIcon, size: 14, color: accentColor),
+                                  child: Icon(statusIcon,
+                                      size: 14, color: accentColor),
                                 );
                               },
                             )
@@ -195,7 +192,8 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                               borderRadius: BorderRadius.circular(4),
                               child: Padding(
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(Icons.chevron_left_rounded, size: 14, color: textMuted),
+                                child: Icon(Icons.chevron_left_rounded,
+                                    size: 14, color: textMuted),
                               ),
                             ),
                             Text(
@@ -211,7 +209,8 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                               borderRadius: BorderRadius.circular(4),
                               child: Padding(
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(Icons.chevron_right_rounded, size: 14, color: textMuted),
+                                child: Icon(Icons.chevron_right_rounded,
+                                    size: 14, color: textMuted),
                               ),
                             ),
                           ],
@@ -241,7 +240,8 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                         const SizedBox(width: 4),
                         InkWell(
                           onTap: () => downloadProv.dismissTask(task.id),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSm),
                           child: Padding(
                             padding: const EdgeInsets.all(2),
                             child: Icon(
@@ -256,8 +256,6 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                   ],
                 ),
                 const SizedBox(height: 5),
-
-                // 2. Thông tin bài hát / Nghệ sĩ hoặc URL YouTube
                 Row(
                   children: [
                     Expanded(
@@ -277,8 +275,6 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                   ],
                 ),
                 const SizedBox(height: 5),
-
-                // 3. Thanh tiến trình chạy mượt mà (Animated Progress Bar)
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(
                     begin: 0.0,
@@ -291,7 +287,9 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                       height: 4.5,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E232E) : const Color(0xFFE5E7EB),
+                        color: isDark
+                            ? const Color(0xFF1E232E)
+                            : const Color(0xFFE5E7EB),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: FractionallySizedBox(
@@ -308,17 +306,15 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                   },
                 ),
                 const SizedBox(height: 5),
-
-                // 4. Mô tả giai đoạn & Các nút thao tác
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Tag giai đoạn & Mô tả tiếng Việt
                     Expanded(
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
                               color: accentColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(3),
@@ -347,8 +343,6 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                         ],
                       ),
                     ),
-
-                    // Nút điều khiển: [▶ PHÁT] / [↻ THỬ LẠI] / [HỦY] / [ĐÓNG]
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -360,12 +354,15 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                             },
                             borderRadius: BorderRadius.circular(4),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2.5),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                                color: const Color(0xFF10B981)
+                                    .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
-                                  color: const Color(0xFF10B981).withValues(alpha: 0.6),
+                                  color: const Color(0xFF10B981)
+                                      .withValues(alpha: 0.6),
                                   width: 0.8,
                                 ),
                               ),
@@ -391,15 +388,19 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                         ],
                         if (task.stage == DownloadStage.failed) ...[
                           InkWell(
-                            onTap: () => downloadProv.retryTask(task.id, songProvider: songProv),
+                            onTap: () => downloadProv.retryTask(task.id,
+                                songProvider: songProv),
                             borderRadius: BorderRadius.circular(4),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2.5),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                                color: const Color(0xFFEF4444)
+                                    .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
-                                  color: const Color(0xFFEF4444).withValues(alpha: 0.6),
+                                  color: const Color(0xFFEF4444)
+                                      .withValues(alpha: 0.6),
                                   width: 0.8,
                                 ),
                               ),
@@ -428,7 +429,8 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                             onTap: () => downloadProv.dismissTask(task.id),
                             borderRadius: BorderRadius.circular(4),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 2),
                               child: Text(
                                 'HỦY',
                                 style: GoogleFonts.jetBrainsMono(
@@ -444,7 +446,8 @@ class _TechDownloadHudState extends State<TechDownloadHud>
                             onTap: () => downloadProv.dismissTask(task.id),
                             borderRadius: BorderRadius.circular(4),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 2),
                               child: Text(
                                 'ĐÓNG',
                                 style: GoogleFonts.jetBrainsMono(

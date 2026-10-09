@@ -17,7 +17,7 @@ class DownloadTask {
   String? artist;
   String? songId;
   DownloadStage stage;
-  double progress; // 0.0 -> 1.0
+  double progress;
   int elapsedSeconds;
   String? errorMessage;
   final DateTime startedAt;

@@ -14,7 +14,6 @@ import 'views/home/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Khởi tạo hệ thống thông báo đẩy trên thiết bị (tiến trình tải ngầm)
   await NotificationService.instance.init();
 
   SystemChrome.setSystemUIOverlayStyle(

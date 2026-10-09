@@ -19,7 +19,8 @@ class MiniPlayerWidget extends StatelessWidget {
         pageBuilder: (context, anim, secAnim) =>
             NowPlayingScreen(playerService: playerService),
         transitionsBuilder: (context, anim, secAnim, child) {
-          final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+          final curved =
+              CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
           return SlideTransition(
             position: Tween<Offset>(
               begin: const Offset(0, 1.0),
@@ -68,125 +69,121 @@ class MiniPlayerWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-            child: Column(
-              children: [
-                // Thin progress line on top (1.5px)
-                StreamBuilder<Duration>(
-                  stream: playerService.player.positionStream,
-                  builder: (context, snapshot) {
-                    final position = snapshot.data ?? Duration.zero;
-                    final duration = playerService.player.duration ??
-                        Duration(seconds: song.duration);
-                    final progress = duration.inMilliseconds > 0
-                        ? (position.inMilliseconds / duration.inMilliseconds)
-                            .clamp(0.0, 1.0)
-                        : 0.0;
+                child: Column(
+                  children: [
+                    StreamBuilder<Duration>(
+                      stream: playerService.player.positionStream,
+                      builder: (context, snapshot) {
+                        final position = snapshot.data ?? Duration.zero;
+                        final duration = playerService.player.duration ??
+                            Duration(seconds: song.duration);
+                        final progress = duration.inMilliseconds > 0
+                            ? (position.inMilliseconds /
+                                    duration.inMilliseconds)
+                                .clamp(0.0, 1.0)
+                            : 0.0;
 
-                    return LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 1.5,
-                      backgroundColor: Colors.transparent,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppTheme.getText(context),
-                      ),
-                    );
-                  },
-                ),
-
-                // Content row
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: Row(
-                      children: [
-                        // Small square album artwork (36x36, 8px radius)
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: AppTheme.getSurfaceSubtle(context),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(
-                              color: AppTheme.getBorder(context),
-                              width: 0.8,
-                            ),
+                        return LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 1.5,
+                          backgroundColor: Colors.transparent,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppTheme.getText(context),
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: (song.coverUrl != null && song.coverUrl!.isNotEmpty)
-                              ? Image.network(
-                                  song.coverUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Icon(
-                                    Icons.music_note,
-                                    color: AppTheme.getTextMuted(context),
-                                    size: 18,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.music_note,
-                                  color: AppTheme.getTextMuted(context),
-                                  size: 18,
-                                ),
-                        ),
-                        const SizedBox(width: 10),
-
-                        // Song title & artist
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                song.title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: AppTheme.getText(context),
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 1),
-                              Text(
-                                song.artist,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: AppTheme.getTextSecondary(context),
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Compact Play/Pause button
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-                          icon: Icon(
-                            isPlaying ? Icons.pause : Icons.play_arrow,
-                            color: AppTheme.getText(context),
-                            size: 22,
-                          ),
-                          onPressed: () {
-                            if (isPlaying) {
-                              playerService.pause();
-                            } else {
-                              playerService.resume();
-                            }
-                          },
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: AppTheme.getSurfaceSubtle(context),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusSm),
+                                border: Border.all(
+                                  color: AppTheme.getBorder(context),
+                                  width: 0.8,
+                                ),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: (song.coverUrl != null &&
+                                      song.coverUrl!.isNotEmpty)
+                                  ? Image.network(
+                                      song.coverUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Icon(
+                                        Icons.music_note,
+                                        color: AppTheme.getTextMuted(context),
+                                        size: 18,
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.music_note,
+                                      color: AppTheme.getTextMuted(context),
+                                      size: 18,
+                                    ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    song.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppTheme.getText(context),
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 1),
+                                  Text(
+                                    song.artist,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppTheme.getTextSecondary(context),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                  minWidth: 34, minHeight: 34),
+                              icon: Icon(
+                                isPlaying ? Icons.pause : Icons.play_arrow,
+                                color: AppTheme.getText(context),
+                                size: 22,
+                              ),
+                              onPressed: () {
+                                if (isPlaying) {
+                                  playerService.pause();
+                                } else {
+                                  playerService.resume();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        );
       },
     );
   }

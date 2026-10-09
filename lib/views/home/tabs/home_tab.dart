@@ -38,7 +38,10 @@ class _HomeTabState extends State<HomeTab> {
         ),
         title: Text(
           'Tạo thư mục mới',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.getText(context)),
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: AppTheme.getText(context)),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -46,7 +49,8 @@ class _HomeTabState extends State<HomeTab> {
           children: [
             Text(
               'Đặt tên cho thư mục bài hát của bạn:',
-              style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12),
+              style: TextStyle(
+                  color: AppTheme.getTextSecondary(context), fontSize: 12),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -55,13 +59,15 @@ class _HomeTabState extends State<HomeTab> {
               style: TextStyle(color: AppTheme.getText(context), fontSize: 13),
               decoration: InputDecoration(
                 hintText: 'Ví dụ: Nhạc Acoustic, Lofi, EDM...',
-                hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12.5),
+                hintStyle: TextStyle(
+                    color: AppTheme.getTextMuted(context), fontSize: 12.5),
                 isDense: true,
                 filled: true,
                 fillColor: AppTheme.getSurface(context),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                  borderSide: BorderSide(
+                      color: AppTheme.getBorder(context), width: 0.8),
                 ),
               ),
             ),
@@ -70,7 +76,9 @@ class _HomeTabState extends State<HomeTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Hủy', style: TextStyle(color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
+            child: Text('Hủy',
+                style: TextStyle(
+                    color: AppTheme.getTextSecondary(context), fontSize: 12.5)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -81,13 +89,15 @@ class _HomeTabState extends State<HomeTab> {
               final name = nameController.text.trim();
               if (name.isNotEmpty) {
                 Navigator.pop(ctx);
-                final folderProv = Provider.of<FolderProvider>(context, listen: false);
+                final folderProv =
+                    Provider.of<FolderProvider>(context, listen: false);
                 final folder = await folderProv.createFolder(name);
                 if (context.mounted) {
                   if (folder != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Đã tạo thư mục "$name"', style: AppTheme.monoStyle(fontSize: 12)),
+                        content: Text('Đã tạo thư mục "$name"',
+                            style: AppTheme.monoStyle(fontSize: 12)),
                         duration: const Duration(seconds: 2),
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: AppTheme.getSurfaceElevated(context),
@@ -96,7 +106,10 @@ class _HomeTabState extends State<HomeTab> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(folderProv.errorMessage ?? 'Tạo thư mục thất bại. Vui lòng thử lại!', style: AppTheme.monoStyle(fontSize: 12)),
+                        content: Text(
+                            folderProv.errorMessage ??
+                                'Tạo thư mục thất bại. Vui lòng thử lại!',
+                            style: AppTheme.monoStyle(fontSize: 12)),
                         duration: const Duration(seconds: 3),
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: AppTheme.getDanger(context),
@@ -106,7 +119,8 @@ class _HomeTabState extends State<HomeTab> {
                 }
               }
             },
-            child: const Text('Tạo', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            child: const Text('Tạo',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -120,9 +134,12 @@ class _HomeTabState extends State<HomeTab> {
     final folderProvider = Provider.of<FolderProvider>(context);
 
     final user = authProvider.user;
-    final userName = (user != null && user.fullName != null && user.fullName!.isNotEmpty)
-        ? user.fullName!
-        : (user != null && user.username.isNotEmpty ? user.username : 'Người dùng');
+    final userName =
+        (user != null && user.fullName != null && user.fullName!.isNotEmpty)
+            ? user.fullName!
+            : (user != null && user.username.isNotEmpty
+                ? user.username
+                : 'Người dùng');
     final songs = songProvider.songs;
     final folders = folderProvider.folders;
 
@@ -141,10 +158,10 @@ class _HomeTabState extends State<HomeTab> {
           color: AppTheme.getText(context),
           backgroundColor: AppTheme.getSurface(context),
           child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics()),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             children: [
-              // 1. Header (MUSIC_STORAGE + v1.0 / ONLINE status, Notification bell, Avatar)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -187,8 +204,6 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                     ],
                   ),
-
-                  // Actions: Notification Bell + Avatar
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -196,7 +211,8 @@ class _HomeTabState extends State<HomeTab> {
                         children: [
                           IconButton(
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+                            constraints: const BoxConstraints(
+                                minWidth: 34, minHeight: 34),
                             icon: Icon(
                               Icons.notifications_none_outlined,
                               size: 20,
@@ -205,7 +221,8 @@ class _HomeTabState extends State<HomeTab> {
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Hệ thống hoạt động bình thường • v1.0 ONLINE'),
+                                  content: Text(
+                                      'Hệ thống hoạt động bình thường • v1.0 ONLINE'),
                                   duration: Duration(seconds: 1),
                                 ),
                               );
@@ -226,12 +243,12 @@ class _HomeTabState extends State<HomeTab> {
                         ],
                       ),
                       const SizedBox(width: 6),
-
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => const SettingsScreen()),
                           );
                         },
                         child: Container(
@@ -247,7 +264,9 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                           child: Center(
                             child: Text(
-                              userName.isNotEmpty ? userName[0].toUpperCase() : 'M',
+                              userName.isNotEmpty
+                                  ? userName[0].toUpperCase()
+                                  : 'M',
                               style: TextStyle(
                                 color: AppTheme.getText(context),
                                 fontWeight: FontWeight.w700,
@@ -261,10 +280,7 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 14),
-
-              // 2. Greeting: Chào bạn, Mạnh Đình + số bài hát đã lưu...
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -297,51 +313,57 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 18),
-
-              // 3. Section: Recently Played
-              _buildSectionHeader('Recently Played', onSeeAll: widget.onNavigateToLibrary),
+              _buildSectionHeader('Recently Played',
+                  onSeeAll: widget.onNavigateToLibrary),
               const SizedBox(height: 8),
-
               if (recentSongs.isEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Center(
                     child: Text(
                       'Chưa có bài hát nào gần đây',
-                      style: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 12),
+                      style: TextStyle(
+                          color: AppTheme.getTextMuted(context), fontSize: 12),
                     ),
                   ),
                 )
               else
-                ...recentSongs.map((song) => _buildRecentSongTile(context, song)),
-
+                ...recentSongs
+                    .map((song) => _buildRecentSongTile(context, song)),
               const SizedBox(height: 22),
-
-              // 4. Section: Thư mục (Folders Grid below Recent Played)
-              _buildSectionHeader('Thư mục', onSeeAll: widget.onNavigateToLibrary),
-              const SizedBox(height: 10),
-
+              _buildSectionHeader('Thư mục',
+                  onSeeAll: widget.onNavigateToLibrary),
+              const SizedBox(height: 8),
               if (folders.isEmpty)
                 _buildEmptyFolderCard(context)
-              else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: folders.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 1.15,
+              else ...[
+                ...folders
+                    .take(4)
+                    .map((folder) => _buildFolderTile(context, folder)),
+                if (folders.length > 4)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Center(
+                      child: TextButton(
+                        onPressed: widget.onNavigateToLibrary,
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'Xem thêm ${folders.length - 4} thư mục trong Thư viện →',
+                          style: AppTheme.monoStyle(
+                            fontSize: 10.5,
+                            color: AppTheme.getTextSecondary(context),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  itemBuilder: (context, index) {
-                    final folder = folders[index];
-                    return _buildFolderGridCard(context, folder);
-                  },
-                ),
-
+              ],
               const SizedBox(height: 120),
             ],
           ),
@@ -377,38 +399,40 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  Widget _buildFolderGridCard(BuildContext context, Folder folder) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => FolderDetailScreen(
-              folderId: folder.id,
-              initialName: folder.name,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: AppTheme.getSurface(context),
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          border: Border.all(
-            color: AppTheme.getBorder(context),
-            width: 0.8,
-          ),
+  Widget _buildFolderTile(BuildContext context, Folder folder) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.getSurface(context),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(
+          color: AppTheme.getBorder(context),
+          width: 0.8,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FolderDetailScreen(
+                  folderId: folder.id,
+                  initialName: folder.name,
+                ),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            child: Row(
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     color: AppTheme.getSurfaceElevated(context),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -424,22 +448,49 @@ class _HomeTabState extends State<HomeTab> {
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Icon(
                             Icons.folder_outlined,
-                            size: 22,
+                            size: 18,
                             color: AppTheme.getText(context),
                           ),
                         )
                       : Icon(
                           Icons.folder_outlined,
-                          size: 22,
+                          size: 18,
                           color: AppTheme.getText(context),
                         ),
                 ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        folder.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.getText(context),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${folder.songCount} bài hát',
+                        style: AppTheme.monoStyle(
+                          fontSize: 10,
+                          color: AppTheme.getTextSecondary(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Container(
-                  width: 28,
-                  height: 28,
+                  width: 26,
+                  height: 26,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
                     color: AppTheme.getSurfaceElevated(context),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     border: Border.all(
                       color: AppTheme.getBorder(context),
                       width: 0.8,
@@ -448,100 +499,89 @@ class _HomeTabState extends State<HomeTab> {
                   child: Center(
                     child: Icon(
                       Icons.arrow_forward_ios,
-                      size: 11,
+                      size: 10,
                       color: AppTheme.getTextSecondary(context),
                     ),
                   ),
                 ),
               ],
             ),
-            const Spacer(),
-            Text(
-              folder.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.getText(context),
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${folder.songCount} bài hát',
-              style: AppTheme.monoStyle(
-                fontSize: 10.5,
-                color: AppTheme.getTextSecondary(context),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildEmptyFolderCard(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showCreateFolderDialog(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        decoration: BoxDecoration(
-          color: AppTheme.getSurface(context),
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          border: Border.all(
-            color: AppTheme.getBorder(context),
-            width: 0.8,
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.getSurface(context),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(
+          color: AppTheme.getBorder(context),
+          width: 0.8,
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppTheme.getSurfaceElevated(context),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(
-                  color: AppTheme.getBorder(context),
-                  width: 0.8,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          onTap: () => _showCreateFolderDialog(context),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.getSurfaceElevated(context),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: AppTheme.getBorder(context),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.create_new_folder_outlined,
+                    size: 18,
+                    color: AppTheme.getText(context),
+                  ),
                 ),
-              ),
-              child: Icon(
-                Icons.create_new_folder_outlined,
-                size: 22,
-                color: AppTheme.getText(context),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Chưa có thư mục nào',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.getText(context),
-                    ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Chưa có thư mục nào',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.getText(context),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Nhấn để tạo thư mục lưu trữ bài hát đầu tiên',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.getTextMuted(context),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Nhấn để tạo thư mục lưu trữ bài hát đầu tiên',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.getTextMuted(context),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                Icon(
+                  Icons.add,
+                  size: 18,
+                  color: AppTheme.getText(context),
+                ),
+              ],
             ),
-            Icon(
-              Icons.add,
-              size: 20,
-              color: AppTheme.getText(context),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -566,13 +606,13 @@ class _HomeTabState extends State<HomeTab> {
           onTap: () {
             final songProv = Provider.of<SongProvider>(context, listen: false);
             final idx = songProv.songs.indexWhere((s) => s.id == song.id);
-            audioPlayerService.setPlaylist(songProv.songs, initialIndex: idx >= 0 ? idx : 0);
+            audioPlayerService.setPlaylist(songProv.songs,
+                initialIndex: idx >= 0 ? idx : 0);
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
             child: Row(
               children: [
-                // Thumbnail (36x36px)
                 Container(
                   width: 36,
                   height: 36,
@@ -589,13 +629,13 @@ class _HomeTabState extends State<HomeTab> {
                       ? Image.network(
                           song.coverUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                          errorBuilder: (_, __, ___) => Icon(Icons.music_note,
+                              color: AppTheme.getTextMuted(context), size: 16),
                         )
-                      : Icon(Icons.music_note, color: AppTheme.getTextMuted(context), size: 16),
+                      : Icon(Icons.music_note,
+                          color: AppTheme.getTextMuted(context), size: 16),
                 ),
                 const SizedBox(width: 10),
-
-                // Title & Artist
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,8 +676,6 @@ class _HomeTabState extends State<HomeTab> {
                     ],
                   ),
                 ),
-
-                // Compact Circular Play button (28x28px)
                 Container(
                   width: 28,
                   height: 28,

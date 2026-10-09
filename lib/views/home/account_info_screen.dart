@@ -47,7 +47,8 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
       isScrollControlled: true,
       backgroundColor: AppTheme.getSurface(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
@@ -101,24 +102,30 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 const SizedBox(height: 6),
                 TextField(
                   controller: nameController,
-                  style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+                  style:
+                      TextStyle(fontSize: 13, color: AppTheme.getText(context)),
                   decoration: InputDecoration(
                     hintText: 'Nhập họ và tên...',
-                    hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    hintStyle: TextStyle(
+                        color: AppTheme.getTextMuted(context), fontSize: 13),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                     filled: true,
                     fillColor: AppTheme.getSurfaceElevated(context),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                      borderSide: BorderSide(
+                          color: AppTheme.getBorder(context), width: 0.8),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                      borderSide: BorderSide(
+                          color: AppTheme.getBorder(context), width: 0.8),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      borderSide: BorderSide(color: AppTheme.getText(context), width: 1.0),
+                      borderSide: BorderSide(
+                          color: AppTheme.getText(context), width: 1.0),
                     ),
                   ),
                 ),
@@ -134,24 +141,30 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 TextField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: TextStyle(fontSize: 13, color: AppTheme.getText(context)),
+                  style:
+                      TextStyle(fontSize: 13, color: AppTheme.getText(context)),
                   decoration: InputDecoration(
                     hintText: 'Nhập địa chỉ email...',
-                    hintStyle: TextStyle(color: AppTheme.getTextMuted(context), fontSize: 13),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    hintStyle: TextStyle(
+                        color: AppTheme.getTextMuted(context), fontSize: 13),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                     filled: true,
                     fillColor: AppTheme.getSurfaceElevated(context),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                      borderSide: BorderSide(
+                          color: AppTheme.getBorder(context), width: 0.8),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      borderSide: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                      borderSide: BorderSide(
+                          color: AppTheme.getBorder(context), width: 0.8),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      borderSide: BorderSide(color: AppTheme.getText(context), width: 1.0),
+                      borderSide: BorderSide(
+                          color: AppTheme.getText(context), width: 1.0),
                     ),
                   ),
                 ),
@@ -162,9 +175,11 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                          side: BorderSide(
+                              color: AppTheme.getBorder(context), width: 0.8),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
                           ),
                         ),
                         onPressed: isSaving ? null : () => Navigator.pop(ctx),
@@ -185,7 +200,8 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                           backgroundColor: AppTheme.getText(context),
                           foregroundColor: AppTheme.getBg(context),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
                           ),
                         ),
                         onPressed: isSaving
@@ -202,11 +218,14 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      ok ? 'Đã cập nhật thông tin thành công' : 'Cập nhật thất bại',
+                                      ok
+                                          ? 'Đã cập nhật thông tin thành công'
+                                          : 'Cập nhật thất bại',
                                       style: AppTheme.monoStyle(fontSize: 12),
                                     ),
                                     duration: const Duration(seconds: 2),
-                                    backgroundColor: AppTheme.getSurfaceElevated(context),
+                                    backgroundColor:
+                                        AppTheme.getSurfaceElevated(context),
                                     behavior: SnackBarBehavior.floating,
                                   ),
                                 );
@@ -257,19 +276,26 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     final songProvider = Provider.of<SongProvider>(context);
     final user = authProvider.user;
 
-    final displayName = (user != null && user.fullName != null && user.fullName!.isNotEmpty)
-        ? user.fullName!
-        : (user != null && user.username.isNotEmpty ? user.username : 'Người dùng');
+    final displayName =
+        (user != null && user.fullName != null && user.fullName!.isNotEmpty)
+            ? user.fullName!
+            : (user != null && user.username.isNotEmpty
+                ? user.username
+                : 'Người dùng');
     final username = user?.username ?? 'user_dev';
-    final email = (user != null && user.email.isNotEmpty) ? user.email : 'email@example.com';
+    final email = (user != null && user.email.isNotEmpty)
+        ? user.email
+        : 'email@example.com';
     final isActive = user?.isActive ?? true;
     final createdAtStr = _formatDate(user?.createdAt);
     final songCount = songProvider.songs.length;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final greenText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
+    final greenText =
+        isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
     final greenBg = isDark ? const Color(0x1F22C55E) : const Color(0x1416A34A);
-    final greenBorder = isDark ? const Color(0x6622C55E) : const Color(0x5516A34A);
+    final greenBorder =
+        isDark ? const Color(0x6622C55E) : const Color(0x5516A34A);
 
     return Scaffold(
       backgroundColor: AppTheme.getBg(context),
@@ -277,7 +303,8 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppTheme.getText(context), size: 20),
+          icon: Icon(Icons.arrow_back,
+              color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -300,12 +327,14 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                       color: AppTheme.getText(context),
                     ),
                   )
-                : Icon(Icons.refresh, color: AppTheme.getText(context), size: 20),
+                : Icon(Icons.refresh,
+                    color: AppTheme.getText(context), size: 20),
             onPressed: _isRefreshing ? null : _handleRefresh,
           ),
           IconButton(
             tooltip: 'Chỉnh sửa',
-            icon: Icon(Icons.edit_outlined, color: AppTheme.getText(context), size: 20),
+            icon: Icon(Icons.edit_outlined,
+                color: AppTheme.getText(context), size: 20),
             onPressed: _showEditProfileDialog,
           ),
         ],
@@ -314,13 +343,13 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           children: [
-            // 1. Profile Hero Card
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppTheme.getSurface(context),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                border:
+                    Border.all(color: AppTheme.getBorder(context), width: 0.8),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -331,11 +360,14 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppTheme.getSurfaceElevated(context),
-                      border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                      border: Border.all(
+                          color: AppTheme.getBorder(context), width: 1.0),
                     ),
                     child: Center(
                       child: Text(
-                        displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                        displayName.isNotEmpty
+                            ? displayName[0].toUpperCase()
+                            : 'U',
                         style: TextStyle(
                           color: AppTheme.getText(context),
                           fontWeight: FontWeight.w700,
@@ -366,11 +398,20 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                             const SizedBox(width: 8),
                             _buildTag(
                               context,
-                              label: 'STATUS: ${isActive ? 'ACTIVE' : 'INACTIVE'}',
+                              label:
+                                  'STATUS: ${isActive ? 'ACTIVE' : 'INACTIVE'}',
                               isHighlighted: true,
-                              textColor: isActive ? greenText : AppTheme.getDanger(context),
-                              borderColor: isActive ? greenBorder : AppTheme.getDanger(context).withValues(alpha: 0.5),
-                              backgroundColor: isActive ? greenBg : AppTheme.getDanger(context).withValues(alpha: 0.1),
+                              textColor: isActive
+                                  ? greenText
+                                  : AppTheme.getDanger(context),
+                              borderColor: isActive
+                                  ? greenBorder
+                                  : AppTheme.getDanger(context)
+                                      .withValues(alpha: 0.5),
+                              backgroundColor: isActive
+                                  ? greenBg
+                                  : AppTheme.getDanger(context)
+                                      .withValues(alpha: 0.1),
                             ),
                           ],
                         ),
@@ -396,10 +437,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // 2. Section: Định danh tài khoản (Identity)
             _buildSectionHeader('Định danh & Thông tin cá nhân'),
             _buildDetailCard(
               context,
@@ -430,10 +468,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 18),
-
-            // 3. Section: Thống kê & Hệ thống (System & Stats)
             _buildSectionHeader('Hệ thống & Thống kê'),
             _buildDetailCard(
               context,
@@ -453,7 +488,6 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
           ],
         ),
@@ -475,7 +509,8 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     );
   }
 
-  Widget _buildDetailCard(BuildContext context, {required List<Widget> children}) {
+  Widget _buildDetailCard(BuildContext context,
+      {required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.getSurface(context),
@@ -545,12 +580,15 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     onTap: onBadgeTap,
                     borderRadius: BorderRadius.circular(4),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 2),
                       decoration: BoxDecoration(
-                        color: badgeColor ?? AppTheme.getSurfaceElevated(context),
+                        color:
+                            badgeColor ?? AppTheme.getSurfaceElevated(context),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                          color: badgeBorderColor ?? AppTheme.getBorder(context),
+                          color:
+                              badgeBorderColor ?? AppTheme.getBorder(context),
                           width: 0.8,
                         ),
                       ),

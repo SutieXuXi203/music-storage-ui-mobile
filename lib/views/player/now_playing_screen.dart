@@ -14,7 +14,8 @@ class NowPlayingScreen extends StatefulWidget {
   State<NowPlayingScreen> createState() => _NowPlayingScreenState();
 }
 
-class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerProviderStateMixin {
+class _NowPlayingScreenState extends State<NowPlayingScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _waveController;
   double _dragOffset = 0.0;
   bool _isDraggingSeek = false;
@@ -66,7 +67,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
@@ -85,17 +87,24 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
               ),
               ListTile(
                 dense: true,
-                leading: Icon(Icons.queue_music, color: AppTheme.getText(context), size: 20),
-                title: Text('Xem hàng đợi phát nhạc', style: TextStyle(fontSize: 13, color: AppTheme.getText(context))),
+                leading: Icon(Icons.queue_music,
+                    color: AppTheme.getText(context), size: 20),
+                title: Text('Xem hàng đợi phát nhạc',
+                    style: TextStyle(
+                        fontSize: 13, color: AppTheme.getText(context))),
                 onTap: () {
                   Navigator.pop(ctx);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const QueueScreen()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const QueueScreen()));
                 },
               ),
               ListTile(
                 dense: true,
-                leading: Icon(Icons.playlist_add, color: AppTheme.getText(context), size: 20),
-                title: Text('Thêm vào danh sách phát', style: TextStyle(fontSize: 13, color: AppTheme.getText(context))),
+                leading: Icon(Icons.playlist_add,
+                    color: AppTheme.getText(context), size: 20),
+                title: Text('Thêm vào danh sách phát',
+                    style: TextStyle(
+                        fontSize: 13, color: AppTheme.getText(context))),
                 onTap: () {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -108,11 +117,15 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
               ),
               ListTile(
                 dense: true,
-                leading: Icon(Icons.info_outline, color: AppTheme.getText(context), size: 20),
-                title: Text('Chi tiết kỹ thuật tệp', style: TextStyle(fontSize: 13, color: AppTheme.getText(context))),
+                leading: Icon(Icons.info_outline,
+                    color: AppTheme.getText(context), size: 20),
+                title: Text('Chi tiết kỹ thuật tệp',
+                    style: TextStyle(
+                        fontSize: 13, color: AppTheme.getText(context))),
                 subtitle: Text(
                   '${song.format.toUpperCase()} · ${song.bitrate.toUpperCase()} · Google Drive',
-                  style: AppTheme.monoStyle(fontSize: 11, color: AppTheme.getTextSecondary(context)),
+                  style: AppTheme.monoStyle(
+                      fontSize: 11, color: AppTheme.getTextSecondary(context)),
                 ),
                 onTap: () => Navigator.pop(ctx),
               ),
@@ -135,15 +148,19 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
             body: Center(
               child: Text(
                 'NO_TRACK_LOADED',
-                style: AppTheme.monoStyle(color: AppTheme.getTextMuted(context)),
+                style:
+                    AppTheme.monoStyle(color: AppTheme.getTextMuted(context)),
               ),
             ),
           );
         }
 
         final position = widget.playerService.player.position;
-        final duration = widget.playerService.player.duration ?? Duration(seconds: song.duration > 0 ? song.duration : 1);
-        final totalSeconds = duration.inMilliseconds > 0 ? duration.inMilliseconds.toDouble() : 1000.0;
+        final duration = widget.playerService.player.duration ??
+            Duration(seconds: song.duration > 0 ? song.duration : 1);
+        final totalSeconds = duration.inMilliseconds > 0
+            ? duration.inMilliseconds.toDouble()
+            : 1000.0;
         final currentSeconds = _isDraggingSeek
             ? _seekPosition
             : position.inMilliseconds.toDouble().clamp(0.0, totalSeconds);
@@ -158,7 +175,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
               backgroundColor: AppTheme.getBg(context),
               elevation: 0,
               leading: IconButton(
-                icon: Icon(Icons.keyboard_arrow_down, size: 26, color: AppTheme.getText(context)),
+                icon: Icon(Icons.keyboard_arrow_down,
+                    size: 26, color: AppTheme.getText(context)),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               centerTitle: true,
@@ -173,7 +191,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
               ),
               actions: [
                 IconButton(
-                  icon: Icon(Icons.more_horiz, size: 20, color: AppTheme.getText(context)),
+                  icon: Icon(Icons.more_horiz,
+                      size: 20, color: AppTheme.getText(context)),
                   onPressed: () => _showMoreMenu(context, song),
                 ),
               ],
@@ -184,43 +203,42 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
               onVerticalDragEnd: _onVerticalDragEnd,
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 8.0),
                   child: Column(
                     children: [
                       const Spacer(flex: 1),
-
-                      // 1. Cover Art (Square rounded 240x240)
                       Center(
                         child: Container(
                           width: 230,
                           height: 230,
                           decoration: BoxDecoration(
                             color: AppTheme.getSurfaceSubtle(context),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                            border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(
+                                color: AppTheme.getBorder(context), width: 1.0),
                           ),
                           clipBehavior: Clip.antiAlias,
-                          child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                              ? Image.network(
-                                  song.coverUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Icon(
-                                    Icons.music_note,
-                                    size: 64,
-                                    color: AppTheme.getTextMuted(context),
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.music_note,
-                                  size: 64,
-                                  color: AppTheme.getTextMuted(context),
-                                ),
+                          child:
+                              song.coverUrl != null && song.coverUrl!.isNotEmpty
+                                  ? Image.network(
+                                      song.coverUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Icon(
+                                        Icons.music_note,
+                                        size: 64,
+                                        color: AppTheme.getTextMuted(context),
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.music_note,
+                                      size: 64,
+                                      color: AppTheme.getTextMuted(context),
+                                    ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
-
-                      // 2. Track Title & Artist
                       Text(
                         song.title,
                         textAlign: TextAlign.center,
@@ -245,22 +263,19 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                           color: AppTheme.getTextSecondary(context),
                         ),
                       ),
-
                       const SizedBox(height: 16),
-
-                      // 3. Audio Waveform Progress Indicator
                       _buildWaveformBar(context, currentSeconds / totalSeconds),
-
                       const SizedBox(height: 6),
-
-                      // 4. Timestamps Row (Mono)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 2),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              _formatDuration(_isDraggingSeek ? Duration(milliseconds: _seekPosition.round()) : position),
+                              _formatDuration(_isDraggingSeek
+                                  ? Duration(
+                                      milliseconds: _seekPosition.round())
+                                  : position),
                               style: AppTheme.monoStyle(
                                 fontSize: 11,
                                 color: AppTheme.getTextSecondary(context),
@@ -276,10 +291,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 14),
-
-                      // 5. Playback Controls Row: [ Shuffle | Prev | Play/Pause Circle | Next | Repeat ]
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -291,13 +303,14 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                                   ? AppTheme.getText(context)
                                   : AppTheme.getTextMuted(context),
                             ),
-                            onPressed: () => widget.playerService.toggleShuffle(),
+                            onPressed: () =>
+                                widget.playerService.toggleShuffle(),
                           ),
                           IconButton(
-                            icon: Icon(Icons.skip_previous, size: 28, color: AppTheme.getText(context)),
+                            icon: Icon(Icons.skip_previous,
+                                size: 28, color: AppTheme.getText(context)),
                             onPressed: () => widget.playerService.previous(),
                           ),
-                          // Circle Play/Pause Button
                           GestureDetector(
                             onTap: () {
                               if (widget.playerService.isPlaying) {
@@ -312,11 +325,15 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: AppTheme.getSurface(context),
-                                border: Border.all(color: AppTheme.getText(context), width: 1.5),
+                                border: Border.all(
+                                    color: AppTheme.getText(context),
+                                    width: 1.5),
                               ),
                               child: Center(
                                 child: Icon(
-                                  widget.playerService.isPlaying ? Icons.pause : Icons.play_arrow,
+                                  widget.playerService.isPlaying
+                                      ? Icons.pause
+                                      : Icons.play_arrow,
                                   size: 30,
                                   color: AppTheme.getText(context),
                                 ),
@@ -324,7 +341,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.skip_next, size: 28, color: AppTheme.getText(context)),
+                            icon: Icon(Icons.skip_next,
+                                size: 28, color: AppTheme.getText(context)),
                             onPressed: () => widget.playerService.next(),
                           ),
                           IconButton(
@@ -339,10 +357,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 14),
-
-                      // 6. Technical Audio Specs Ticker: [ MP3 | 192 KBPS | 44.1 KHZ ]
                       Text(
                         '${song.format.toUpperCase()}  |  ${song.bitrate.toUpperCase()}  |  44.1 KHZ',
                         style: AppTheme.monoStyle(
@@ -352,10 +367,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                           letterSpacing: 1.0,
                         ),
                       ),
-
                       const Spacer(flex: 1),
-
-                      // 7. Peek Card: [ Tiếp theo ]
                       if (nextSong != null) ...[
                         Align(
                           alignment: Alignment.centerLeft,
@@ -373,15 +385,20 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const QueueScreen()),
+                              MaterialPageRoute(
+                                  builder: (_) => const QueueScreen()),
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
                             decoration: BoxDecoration(
                               color: AppTheme.getSurface(context),
-                              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                              border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                              borderRadius:
+                                  BorderRadius.circular(AppTheme.radiusSm),
+                              border: Border.all(
+                                  color: AppTheme.getBorder(context),
+                                  width: 0.8),
                             ),
                             child: Row(
                               children: [
@@ -390,18 +407,23 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                                   height: 36,
                                   decoration: BoxDecoration(
                                     color: AppTheme.getSurfaceSubtle(context),
-                                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                                    border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                                    borderRadius: BorderRadius.circular(
+                                        AppTheme.radiusSm),
+                                    border: Border.all(
+                                        color: AppTheme.getBorder(context),
+                                        width: 0.8),
                                   ),
                                   clipBehavior: Clip.antiAlias,
-                                  child: nextSong.coverUrl != null && nextSong.coverUrl!.isNotEmpty
+                                  child: nextSong.coverUrl != null &&
+                                          nextSong.coverUrl!.isNotEmpty
                                       ? Image.network(
                                           nextSong.coverUrl!,
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) => Icon(
                                             Icons.music_note,
                                             size: 16,
-                                            color: AppTheme.getTextMuted(context),
+                                            color:
+                                                AppTheme.getTextMuted(context),
                                           ),
                                         )
                                       : Icon(
@@ -413,7 +435,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
@@ -433,7 +456,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                                         overflow: TextOverflow.ellipsis,
                                         style: AppTheme.monoStyle(
                                           fontSize: 10,
-                                          color: AppTheme.getTextSecondary(context),
+                                          color: AppTheme.getTextSecondary(
+                                              context),
                                         ),
                                       ),
                                     ],
@@ -449,7 +473,6 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                           ),
                         ),
                       ],
-
                       const SizedBox(height: 10),
                     ],
                   ),
@@ -472,7 +495,9 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
         if (duration == null) return;
         setState(() {
           _isDraggingSeek = true;
-          _seekPosition = (details.localPosition.dx / MediaQuery.of(context).size.width) * duration.inMilliseconds;
+          _seekPosition =
+              (details.localPosition.dx / MediaQuery.of(context).size.width) *
+                  duration.inMilliseconds;
         });
       },
       onHorizontalDragUpdate: (details) {
@@ -488,7 +513,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
         setState(() {
           _isDraggingSeek = false;
         });
-        widget.playerService.seek(Duration(milliseconds: _seekPosition.round()));
+        widget.playerService
+            .seek(Duration(milliseconds: _seekPosition.round()));
       },
       child: SizedBox(
         height: 28,
@@ -496,7 +522,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
           animation: _waveController,
           builder: (context, _) {
             const barCount = 42;
-            final activeBarCount = (progress.clamp(0.0, 1.0) * barCount).round();
+            final activeBarCount =
+                (progress.clamp(0.0, 1.0) * barCount).round();
 
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -504,9 +531,14 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
               children: List.generate(barCount, (index) {
                 final isActive = index <= activeBarCount;
 
-                // Subtle animation wave modulation
-                final baseHeight = 4.0 + (math.sin(index * 0.45) * 8.0).abs() + ((index % 3 == 0) ? 6.0 : 2.0);
-                final waveMod = isPlaying ? math.sin((index * 0.3) + (_waveController.value * math.pi * 2)) * 3.0 : 0.0;
+                final baseHeight = 4.0 +
+                    (math.sin(index * 0.45) * 8.0).abs() +
+                    ((index % 3 == 0) ? 6.0 : 2.0);
+                final waveMod = isPlaying
+                    ? math.sin((index * 0.3) +
+                            (_waveController.value * math.pi * 2)) *
+                        3.0
+                    : 0.0;
                 final barHeight = (baseHeight + waveMod).clamp(3.0, 24.0);
 
                 return Container(
@@ -515,7 +547,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                   decoration: BoxDecoration(
                     color: isActive
                         ? AppTheme.getText(context)
-                        : AppTheme.getTextMuted(context).withValues(alpha: 0.35),
+                        : AppTheme.getTextMuted(context)
+                            .withValues(alpha: 0.35),
                     borderRadius: BorderRadius.circular(1),
                   ),
                 );

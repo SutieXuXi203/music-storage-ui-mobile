@@ -22,9 +22,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final settingsProvider = Provider.of<SettingsProvider>(context);
     final user = authProvider.user;
 
-    final displayName = (user != null && user.fullName != null && user.fullName!.isNotEmpty)
-        ? user.fullName!
-        : (user != null && user.username.isNotEmpty ? user.username : 'Người dùng');
+    final displayName =
+        (user != null && user.fullName != null && user.fullName!.isNotEmpty)
+            ? user.fullName!
+            : (user != null && user.username.isNotEmpty
+                ? user.username
+                : 'Người dùng');
     final email = (user != null && user.email.isNotEmpty)
         ? user.email
         : 'email@example.com';
@@ -35,7 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppTheme.getText(context), size: 20),
+          icon: Icon(Icons.arrow_back,
+              color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -51,7 +55,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           children: [
-            // 1. Profile header (Compact: 42x42 avatar)
             InkWell(
               onTap: () {
                 Navigator.push(
@@ -61,11 +64,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: AppTheme.getSurface(context),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                  border: Border.all(
+                      color: AppTheme.getBorder(context), width: 0.8),
                 ),
                 child: Row(
                   children: [
@@ -75,11 +80,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: AppTheme.getSurfaceElevated(context),
-                        border: Border.all(color: AppTheme.getBorder(context), width: 1.0),
+                        border: Border.all(
+                            color: AppTheme.getBorder(context), width: 1.0),
                       ),
                       child: Center(
                         child: Text(
-                          displayName.isNotEmpty ? displayName[0].toUpperCase() : 'M',
+                          displayName.isNotEmpty
+                              ? displayName[0].toUpperCase()
+                              : 'M',
                           style: TextStyle(
                             color: AppTheme.getText(context),
                             fontWeight: FontWeight.w700,
@@ -121,33 +129,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 18),
-
-            // 2. Section: Giao diện
             _buildSectionHeader('Giao diện'),
             _buildSelectTile<ThemeMode>(
               icon: Icons.brightness_medium_outlined,
               title: 'Chủ đề',
               currentValue: settingsProvider.themeMode,
-              currentLabel: settingsProvider.themeMode == ThemeMode.dark ? 'Dark' : 'Light',
+              currentLabel: settingsProvider.themeMode == ThemeMode.dark
+                  ? 'Dark'
+                  : 'Light',
               items: const [
                 MapEntry(ThemeMode.dark, 'Dark'),
                 MapEntry(ThemeMode.light, 'Light'),
               ],
               onChanged: (mode) => settingsProvider.setThemeMode(mode),
             ),
-
             const SizedBox(height: 24),
-
-            // 6. Action Button: [ Đăng xuất ]
             SizedBox(
               height: 40,
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   backgroundColor: AppTheme.getSurface(context),
                   foregroundColor: AppTheme.getDanger(context),
-                  side: BorderSide(color: AppTheme.getBorder(context), width: 0.8),
+                  side: BorderSide(
+                      color: AppTheme.getBorder(context), width: 0.8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
@@ -172,7 +177,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -246,7 +250,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               decoration: BoxDecoration(
                 color: AppTheme.getSurfaceSubtle(context),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                border: Border.all(color: AppTheme.getBorder(context), width: 0.8),
+                border:
+                    Border.all(color: AppTheme.getBorder(context), width: 0.8),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -281,13 +286,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       entry.value,
                       style: AppTheme.monoStyle(
                         fontSize: 11.5,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? AppTheme.getText(context) : AppTheme.getTextSecondary(context),
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected
+                            ? AppTheme.getText(context)
+                            : AppTheme.getTextSecondary(context),
                       ),
                     ),
                     const SizedBox(width: 12),
                     if (isSelected)
-                      Icon(Icons.check, size: 14, color: AppTheme.getText(context)),
+                      Icon(Icons.check,
+                          size: 14, color: AppTheme.getText(context)),
                   ],
                 ),
               );
