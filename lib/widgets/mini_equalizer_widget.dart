@@ -56,19 +56,21 @@ class _MiniEqualizerWidgetState extends State<MiniEqualizerWidget>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return CustomPaint(
-          size: Size(widget.width, widget.height),
-          painter: _EqualizerPainter(
-            progress: _controller.value,
-            isPlaying: widget.isPlaying,
-            color: widget.color,
-            barCount: widget.barCount,
-          ),
-        );
-      },
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return CustomPaint(
+            size: Size(widget.width, widget.height),
+            painter: _EqualizerPainter(
+              progress: _controller.value,
+              isPlaying: widget.isPlaying,
+              color: widget.color,
+              barCount: widget.barCount,
+            ),
+          );
+        },
+      ),
     );
   }
 }

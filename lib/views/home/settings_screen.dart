@@ -37,7 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
-        leading: IconButton(
+        leading: BouncingIconButton(
           icon: Icon(Icons.arrow_back,
               color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),

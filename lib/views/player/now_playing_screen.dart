@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../services/audio_player_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/song_model.dart';
+import '../../widgets/tech_playback_controls.dart';
 import 'queue_screen.dart';
 
 class NowPlayingScreen extends StatefulWidget {
@@ -155,15 +156,11 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
           );
         }
 
-        final position = widget.playerService.player.position;
         final duration = widget.playerService.player.duration ??
             Duration(seconds: song.duration > 0 ? song.duration : 1);
         final totalSeconds = duration.inMilliseconds > 0
             ? duration.inMilliseconds.toDouble()
             : 1000.0;
-        final currentSeconds = _isDraggingSeek
-            ? _seekPosition
-            : position.inMilliseconds.toDouble().clamp(0.0, totalSeconds);
 
         final nextSong = widget.playerService.nextSong;
 
@@ -174,7 +171,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
             appBar: AppBar(
               backgroundColor: AppTheme.getBg(context),
               elevation: 0,
-              leading: IconButton(
+              leading: BouncingIconButton(
                 icon: Icon(Icons.keyboard_arrow_down,
                     size: 26, color: AppTheme.getText(context)),
                 onPressed: () => Navigator.of(context).pop(),
@@ -184,13 +181,12 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                 'AUDIO_ENGINE_EXEC',
                 style: AppTheme.monoStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.getTextSecondary(context),
                   letterSpacing: 1.2,
+                  color: AppTheme.getTextSecondary(context),
                 ),
               ),
               actions: [
-                IconButton(
+                BouncingIconButton(
                   icon: Icon(Icons.more_horiz,
                       size: 20, color: AppTheme.getText(context)),
                   onPressed: () => _showMoreMenu(context, song),
@@ -217,25 +213,16 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                             borderRadius:
                                 BorderRadius.circular(AppTheme.radiusSm),
                             border: Border.all(
-                                color: AppTheme.getBorder(context), width: 1.0),
+                                color: AppTheme.getBorder(context), width: 0.8),
                           ),
                           clipBehavior: Clip.antiAlias,
-                          child:
-                              song.coverUrl != null && song.coverUrl!.isNotEmpty
-                                  ? Image.network(
-                                      song.coverUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Icon(
-                                        Icons.music_note,
-                                        size: 64,
-                                        color: AppTheme.getTextMuted(context),
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.music_note,
-                                      size: 64,
-                                      color: AppTheme.getTextMuted(context),
-                                    ),
+                          child: AppCoverImage(
+                            url: song.coverUrl,
+                            width: 230,
+                            height: 230,
+                            borderRadius: AppTheme.radiusSm,
+                            iconSize: 64,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -264,98 +251,64 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildWaveformBar(context, currentSeconds / totalSeconds),
-                      const SizedBox(height: 6),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _formatDuration(_isDraggingSeek
-                                  ? Duration(
-                                      milliseconds: _seekPosition.round())
-                                  : position),
-                              style: AppTheme.monoStyle(
-                                fontSize: 11,
-                                color: AppTheme.getTextSecondary(context),
+                      StreamBuilder<Duration>(
+                        stream: widget.playerService.player.positionStream,
+                        builder: (context, snapshot) {
+                          final livePosition = snapshot.data ??
+                              widget.playerService.player.position;
+                          final currentSeconds = _isDraggingSeek
+                              ? _seekPosition
+                              : livePosition.inMilliseconds
+                                  .toDouble()
+                                  .clamp(0.0, totalSeconds);
+
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              RepaintBoundary(
+                                child: _buildWaveformBar(
+                                    context, currentSeconds / totalSeconds),
                               ),
-                            ),
-                            Text(
-                              _formatDuration(duration),
-                              style: AppTheme.monoStyle(
-                                fontSize: 11,
-                                color: AppTheme.getTextSecondary(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.shuffle,
-                              size: 20,
-                              color: widget.playerService.isShuffle
-                                  ? AppTheme.getText(context)
-                                  : AppTheme.getTextMuted(context),
-                            ),
-                            onPressed: () =>
-                                widget.playerService.toggleShuffle(),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.skip_previous,
-                                size: 28, color: AppTheme.getText(context)),
-                            onPressed: () => widget.playerService.previous(),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (widget.playerService.isPlaying) {
-                                widget.playerService.pause();
-                              } else {
-                                widget.playerService.resume();
-                              }
-                            },
-                            child: Container(
-                              width: 58,
-                              height: 58,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppTheme.getSurface(context),
-                                border: Border.all(
-                                    color: AppTheme.getText(context),
-                                    width: 1.5),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  widget.playerService.isPlaying
-                                      ? Icons.pause
-                                      : Icons.play_arrow,
-                                  size: 30,
-                                  color: AppTheme.getText(context),
+                              const SizedBox(height: 6),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _formatDuration(_isDraggingSeek
+                                          ? Duration(
+                                              milliseconds:
+                                                  _seekPosition.round())
+                                          : livePosition),
+                                      style: AppTheme.monoStyle(
+                                        fontSize: 11,
+                                        color:
+                                            AppTheme.getTextSecondary(context),
+                                      ),
+                                    ),
+                                    Text(
+                                      _formatDuration(duration),
+                                      style: AppTheme.monoStyle(
+                                        fontSize: 11,
+                                        color:
+                                            AppTheme.getTextSecondary(context),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.skip_next,
-                                size: 28, color: AppTheme.getText(context)),
-                            onPressed: () => widget.playerService.next(),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.repeat,
-                              size: 20,
-                              color: widget.playerService.isLoop
-                                  ? AppTheme.getText(context)
-                                  : AppTheme.getTextMuted(context),
-                            ),
-                            onPressed: () => widget.playerService.toggleLoop(),
-                          ),
-                        ],
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      RepaintBoundary(
+                        child: TechPlaybackControls(
+                          playerService: widget.playerService,
+                        ),
                       ),
                       const SizedBox(height: 14),
                       Text(
@@ -381,7 +334,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                           ),
                         ),
                         const SizedBox(height: 6),
-                        GestureDetector(
+                        BouncingWidget(
                           onTap: () {
                             Navigator.push(
                               context,
@@ -414,23 +367,13 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                                         width: 0.8),
                                   ),
                                   clipBehavior: Clip.antiAlias,
-                                  child: nextSong.coverUrl != null &&
-                                          nextSong.coverUrl!.isNotEmpty
-                                      ? Image.network(
-                                          nextSong.coverUrl!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => Icon(
-                                            Icons.music_note,
-                                            size: 16,
-                                            color:
-                                                AppTheme.getTextMuted(context),
-                                          ),
-                                        )
-                                      : Icon(
-                                          Icons.music_note,
-                                          size: 16,
-                                          color: AppTheme.getTextMuted(context),
-                                        ),
+                                  child: AppCoverImage(
+                                    url: nextSong.coverUrl,
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: AppTheme.radiusSm,
+                                    iconSize: 16,
+                                  ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(

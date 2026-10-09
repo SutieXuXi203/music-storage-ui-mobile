@@ -69,18 +69,12 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                             color: AppTheme.getBorder(context), width: 0.8),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: widget.song.coverUrl != null &&
-                              widget.song.coverUrl!.isNotEmpty
-                          ? Image.network(
-                              widget.song.coverUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(
-                                  Icons.music_note,
-                                  color: AppTheme.getTextMuted(context),
-                                  size: 18),
-                            )
-                          : Icon(Icons.music_note,
-                              color: AppTheme.getTextMuted(context), size: 18),
+                      child: AppCoverImage(
+                        url: widget.song.coverUrl,
+                        width: 40,
+                        height: 40,
+                        iconSize: 18,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -225,7 +219,7 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                         letterSpacing: 0.6,
                       ),
                     ),
-                    IconButton(
+                    BouncingIconButton(
                       icon: Icon(Icons.close,
                           size: 20, color: AppTheme.getTextSecondary(context)),
                       onPressed: () => Navigator.pop(ctx),
@@ -382,22 +376,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                         ),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: widget.song.coverUrl != null &&
-                              widget.song.coverUrl!.isNotEmpty
-                          ? Image.network(
-                              widget.song.coverUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(
-                                Icons.music_note,
-                                color: AppTheme.getTextMuted(context),
-                                size: 18,
-                              ),
-                            )
-                          : Icon(
-                              Icons.music_note,
-                              color: AppTheme.getTextMuted(context),
-                              size: 18,
-                            ),
+                      child: AppCoverImage(
+                        url: widget.song.coverUrl,
+                        width: 38,
+                        height: 38,
+                        borderRadius: AppTheme.radiusSm,
+                        iconSize: 18,
+                      ),
                     ),
                     if (widget.isCurrent) ...[
                       Container(
@@ -478,7 +463,7 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                   ),
                 ),
                 const SizedBox(width: 4),
-                IconButton(
+                BouncingIconButton(
                   padding: EdgeInsets.zero,
                   constraints:
                       const BoxConstraints(minWidth: 32, minHeight: 32),

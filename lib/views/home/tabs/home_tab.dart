@@ -172,32 +172,31 @@ class _HomeTabState extends State<HomeTab> {
                       Text(
                         'MEOWSIC',
                         style: AppTheme.monoStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.5,
                           color: AppTheme.getText(context),
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            width: 5,
-                            height: 5,
+                            width: 6,
+                            height: 6,
                             decoration: const BoxDecoration(
-                              color: Color(0xFF22C55E),
+                              color: AppTheme.terminalGreen,
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 5),
                           Text(
                             'v1.0 / ONLINE',
                             style: AppTheme.monoStyle(
                               fontSize: 9.5,
-                              fontWeight: FontWeight.w600,
                               color: AppTheme.getTextSecondary(context),
-                              letterSpacing: 0.4,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ],
@@ -209,21 +208,24 @@ class _HomeTabState extends State<HomeTab> {
                     children: [
                       Stack(
                         children: [
-                          IconButton(
+                          BouncingIconButton(
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(
                                 minWidth: 34, minHeight: 34),
                             icon: Icon(
                               Icons.notifications_none_outlined,
-                              size: 20,
+                              size: 19,
                               color: AppTheme.getText(context),
                             ),
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text(
-                                      'Hệ thống hoạt động bình thường • v1.0 ONLINE'),
-                                  duration: Duration(seconds: 1),
+                                      'Hệ thống hoạt động bình thường // v1.0 ONLINE',
+                                      style: AppTheme.monoStyle(fontSize: 11)),
+                                  duration: const Duration(seconds: 1),
+                                  backgroundColor:
+                                      AppTheme.getSurfaceElevated(context),
                                 ),
                               );
                             },
@@ -235,7 +237,7 @@ class _HomeTabState extends State<HomeTab> {
                               width: 6,
                               height: 6,
                               decoration: const BoxDecoration(
-                                color: Color(0xFF22C55E),
+                                color: AppTheme.terminalGreen,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -243,7 +245,7 @@ class _HomeTabState extends State<HomeTab> {
                         ],
                       ),
                       const SizedBox(width: 6),
-                      GestureDetector(
+                      BouncingWidget(
                         onTap: () {
                           Navigator.push(
                             context,
@@ -252,8 +254,8 @@ class _HomeTabState extends State<HomeTab> {
                           );
                         },
                         child: Container(
-                          width: 34,
-                          height: 34,
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: AppTheme.getSurfaceElevated(context),
@@ -442,21 +444,14 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: folder.coverUrl != null && folder.coverUrl!.isNotEmpty
-                      ? Image.network(
-                          folder.coverUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(
-                            Icons.folder_outlined,
-                            size: 18,
-                            color: AppTheme.getText(context),
-                          ),
-                        )
-                      : Icon(
-                          Icons.folder_outlined,
-                          size: 18,
-                          color: AppTheme.getText(context),
-                        ),
+                  child: AppCoverImage(
+                    url: folder.coverUrl,
+                    width: 36,
+                    height: 36,
+                    borderRadius: AppTheme.radiusSm,
+                    placeholderIcon: Icons.folder_outlined,
+                    iconSize: 18,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -625,15 +620,13 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                      ? Image.network(
-                          song.coverUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(Icons.music_note,
-                              color: AppTheme.getTextMuted(context), size: 16),
-                        )
-                      : Icon(Icons.music_note,
-                          color: AppTheme.getTextMuted(context), size: 16),
+                  child: AppCoverImage(
+                    url: song.coverUrl,
+                    width: 36,
+                    height: 36,
+                    borderRadius: AppTheme.radiusSm,
+                    iconSize: 16,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(

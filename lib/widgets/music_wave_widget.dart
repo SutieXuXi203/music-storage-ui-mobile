@@ -169,15 +169,17 @@ class _MusicWaveWidgetState extends State<MusicWaveWidget>
             ? AppTheme.terminalGreen
             : Colors.white);
 
-    return CustomPaint(
-      size: Size(double.infinity, widget.height),
-      painter: _BeatWavePainter(
-        heights: _currentHeights,
-        peakHeights: _peakHeights,
-        timeSec: _internalTimeSec,
-        isPlaying: widget.isPlaying,
-        waveType: waveType,
-        color: waveColor,
+    return RepaintBoundary(
+      child: CustomPaint(
+        size: Size(double.infinity, widget.height),
+        painter: _BeatWavePainter(
+          heights: _currentHeights,
+          peakHeights: _peakHeights,
+          timeSec: _internalTimeSec,
+          isPlaying: widget.isPlaying,
+          waveType: waveType,
+          color: waveColor,
+        ),
       ),
     );
   }

@@ -76,7 +76,6 @@ class AudioPlayerService extends ChangeNotifier {
       notifyListeners();
     });
 
-    _player.positionStream.listen((_) => notifyListeners());
     _player.durationStream.listen((_) => notifyListeners());
   }
 

@@ -42,6 +42,8 @@ class _SearchTabState extends State<SearchTab> {
       ),
       body: SafeArea(
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
           children: [
             Container(
@@ -64,7 +66,7 @@ class _SearchTabState extends State<SearchTab> {
                   prefixIcon: Icon(Icons.search,
                       size: 18, color: AppTheme.getTextMuted(context)),
                   suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
+                      ? BouncingIconButton(
                           padding: EdgeInsets.zero,
                           icon: Icon(Icons.close,
                               size: 16,
@@ -152,15 +154,13 @@ class _SearchTabState extends State<SearchTab> {
                   Border.all(color: AppTheme.getBorder(context), width: 0.8),
             ),
             clipBehavior: Clip.antiAlias,
-            child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                ? Image.network(
-                    song.coverUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Icon(Icons.music_note,
-                        color: AppTheme.getTextMuted(context), size: 16),
-                  )
-                : Icon(Icons.music_note,
-                    color: AppTheme.getTextMuted(context), size: 16),
+            child: AppCoverImage(
+              url: song.coverUrl,
+              width: 36,
+              height: 36,
+              borderRadius: AppTheme.radiusSm,
+              iconSize: 16,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -202,7 +202,7 @@ class _SearchTabState extends State<SearchTab> {
               ],
             ),
           ),
-          GestureDetector(
+          BouncingWidget(
             onTap: () {
               final songProv =
                   Provider.of<SongProvider>(context, listen: false);

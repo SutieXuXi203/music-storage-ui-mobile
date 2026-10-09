@@ -75,82 +75,87 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: audioPlayerService,
-      builder: (context, _) {
-        final hasActiveSong = audioPlayerService.currentSong != null;
-        final surfaceColor = AppTheme.getSurface(context);
-        final borderColor = AppTheme.getBorder(context);
+    final surfaceColor = AppTheme.getSurface(context);
+    final borderColor = AppTheme.getBorder(context);
 
-        return Scaffold(
-          backgroundColor: AppTheme.getBg(context),
-          extendBody: true,
-          body: Stack(
-            children: List.generate(_tabs.length, (index) {
-              final isSelected = _currentIndex == index;
-              return IgnorePointer(
-                ignoring: !isSelected,
-                child: AnimatedOpacity(
-                  opacity: isSelected ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  child: _tabs[index],
-                ),
+    return Scaffold(
+      backgroundColor: AppTheme.getBg(context),
+      extendBody: true,
+      body: Stack(
+        children: List.generate(_tabs.length, (index) {
+          final isSelected = _currentIndex == index;
+          return IgnorePointer(
+            ignoring: !isSelected,
+            child: AnimatedOpacity(
+              opacity: isSelected ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              child: _tabs[index],
+            ),
+          );
+        }),
+      ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const RepaintBoundary(child: TechDownloadHud()),
+          ListenableBuilder(
+            listenable: audioPlayerService,
+            builder: (context, _) {
+              if (audioPlayerService.currentSong == null) {
+                return const SizedBox.shrink();
+              }
+              return RepaintBoundary(
+                child: MiniPlayerWidget(playerService: audioPlayerService),
               );
-            }),
+            },
           ),
-          bottomNavigationBar: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const TechDownloadHud(),
-              if (hasActiveSong)
-                MiniPlayerWidget(playerService: audioPlayerService),
-              ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          surfaceColor.withValues(alpha: 0.45),
-                          surfaceColor.withValues(alpha: 0.80),
-                          surfaceColor.withValues(alpha: 0.98),
-                        ],
-                        stops: const [0.0, 0.45, 1.0],
-                      ),
-                      border: Border(
-                        top: BorderSide(
-                          color: borderColor.withValues(alpha: 0.6),
-                          width: 0.8,
-                        ),
+          RepaintBoundary(
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        surfaceColor.withValues(alpha: 0.45),
+                        surfaceColor.withValues(alpha: 0.80),
+                        surfaceColor.withValues(alpha: 0.98),
+                      ],
+                      stops: const [0.0, 0.45, 1.0],
+                    ),
+                    border: Border(
+                      top: BorderSide(
+                        color: borderColor.withValues(alpha: 0.6),
+                        width: 0.8,
                       ),
                     ),
-                    child: SafeArea(
-                      top: false,
-                      child: SizedBox(
-                        height: 52,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildNavItem(
-                                0, Icons.home_outlined, Icons.home, 'Home'),
-                            _buildNavItem(1, Icons.library_music_outlined,
-                                Icons.library_music, 'Library'),
-                            _buildNavItem(2, Icons.search_outlined,
-                                Icons.search, 'Search'),
-                          ],
-                        ),
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: SizedBox(
+                      height: 52,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildNavItem(
+                              0, Icons.home_outlined, Icons.home, 'Home'),
+                          _buildNavItem(1, Icons.library_music_outlined,
+                              Icons.library_music, 'Library'),
+                          _buildNavItem(2, Icons.search_outlined,
+                              Icons.search, 'Search'),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -161,10 +166,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final inactiveColor = AppTheme.getTextMuted(context);
 
     return Expanded(
-      child: InkWell(
+      child: BouncingWidget(
         onTap: () => _onTabTapped(index),
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
+        scaleFactor: 0.90,
         child: SizedBox(
           height: 52,
           child: Column(

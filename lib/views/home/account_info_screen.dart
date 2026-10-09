@@ -302,7 +302,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
-        leading: IconButton(
+        leading: BouncingIconButton(
           icon: Icon(Icons.arrow_back,
               color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),
@@ -316,7 +316,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
           ),
         ),
         actions: [
-          IconButton(
+          BouncingIconButton(
             tooltip: 'Làm mới',
             icon: _isRefreshing
                 ? SizedBox(
@@ -331,7 +331,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     color: AppTheme.getText(context), size: 20),
             onPressed: _isRefreshing ? null : _handleRefresh,
           ),
-          IconButton(
+          BouncingIconButton(
             tooltip: 'Chỉnh sửa',
             icon: Icon(Icons.edit_outlined,
                 color: AppTheme.getText(context), size: 20),

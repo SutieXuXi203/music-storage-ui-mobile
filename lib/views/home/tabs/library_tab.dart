@@ -225,9 +225,8 @@ class _LibraryTabState extends State<LibraryTab> {
                         fontWeight: FontWeight.w700,
                       ),
                       suffixIcon: urlController.text.isNotEmpty
-                          ? IconButton(
+                          ? BouncingIconButton(
                               icon: const Icon(Icons.close, size: 16),
-                              splashRadius: 16,
                               tooltip: 'Clear',
                               color: AppTheme.getTextMuted(context),
                               onPressed: () {
@@ -827,15 +826,15 @@ class _LibraryTabState extends State<LibraryTab> {
         ),
         actions: [
           if (_selectedCategory == 'Thư mục')
-            IconButton(
+            BouncingIconButton(
               icon: Icon(Icons.create_new_folder_outlined,
-                  color: AppTheme.getText(context), size: 22),
+                  color: AppTheme.getText(context), size: 21),
               tooltip: 'Tạo thư mục mới',
               onPressed: _showCreateFolderDialog,
             )
           else
-            IconButton(
-              icon: Icon(Icons.add, color: AppTheme.getText(context), size: 22),
+            BouncingIconButton(
+              icon: Icon(Icons.add, color: AppTheme.getText(context), size: 21),
               tooltip: 'Thêm từ YouTube',
               onPressed: _showAddSongDialog,
             ),
@@ -1013,6 +1012,8 @@ class _LibraryTabState extends State<LibraryTab> {
     }
 
     return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics()),
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
       itemCount: folders.length,
       separatorBuilder: (_, __) => const SizedBox(height: 6),
@@ -1033,32 +1034,13 @@ class _LibraryTabState extends State<LibraryTab> {
               onTap: () => _showChangeCoverDialog(context, folder),
               child: Stack(
                 children: [
-                  Container(
+                  AppCoverImage(
+                    url: folder.coverUrl,
                     width: 44,
                     height: 44,
-                    decoration: BoxDecoration(
-                      color: AppTheme.getSurfaceElevated(context),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: Border.all(
-                          color: AppTheme.getBorder(context), width: 0.8),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child:
-                        folder.coverUrl != null && folder.coverUrl!.isNotEmpty
-                            ? Image.network(
-                                folder.coverUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Icon(
-                                  Icons.folder_outlined,
-                                  color: AppTheme.getText(context),
-                                  size: 22,
-                                ),
-                              )
-                            : Icon(
-                                Icons.folder_outlined,
-                                color: AppTheme.getText(context),
-                                size: 22,
-                              ),
+                    borderRadius: AppTheme.radiusSm,
+                    placeholderIcon: Icons.folder_outlined,
+                    iconSize: 22,
                   ),
                   Positioned(
                     bottom: 0,
@@ -1197,6 +1179,8 @@ class _LibraryTabState extends State<LibraryTab> {
     }
 
     return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics()),
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
       itemCount: songs.length,
       separatorBuilder: (_, __) => const SizedBox(height: 6),

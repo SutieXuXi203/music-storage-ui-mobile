@@ -33,7 +33,7 @@ class _QueueScreenState extends State<QueueScreen> {
           appBar: AppBar(
             backgroundColor: AppTheme.getBg(context),
             elevation: 0,
-            leading: IconButton(
+            leading: BouncingIconButton(
               icon: Icon(Icons.arrow_back,
                   color: AppTheme.getText(context), size: 20),
               onPressed: () => Navigator.pop(context),
@@ -41,13 +41,13 @@ class _QueueScreenState extends State<QueueScreen> {
             title: Text(
               'Hàng đợi',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.getText(context),
               ),
             ),
             actions: [
-              IconButton(
+              BouncingIconButton(
                 icon: Icon(Icons.more_horiz,
                     color: AppTheme.getText(context), size: 20),
                 onPressed: () {},
@@ -89,7 +89,7 @@ class _QueueScreenState extends State<QueueScreen> {
                           color: AppTheme.getTextSecondary(context),
                         ),
                       ),
-                      GestureDetector(
+                      BouncingWidget(
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -131,6 +131,8 @@ class _QueueScreenState extends State<QueueScreen> {
                           ),
                         )
                       : ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(
+                              parent: BouncingScrollPhysics()),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 4),
                           itemCount: playlist.length,
@@ -188,21 +190,12 @@ class _QueueScreenState extends State<QueueScreen> {
                                           width: 0.8),
                                     ),
                                     clipBehavior: Clip.antiAlias,
-                                    child: song.coverUrl != null &&
-                                            song.coverUrl!.isNotEmpty
-                                        ? Image.network(
-                                            song.coverUrl!,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Icon(
-                                                Icons.music_note,
-                                                color: AppTheme.getTextMuted(
-                                                    context),
-                                                size: 16),
-                                          )
-                                        : Icon(Icons.music_note,
-                                            color:
-                                                AppTheme.getTextMuted(context),
-                                            size: 16),
+                                    child: AppCoverImage(
+                                      url: song.coverUrl,
+                                      width: 36,
+                                      height: 36,
+                                      iconSize: 16,
+                                    ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
@@ -249,9 +242,12 @@ class _QueueScreenState extends State<QueueScreen> {
                                       ],
                                     ),
                                   ),
-                                  Icon(Icons.more_vert,
-                                      size: 18,
-                                      color: AppTheme.getTextMuted(context)),
+                                  BouncingIconButton(
+                                    icon: Icon(Icons.more_vert,
+                                        size: 18,
+                                        color: AppTheme.getTextMuted(context)),
+                                    onPressed: () {},
+                                  ),
                                 ],
                               ),
                             );
@@ -369,7 +365,7 @@ class _QueueScreenState extends State<QueueScreen> {
     final activeBg = AppTheme.getAction(context);
     final activeText = AppTheme.getActionText(context);
 
-    return GestureDetector(
+    return BouncingWidget(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),

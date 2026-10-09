@@ -289,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   color: AppTheme.getTextSecondary(context)),
                               prefixIconConstraints: const BoxConstraints(
                                   minWidth: 42, minHeight: 44),
-                              suffixIcon: IconButton(
+                              suffixIcon: BouncingIconButton(
                                 padding: EdgeInsets.zero,
                                 icon: Icon(
                                   _obscurePassword

@@ -109,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
-        leading: IconButton(
+        leading: BouncingIconButton(
           icon: Icon(Icons.arrow_back,
               color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),
@@ -214,7 +214,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           hint: 'Mật khẩu (từ 6 ký tự, gồm cả chữ & số)',
                           icon: Icons.lock_outline,
                           obscureText: _obscurePassword,
-                          suffixIcon: IconButton(
+                          suffixIcon: BouncingIconButton(
                             padding: EdgeInsets.zero,
                             icon: Icon(
                               _obscurePassword

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+export '../../widgets/bouncing_widget.dart';
+export '../../widgets/app_cover_image.dart';
 
 class AppTheme {
   static const double space4 = 4.0;
@@ -54,6 +56,9 @@ class AppTheme {
   static const Color textMuted = darkTextMuted;
   static const Color accentGreen = Color(0xFF22C55E);
   static const Color terminalGreen = Color(0xFF22C55E);
+  static const Color pixelGreen = Color(0xFF22C55E);
+  static const Color pixelCyan = Color(0xFF00E5FF);
+  static const Color pixelAmber = Color(0xFFFFB800);
   static const Color error = darkDanger;
 
   static bool isDark(BuildContext context) =>
@@ -94,6 +99,20 @@ class AppTheme {
 
   static Color getDanger(BuildContext context) =>
       isDark(context) ? darkDanger : lightDanger;
+
+  static TextStyle pixelStyle({
+    double fontSize = 11,
+    FontWeight fontWeight = FontWeight.w400,
+    Color? color,
+    double letterSpacing = 0.5,
+  }) {
+    return monoStyle(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+    );
+  }
 
   static TextStyle monoStyle({
     double fontSize = 11,
@@ -192,6 +211,24 @@ class AppTheme {
               ),
             ]
           : null,
+    );
+  }
+
+  static BoxDecoration pixelBox(
+    BuildContext context, {
+    Color? color,
+    BorderRadius? borderRadius,
+    double borderWidth = 1.0,
+    Color? borderColor,
+    bool hasHardShadow = true,
+  }) {
+    return cardBox(
+      context,
+      color: color,
+      borderRadius: borderRadius,
+      borderWidth: borderWidth,
+      borderColor: borderColor,
+      hasShadow: false,
     );
   }
 

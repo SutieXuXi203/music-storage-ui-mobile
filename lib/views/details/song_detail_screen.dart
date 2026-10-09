@@ -21,7 +21,7 @@ class SongDetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
-        leading: IconButton(
+        leading: BouncingIconButton(
           icon: Icon(Icons.arrow_back,
               color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),
@@ -29,6 +29,8 @@ class SongDetailScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -39,20 +41,19 @@ class SongDetailScreen extends StatelessWidget {
                   height: 180,
                   decoration: BoxDecoration(
                     color: AppTheme.getSurfaceSubtle(context),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.radiusMd),
                     border: Border.all(
                         color: AppTheme.getBorder(context), width: 1.0),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                      ? Image.network(
-                          song.coverUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(Icons.music_note,
-                              size: 48, color: AppTheme.getTextMuted(context)),
-                        )
-                      : Icon(Icons.music_note,
-                          size: 48, color: AppTheme.getTextMuted(context)),
+                  child: AppCoverImage(
+                    url: song.coverUrl,
+                    width: 180,
+                    height: 180,
+                    borderRadius: AppTheme.radiusMd,
+                    iconSize: 48,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -240,7 +241,7 @@ class SongDetailScreen extends StatelessWidget {
 
   Widget _buildPillAction(BuildContext context,
       {required IconData icon, required String label}) {
-    return GestureDetector(
+    return BouncingWidget(
       onTap: () {},
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

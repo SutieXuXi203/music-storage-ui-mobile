@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/audio_player_service.dart';
 import '../core/theme/app_theme.dart';
 import '../views/player/now_playing_screen.dart';
+import 'tech_playback_controls.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   final AudioPlayerService playerService;
@@ -111,22 +112,13 @@ class MiniPlayerWidget extends StatelessWidget {
                                 ),
                               ),
                               clipBehavior: Clip.antiAlias,
-                              child: (song.coverUrl != null &&
-                                      song.coverUrl!.isNotEmpty)
-                                  ? Image.network(
-                                      song.coverUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Icon(
-                                        Icons.music_note,
-                                        color: AppTheme.getTextMuted(context),
-                                        size: 18,
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.music_note,
-                                      color: AppTheme.getTextMuted(context),
-                                      size: 18,
-                                    ),
+                              child: AppCoverImage(
+                                url: song.coverUrl,
+                                width: 36,
+                                height: 36,
+                                borderRadius: AppTheme.radiusSm,
+                                iconSize: 18,
+                              ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -157,16 +149,10 @@ class MiniPlayerWidget extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(
-                                  minWidth: 34, minHeight: 34),
-                              icon: Icon(
-                                isPlaying ? Icons.pause : Icons.play_arrow,
-                                color: AppTheme.getText(context),
-                                size: 22,
-                              ),
-                              onPressed: () {
+                            TechPlayCoreButton(
+                              isPlaying: isPlaying,
+                              size: 34,
+                              onTap: () {
                                 if (isPlaying) {
                                   playerService.pause();
                                 } else {

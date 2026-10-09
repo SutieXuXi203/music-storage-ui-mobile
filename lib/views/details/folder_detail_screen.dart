@@ -8,6 +8,8 @@ import '../../providers/song_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/audio_player_service.dart';
 import 'song_detail_screen.dart';
+import '../player/now_playing_screen.dart';
+import '../../widgets/mini_player_widget.dart';
 
 class FolderDetailScreen extends StatefulWidget {
   final String folderId;
@@ -24,6 +26,30 @@ class FolderDetailScreen extends StatefulWidget {
 }
 
 class _FolderDetailScreenState extends State<FolderDetailScreen> {
+  void _openNowPlaying(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black.withValues(alpha: 0.6),
+        transitionDuration: const Duration(milliseconds: 260),
+        reverseTransitionDuration: const Duration(milliseconds: 220),
+        pageBuilder: (context, anim, secAnim) =>
+            NowPlayingScreen(playerService: audioPlayerService),
+        transitionsBuilder: (context, anim, secAnim, child) {
+          final curved =
+              CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1.0),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -483,7 +509,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                             letterSpacing: 0.5,
                           ),
                         ),
-                        IconButton(
+                        BouncingIconButton(
                           icon: Icon(Icons.close,
                               size: 20,
                               color: AppTheme.getTextSecondary(context)),
@@ -553,23 +579,12 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                                               AppTheme.radiusSm),
                                         ),
                                         clipBehavior: Clip.antiAlias,
-                                        child: song.coverUrl != null &&
-                                                song.coverUrl!.isNotEmpty
-                                            ? Image.network(
-                                                song.coverUrl!,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) =>
-                                                    Icon(
-                                                  Icons.music_note,
-                                                  color: AppTheme.getTextMuted(
-                                                      context),
-                                                  size: 16,
-                                                ),
-                                              )
-                                            : Icon(Icons.music_note,
-                                                color: AppTheme.getTextMuted(
-                                                    context),
-                                                size: 16),
+                                        child: AppCoverImage(
+                                          url: song.coverUrl,
+                                          width: 38,
+                                          height: 38,
+                                          iconSize: 16,
+                                        ),
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
@@ -714,17 +729,12 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                             color: AppTheme.getBorder(context), width: 0.8),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: song.coverUrl != null && song.coverUrl!.isNotEmpty
-                          ? Image.network(
-                              song.coverUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(
-                                  Icons.music_note,
-                                  color: AppTheme.getTextMuted(context),
-                                  size: 18),
-                            )
-                          : Icon(Icons.music_note,
-                              color: AppTheme.getTextMuted(context), size: 18),
+                      child: AppCoverImage(
+                        url: song.coverUrl,
+                        width: 40,
+                        height: 40,
+                        iconSize: 18,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -771,6 +781,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                     final idx = songs.indexWhere((s) => s.id == song.id);
                     audioPlayerService.setPlaylist(songs,
                         initialIndex: idx != -1 ? idx : 0);
+                    _openNowPlaying(context);
                   },
                 ),
                 ListTile(
@@ -977,7 +988,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.getBg(context),
         elevation: 0,
-        leading: IconButton(
+        leading: BouncingIconButton(
           icon: Icon(Icons.arrow_back,
               color: AppTheme.getText(context), size: 20),
           onPressed: () => Navigator.pop(context),
@@ -1055,6 +1066,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1075,22 +1088,14 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                               color: AppTheme.getBorder(context), width: 1.0),
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: folder.coverUrl != null &&
-                                folder.coverUrl!.isNotEmpty
-                            ? Image.network(
-                                folder.coverUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Icon(
-                                  Icons.folder_outlined,
-                                  size: 56,
-                                  color: AppTheme.getTextMuted(context),
-                                ),
-                              )
-                            : Icon(
-                                Icons.folder_outlined,
-                                size: 56,
-                                color: AppTheme.getTextMuted(context),
-                              ),
+                        child: AppCoverImage(
+                          url: folder.coverUrl,
+                          width: 160,
+                          height: 160,
+                          borderRadius: AppTheme.radiusMd,
+                          placeholderIcon: Icons.folder_outlined,
+                          iconSize: 56,
+                        ),
                       ),
                       Positioned(
                         bottom: 6,
@@ -1170,6 +1175,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                         : () {
                             audioPlayerService.setPlaylist(songs,
                                 initialIndex: 0);
+                            _openNowPlaying(context);
                           },
                   ),
                   const SizedBox(width: 10),
@@ -1267,19 +1273,12 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                                 color: AppTheme.getBorder(context), width: 0.8),
                           ),
                           clipBehavior: Clip.antiAlias,
-                          child:
-                              song.coverUrl != null && song.coverUrl!.isNotEmpty
-                                  ? Image.network(
-                                      song.coverUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Icon(
-                                          Icons.music_note,
-                                          color: AppTheme.getTextMuted(context),
-                                          size: 18),
-                                    )
-                                  : Icon(Icons.music_note,
-                                      color: AppTheme.getTextMuted(context),
-                                      size: 18),
+                          child: AppCoverImage(
+                            url: song.coverUrl,
+                            width: 38,
+                            height: 38,
+                            iconSize: 18,
+                          ),
                         ),
                         title: Text(
                           song.title,
@@ -1299,7 +1298,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                             color: AppTheme.getTextSecondary(context),
                           ),
                         ),
-                        trailing: IconButton(
+                        trailing: BouncingIconButton(
                           icon: Icon(Icons.more_vert,
                               size: 18,
                               color: AppTheme.getTextSecondary(context)),
@@ -1308,6 +1307,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                         onTap: () {
                           audioPlayerService.setPlaylist(songs,
                               initialIndex: index);
+                          _openNowPlaying(context);
                         },
                       ),
                     );
@@ -1318,6 +1318,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: MiniPlayerWidget(playerService: audioPlayerService),
     );
   }
 }
