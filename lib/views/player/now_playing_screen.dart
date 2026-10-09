@@ -148,7 +148,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
             backgroundColor: AppTheme.getBg(context),
             body: Center(
               child: Text(
-                'NO_TRACK_LOADED',
+                'CHƯA CÓ BÀI HÁT',
                 style:
                     AppTheme.monoStyle(color: AppTheme.getTextMuted(context)),
               ),
@@ -178,7 +178,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
               ),
               centerTitle: true,
               title: Text(
-                'AUDIO_ENGINE_EXEC',
+                'ĐANG PHÁT',
                 style: AppTheme.monoStyle(
                   fontSize: 12,
                   letterSpacing: 1.2,

@@ -111,7 +111,7 @@ class SongDetailScreen extends StatelessWidget {
                                 size: 18,
                                 color: AppTheme.getActionText(context)),
                             const SizedBox(width: 4),
-                            Text('PLAY',
+                            Text('PHÁT',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 12.5,
@@ -145,7 +145,7 @@ class SongDetailScreen extends StatelessWidget {
                             Icon(Icons.shuffle,
                                 size: 16, color: AppTheme.getText(context)),
                             const SizedBox(width: 4),
-                            Text('SHUFFLE',
+                            Text('TRỘN BÀI',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12.5,
@@ -161,20 +161,20 @@ class SongDetailScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildPillAction(context, icon: Icons.add, label: 'Add'),
+                  _buildPillAction(context, icon: Icons.add, label: 'Thêm'),
                   _buildPillAction(context,
-                      icon: Icons.favorite_border, label: 'Favorite'),
+                      icon: Icons.favorite_border, label: 'Yêu thích'),
                   _buildPillAction(context,
-                      icon: Icons.download_outlined, label: 'Download'),
+                      icon: Icons.download_outlined, label: 'Tải về'),
                   _buildPillAction(context,
-                      icon: Icons.more_horiz, label: 'More'),
+                      icon: Icons.more_horiz, label: 'Khác'),
                 ],
               ),
               const SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Information',
+                  'Thông tin',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -191,15 +191,15 @@ class SongDetailScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildInfoRow(context, 'Format', song.format.toUpperCase(),
+                    _buildInfoRow(context, 'Định dạng', song.format.toUpperCase(),
                         isMono: true),
                     Divider(height: 1, color: AppTheme.getBorder(context)),
                     _buildInfoRow(
-                        context, 'Bitrate', song.bitrate.toUpperCase(),
+                        context, 'Tốc độ bit', song.bitrate.toUpperCase(),
                         isMono: true),
                     Divider(height: 1, color: AppTheme.getBorder(context)),
                     _buildInfoRow(
-                        context, 'Size', _formatFileSize(song.fileSize),
+                        context, 'Kích thước', _formatFileSize(song.fileSize),
                         isMono: true),
                   ],
                 ),
@@ -208,7 +208,7 @@ class SongDetailScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Storage',
+                  'Lưu trữ',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -225,9 +225,9 @@ class SongDetailScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildInfoRow(context, 'Provider', 'Google Drive'),
+                    _buildInfoRow(context, 'Nguồn lưu trữ', 'Google Drive'),
                     Divider(height: 1, color: AppTheme.getBorder(context)),
-                    _buildInfoRow(context, 'Status', 'Streaming ready'),
+                    _buildInfoRow(context, 'Trạng thái', 'Sẵn sàng phát'),
                   ],
                 ),
               ),

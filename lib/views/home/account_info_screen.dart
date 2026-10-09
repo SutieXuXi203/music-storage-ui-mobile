@@ -399,7 +399,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                             _buildTag(
                               context,
                               label:
-                                  'STATUS: ${isActive ? 'ACTIVE' : 'INACTIVE'}',
+                                  'TRẠNG THÁI: ${isActive ? 'HOẠT ĐỘNG' : 'KHÔNG HOẠT ĐỘNG'}',
                               isHighlighted: true,
                               textColor: isActive
                                   ? greenText
@@ -453,7 +453,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   context,
                   label: 'Họ và tên',
                   value: displayName,
-                  trailingBadge: 'EDIT',
+                  trailingBadge: 'SỬA',
                   onBadgeTap: _showEditProfileDialog,
                 ),
                 _buildDivider(context),
@@ -461,7 +461,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   context,
                   label: 'Email',
                   value: email,
-                  trailingBadge: 'VERIFIED',
+                  trailingBadge: 'ĐÃ XÁC THỰC',
                   badgeColor: greenBg,
                   badgeBorderColor: greenBorder,
                   badgeTextColor: greenText,

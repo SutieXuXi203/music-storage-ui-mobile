@@ -170,7 +170,7 @@ class _LibraryTabState extends State<LibraryTab> {
               children: [
                 Expanded(
                   child: Text(
-                    '[CMD://INGEST_YOUTUBE_STREAM]',
+                    '[LỆNH://TẢI_NHẠC_YOUTUBE]',
                     style: GoogleFonts.jetBrainsMono(
                       fontWeight: FontWeight.w700,
                       fontSize: 13.5,
@@ -189,7 +189,7 @@ class _LibraryTabState extends State<LibraryTab> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    '> TARGET: HTTPS://YOUTUBE_AUDIO_EXTRACTION',
+                    '> ĐÍCH: TRÍCH XUẤT ÂM THANH YOUTUBE',
                     style: GoogleFonts.jetBrainsMono(
                       color: AppTheme.getTextSecondary(context),
                       fontSize: 11,
@@ -227,7 +227,7 @@ class _LibraryTabState extends State<LibraryTab> {
                       suffixIcon: urlController.text.isNotEmpty
                           ? BouncingIconButton(
                               icon: const Icon(Icons.close, size: 16),
-                              tooltip: 'Clear',
+                              tooltip: 'Xóa',
                               color: AppTheme.getTextMuted(context),
                               onPressed: () {
                                 urlController.clear();
@@ -256,7 +256,7 @@ class _LibraryTabState extends State<LibraryTab> {
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
                 child: Text(
-                  '[CANCEL]',
+                  '[HỦY]',
                   style: GoogleFonts.jetBrainsMono(
                     color: AppTheme.getTextSecondary(context),
                     fontSize: 11.5,
@@ -274,7 +274,7 @@ class _LibraryTabState extends State<LibraryTab> {
                 ),
                 onPressed: submit,
                 child: Text(
-                  '[EXECUTE]',
+                  '[THỰC HIỆN]',
                   style: GoogleFonts.jetBrainsMono(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,

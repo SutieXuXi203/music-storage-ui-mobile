@@ -63,13 +63,13 @@ class _QueueScreenState extends State<QueueScreen> {
                   child: Row(
                     children: [
                       _buildPillTab(
-                        title: 'Up Next',
+                        title: 'Tiếp theo',
                         isSelected: _selectedTab == 0,
                         onTap: () => setState(() => _selectedTab = 0),
                       ),
                       const SizedBox(width: 8),
                       _buildPillTab(
-                        title: 'Playlist',
+                        title: 'Danh sách phát',
                         isSelected: _selectedTab == 1,
                         onTap: () => setState(() => _selectedTab = 1),
                       ),
@@ -83,7 +83,7 @@ class _QueueScreenState extends State<QueueScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${playlist.length} tracks · ${_calculateTotalDuration(playlist)}',
+                        '${playlist.length} bài hát · ${_calculateTotalDuration(playlist)}',
                         style: AppTheme.monoStyle(
                           fontSize: 11,
                           color: AppTheme.getTextSecondary(context),

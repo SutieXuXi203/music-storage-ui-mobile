@@ -136,11 +136,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'Chủ đề',
               currentValue: settingsProvider.themeMode,
               currentLabel: settingsProvider.themeMode == ThemeMode.dark
-                  ? 'Dark'
-                  : 'Light',
+                  ? 'Tối'
+                  : 'Sáng',
               items: const [
-                MapEntry(ThemeMode.dark, 'Dark'),
-                MapEntry(ThemeMode.light, 'Light'),
+                MapEntry(ThemeMode.dark, 'Tối'),
+                MapEntry(ThemeMode.light, 'Sáng'),
               ],
               onChanged: (mode) => settingsProvider.setThemeMode(mode),
             ),

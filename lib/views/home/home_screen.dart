@@ -141,11 +141,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           _buildNavItem(
-                              0, Icons.home_outlined, Icons.home, 'Home'),
+                              0, Icons.home_outlined, Icons.home, 'Trang chủ'),
                           _buildNavItem(1, Icons.library_music_outlined,
-                              Icons.library_music, 'Library'),
+                              Icons.library_music, 'Thư viện'),
                           _buildNavItem(2, Icons.search_outlined,
-                              Icons.search, 'Search'),
+                              Icons.search, 'Tìm kiếm'),
                         ],
                       ),
                     ),

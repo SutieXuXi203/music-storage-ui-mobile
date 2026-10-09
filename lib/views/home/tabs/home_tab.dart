@@ -192,7 +192,7 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            'v1.0 / ONLINE',
+                            'v1.0 / TRỰC TUYẾN',
                             style: AppTheme.monoStyle(
                               fontSize: 9.5,
                               color: AppTheme.getTextSecondary(context),
@@ -221,7 +221,7 @@ class _HomeTabState extends State<HomeTab> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                      'Hệ thống hoạt động bình thường // v1.0 ONLINE',
+                                      'Hệ thống hoạt động bình thường // v1.0 TRỰC TUYẾN',
                                       style: AppTheme.monoStyle(fontSize: 11)),
                                   duration: const Duration(seconds: 1),
                                   backgroundColor:
@@ -316,24 +316,6 @@ class _HomeTabState extends State<HomeTab> {
                 ],
               ),
               const SizedBox(height: 18),
-              _buildSectionHeader('Recently Played',
-                  onSeeAll: widget.onNavigateToLibrary),
-              const SizedBox(height: 8),
-              if (recentSongs.isEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Center(
-                    child: Text(
-                      'Chưa có bài hát nào gần đây',
-                      style: TextStyle(
-                          color: AppTheme.getTextMuted(context), fontSize: 12),
-                    ),
-                  ),
-                )
-              else
-                ...recentSongs
-                    .map((song) => _buildRecentSongTile(context, song)),
-              const SizedBox(height: 22),
               _buildSectionHeader('Thư mục',
                   onSeeAll: widget.onNavigateToLibrary),
               const SizedBox(height: 8),
@@ -366,6 +348,24 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ),
               ],
+              const SizedBox(height: 22),
+              _buildSectionHeader('Nghe gần đây',
+                  onSeeAll: widget.onNavigateToLibrary),
+              const SizedBox(height: 8),
+              if (recentSongs.isEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: Text(
+                      'Chưa có bài hát nào gần đây',
+                      style: TextStyle(
+                          color: AppTheme.getTextMuted(context), fontSize: 12),
+                    ),
+                  ),
+                )
+              else
+                ...recentSongs
+                    .map((song) => _buildRecentSongTile(context, song)),
               const SizedBox(height: 120),
             ],
           ),

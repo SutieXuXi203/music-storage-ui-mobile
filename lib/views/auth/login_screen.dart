@@ -245,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 fontSize: 13, color: AppTheme.getText(context)),
                             decoration: InputDecoration(
                               isDense: true,
-                              hintText: 'Username or email',
+                              hintText: 'Tên đăng nhập hoặc email',
                               hintStyle: TextStyle(
                                   color: AppTheme.getTextMuted(context),
                                   fontSize: 12.5),
@@ -280,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 fontSize: 13, color: AppTheme.getText(context)),
                             decoration: InputDecoration(
                               isDense: true,
-                              hintText: 'Password',
+                              hintText: 'Mật khẩu',
                               hintStyle: TextStyle(
                                   color: AppTheme.getTextMuted(context),
                                   fontSize: 12.5),
@@ -337,7 +337,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     ),
                                   )
                                 : Text(
-                                    '→ ENTER_SYSTEM',
+                                    '→ ĐĂNG NHẬP',
                                     style: AppTheme.monoStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
@@ -357,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen>
                             );
                           },
                           child: Text(
-                            '+ CREATE_NEW_ACCOUNT',
+                            '+ ĐĂNG KÝ TÀI KHOẢN MỚI',
                             style: AppTheme.monoStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
