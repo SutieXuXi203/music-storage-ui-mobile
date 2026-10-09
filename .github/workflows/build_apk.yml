@@ -77,20 +77,23 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.19
-          name: Meowsic App Release v1.0.19
+          tag_name: v1.0.20
+          name: Meowsic App Release v1.0.20
           body: |
-            ## Meowsic Music App Android Release v1.0.19
+            ## Meowsic Music App Android Release v1.0.20
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.19** (Build 20)
-            - **Đưa khu vực Thư mục lên trên cùng Trang chủ**:
-              - Khu vực thư mục bộ sưu tập được chuyển lên đầu tab Trang chủ (ngay dưới header chào mừng), giúp duyệt và mở các thư mục nhạc nhanh chóng và tiện lợi.
-            - **Việt hóa toàn diện 100% giao diện**:
-              - Toàn bộ giao diện từ các tab điều hướng, tiêu đề màn hình, menu thao tác bài hát, dialog xác nhận đến các thông báo hệ thống đều được bản địa hóa sang Tiếng Việt chuẩn mực và tự nhiên.
-            - **Nâng cấp thanh thông báo (SnackBar) công nghệ cao, độ tương phản sắc nét**:
-              - Khắc phục hoàn toàn lỗi thông báo cập nhật bị tối màu, chìm vào nền đen trong Dark Mode.
-              - Chữ hiển thị màu trắng rõ nét, tích hợp icon trạng thái công nghệ (`check_circle_outline_rounded` / cảnh báo đỏ) và khung viền nổi bật.
-              - Cơ chế tự hủy thông báo cũ tức thì khi xuất hiện thông báo mới, không gây trễ giao diện.
+            - Phiên bản: **v1.0.20** (Build 21)
+            - **Khắc phục triệt để lỗi ảnh bìa thumbnail bị co giãn / biến dạng tỷ lệ**:
+              - Tối ưu bộ giải mã ảnh theo tỷ lệ khung hình chuẩn xác, loại bỏ việc ép cưỡng bức khung hình thành vuông gây méo ảnh. Ảnh thumbnail của từng bài hát luôn hiển thị sắc nét, chuẩn tỷ lệ tự nhiên.
+            - **Tái cấu trúc hàng đợi & Tích hợp khung "Bài tiếp theo" trực tiếp vào trình phát**:
+              - Loại bỏ màn hình Hàng đợi riêng biệt, thay vào đó khi đang có bài hát phát mà thêm bài hát thứ 2 trở lên thì danh sách sẽ xuất hiện ngay trong khung **"Bài tiếp theo"** ở màn hình phát nhạc.
+              - Danh sách bài tiếp theo hiển thị thứ tự `= 01`, `= 02`, ảnh bìa, tiêu đề, thời lượng và nút xóa từng bài hoặc xóa tất cả.
+              - Thêm lựa chọn **"Phát tiếp theo"** vào menu 3 chấm của mỗi bài hát trên toàn ứng dụng.
+            - **Hiển thị "Nhóm đang phát" tại Trang Chủ**:
+              - Khi người dùng dừng hoặc tạm dừng nghe nhạc, nhóm phát hiện tại sẽ xuất hiện trực tiếp ở Trang Chủ với nhãn trạng thái trực quan, cho phép tiếp tục nghe lại ngay lập tức.
+            - **Kiểm soát phát nhạc trong nền & Hỏi ý kiến người dùng**:
+              - Tắt tự động phát nhạc khi rời ứng dụng / tắt màn hình; thay vào đó hiển thị hộp thoại hỏi người dùng có muốn phát nhạc trong nền không.
+              - Thêm công tắc cài đặt bật/tắt tính năng phát nhạc trong nền trong trang Cài đặt.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |
