@@ -77,20 +77,21 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.17
-          name: Meowsic App Release v1.0.17
+          tag_name: v1.0.18
+          name: Meowsic App Release v1.0.18
           body: |
-            ## Meowsic Music App Android Release v1.0.17
+            ## Meowsic Music App Android Release v1.0.18
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.17** (Build 18)
-            - **Khắc phục triệt để lỗi Connection Timeout (Lỗi kết nối máy chủ)**:
-              - Đảm bảo app luôn kết nối trực tiếp đến máy chủ Production Fly.io (`https://music-storage-backend.fly.dev/api`), loại bỏ hoàn toàn việc fallback nhầm sang IP `10.0.2.2`.
-              - Nâng timeout kết nối mạng lên 45 giây để máy chủ đám mây kịp phản hồi ngay cả khi dùng mạng 4G/di động.
-              - Cập nhật máy chủ Fly.io luôn duy trì ít nhất 1 máy ảo hoạt động liên tục (min_machines_running = 1) để phản hồi tức thì dưới 1 giây.
-            - **Recently Played chuẩn 5 bài nghe gần đây nhất (Cơ chế LRU)**:
-              - Danh sách hiển thị chính xác tối đa 5 bài nhạc được nghe gần đây.
-              - Khi nghe một bài nhạc mới, bài đó sẽ được đẩy lên đầu tiên (vị trí 1), bài nghe sớm nhất ở cuối danh sách sẽ tự động bị thay thế.
-            - **Chuyển tab Library sang bên trái tab Search**: Thanh điều hướng hiện theo thứ tự `[Home, Library, Search]`.
+            - Phiên bản: **v1.0.18** (Build 19)
+            - **Tối ưu hiệu năng 60–120fps siêu mượt mà**:
+              - Tích hợp bộ đệm nén ảnh thu nhỏ theo kích thước khung hình (`AppCoverImage`), giải phóng tối đa RAM và GPU khi cuộn danh sách bài hát lớn.
+              - Phân tách stream thời gian phát nhạc độc lập, triệt tiêu giật khung hình và hiện tượng re-render toàn màn hình khi đang phát nhạc.
+              - Cô lập render bằng `RepaintBoundary` cho Equalizer, sóng nhạc, mini-player và download HUD.
+              - Áp dụng vật lý cuộn nảy `BouncingScrollPhysics` trên toàn bộ danh sách và tab điều hướng.
+            - **Tinh chỉnh giao diện Minimalist Tech cao cấp**:
+              - Nút Play phát nhạc công nghệ với các đường viền vòng cung mượt mà bao quanh (loại bỏ các vạch gai nhô ra ngoài).
+              - Sóng nhạc và Equalizer liên tục mượt mà, hiển thị tinh gọn và thanh lịch.
+              - Khôi phục typography và hình khối bo góc tinh tế `4.0`, loại bỏ mọi chi tiết rườm rà.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |
