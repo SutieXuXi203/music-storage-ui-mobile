@@ -72,14 +72,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.14
-          name: Meowsic App Release v1.0.14
+          tag_name: v1.0.15
+          name: Meowsic App Release v1.0.15
           body: |
-            ## Meowsic Music App Android Release v1.0.14
+            ## Meowsic Music App Android Release v1.0.15
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.14** (Build 15)
+            - Phiên bản: **v1.0.15** (Build 16)
+            - **Chuyển tab Library sang bên trái tab Search**: Thanh điều hướng bên dưới hiện theo thứ tự `[Trang chủ (Home), Thư viện (Library), Tìm kiếm (Search)]`.
             - **Bỏ huy hiệu và ràng buộc Thư mục mặc định**: Tất cả thư mục đều tự do và bình đẳng, người dùng có toàn quyền đổi tên, đổi ảnh bìa hoặc xóa thư mục bất kỳ.
-            - **Đặt ảnh bìa tùy chỉnh cho thư mục**: Hỗ trợ chọn ảnh từ thư viện thiết bị hoặc nhập liên kết ảnh online trực tiếp (chạm vào ảnh bìa thư mục hoặc menu 3 chấm để đổi).
+            - **Đặt ảnh bìa tùy chỉnh cho thư mục**: Hỗ trợ chọn ảnh từ thư viện thiết bị hoặc nhập liên kết ảnh online trực tiếp.
             - **Đồng nhất bo tròn 4px toàn bộ giao diện**: Chuẩn hóa phong cách thiết kế phẳng tối giản, sắc sảo.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.

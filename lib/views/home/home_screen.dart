@@ -31,11 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _tabs = [
       HomeTab(
-        onNavigateToSearch: () => _onTabTapped(1),
-        onNavigateToLibrary: () => _onTabTapped(2),
+        onNavigateToSearch: () => _onTabTapped(2),
+        onNavigateToLibrary: () => _onTabTapped(1),
       ),
-      const SearchTab(),
       const LibraryTab(),
+      const SearchTab(),
     ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SongProvider>(context, listen: false).fetchSongs();
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (matched != null) {
         audioPlayerService.playSong(matched);
       } else {
-        _onTabTapped(2);
+        _onTabTapped(1);
       }
     });
   }
@@ -140,8 +140,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
-                            _buildNavItem(1, Icons.search_outlined, Icons.search, 'Search'),
-                            _buildNavItem(2, Icons.library_music_outlined, Icons.library_music, 'Library'),
+                            _buildNavItem(1, Icons.library_music_outlined, Icons.library_music, 'Library'),
+                            _buildNavItem(2, Icons.search_outlined, Icons.search, 'Search'),
                           ],
                         ),
                       ),
