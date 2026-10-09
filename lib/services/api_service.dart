@@ -195,7 +195,108 @@ class ApiService {
     }
   }
 
-  // --- PLAYLISTS & FOLDERS ---
+  // --- FOLDERS (Thư mục bộ sưu tập) ---
+  Future<List<Folder>> getFolders() async {
+    try {
+      _lastErrorMessage = null;
+      final response = await _dio.get(ApiConstants.folders);
+      final List list = response.data['data'] ?? [];
+      return list.map((item) => Folder.fromJson(item)).toList();
+    } catch (e) {
+      _extractError(e);
+      return [];
+    }
+  }
+
+  Future<Folder?> createFolder(String name) async {
+    try {
+      _lastErrorMessage = null;
+      final response = await _dio.post(
+        ApiConstants.folders,
+        data: {'name': name.trim()},
+      );
+      if (response.data['data'] != null) {
+        return Folder.fromJson(response.data['data']);
+      }
+      _lastErrorMessage = response.data['message'] ?? 'Không nhận được dữ liệu phản hồi';
+      return null;
+    } catch (e) {
+      _extractError(e);
+      return null;
+    }
+  }
+
+  Future<Folder?> getFolderDetails(String folderId) async {
+    try {
+      _lastErrorMessage = null;
+      final response = await _dio.get('${ApiConstants.folders}/$folderId');
+      if (response.data['data'] != null) {
+        return Folder.fromJson(response.data['data']);
+      }
+      return null;
+    } catch (e) {
+      _extractError(e);
+      return null;
+    }
+  }
+
+  Future<bool> renameFolder(String folderId, String newName) async {
+    try {
+      _lastErrorMessage = null;
+      final response = await _dio.put(
+        '${ApiConstants.folders}/$folderId',
+        data: {'name': newName.trim()},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      _extractError(e);
+      return false;
+    }
+  }
+
+  Future<bool> deleteFolder(String folderId) async {
+    try {
+      _lastErrorMessage = null;
+      final response = await _dio.delete('${ApiConstants.folders}/$folderId');
+      return response.statusCode == 200;
+    } catch (e) {
+      _extractError(e);
+      return false;
+    }
+  }
+
+  Future<bool> addSongToFolder(String folderId, String songId, {String? fromFolderId}) async {
+    try {
+      _lastErrorMessage = null;
+      final data = <String, dynamic>{
+        'song_id': songId,
+      };
+      if (fromFolderId != null && fromFolderId.isNotEmpty) {
+        data['from_folder_id'] = fromFolderId;
+      }
+      final response = await _dio.post(
+        '${ApiConstants.folders}/$folderId/songs',
+        data: data,
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      _extractError(e);
+      return false;
+    }
+  }
+
+  Future<bool> removeSongFromFolder(String folderId, String songId) async {
+    try {
+      _lastErrorMessage = null;
+      final response = await _dio.delete('${ApiConstants.folders}/$folderId/songs/$songId');
+      return response.statusCode == 200;
+    } catch (e) {
+      _extractError(e);
+      return false;
+    }
+  }
+
+  // --- PLAYLISTS (Danh sách phát độc lập) ---
   Future<List<Playlist>> getPlaylists() async {
     try {
       _lastErrorMessage = null;
@@ -204,16 +305,9 @@ class ApiService {
       return list.map((item) => Playlist.fromJson(item)).toList();
     } catch (e) {
       _extractError(e);
-      try {
-        final response = await _dio.get(ApiConstants.folders);
-        final List list = response.data['data'] ?? [];
-        return list.map((item) => Playlist.fromJson(item)).toList();
-      } catch (_) {}
       return [];
     }
   }
-
-  Future<List<Playlist>> getFolders() => getPlaylists();
 
   Future<Playlist?> createPlaylist(String name) async {
     try {
@@ -229,21 +323,9 @@ class ApiService {
       return null;
     } catch (e) {
       _extractError(e);
-      try {
-        final response = await _dio.post(
-          ApiConstants.folders,
-          data: {'name': name.trim()},
-        );
-        if (response.data['data'] != null) {
-          _lastErrorMessage = null;
-          return Playlist.fromJson(response.data['data']);
-        }
-      } catch (_) {}
       return null;
     }
   }
-
-  Future<Playlist?> createFolder(String name) => createPlaylist(name);
 
   Future<Playlist?> getPlaylistDetails(String playlistId) async {
     try {
@@ -255,18 +337,9 @@ class ApiService {
       return null;
     } catch (e) {
       _extractError(e);
-      try {
-        final response = await _dio.get('${ApiConstants.folders}/$playlistId');
-        if (response.data['data'] != null) {
-          _lastErrorMessage = null;
-          return Playlist.fromJson(response.data['data']);
-        }
-      } catch (_) {}
       return null;
     }
   }
-
-  Future<Playlist?> getFolderDetails(String folderId) => getPlaylistDetails(folderId);
 
   Future<bool> renamePlaylist(String playlistId, String newName) async {
     try {
@@ -278,18 +351,9 @@ class ApiService {
       return response.statusCode == 200;
     } catch (e) {
       _extractError(e);
-      try {
-        final response = await _dio.put(
-          '${ApiConstants.folders}/$playlistId',
-          data: {'name': newName.trim()},
-        );
-        return response.statusCode == 200;
-      } catch (_) {}
       return false;
     }
   }
-
-  Future<bool> renameFolder(String folderId, String newName) => renamePlaylist(folderId, newName);
 
   Future<bool> deletePlaylist(String playlistId) async {
     try {
@@ -298,52 +362,23 @@ class ApiService {
       return response.statusCode == 200;
     } catch (e) {
       _extractError(e);
-      try {
-        final response = await _dio.delete('${ApiConstants.folders}/$playlistId');
-        return response.statusCode == 200;
-      } catch (_) {}
       return false;
     }
   }
 
-  Future<bool> deleteFolder(String folderId) => deletePlaylist(folderId);
-
-  Future<bool> addSongToPlaylist(String playlistId, String songId, {String? fromPlaylistId}) async {
+  Future<bool> addSongToPlaylist(String playlistId, String songId) async {
     try {
       _lastErrorMessage = null;
-      final data = <String, dynamic>{
-        'song_id': songId,
-      };
-      if (fromPlaylistId != null && fromPlaylistId.isNotEmpty) {
-        data['from_playlist_id'] = fromPlaylistId;
-        data['from_folder_id'] = fromPlaylistId;
-      }
       final response = await _dio.post(
         '${ApiConstants.playlists}/$playlistId/songs',
-        data: data,
+        data: {'song_id': songId},
       );
       return response.statusCode == 200;
     } catch (e) {
       _extractError(e);
-      try {
-        final data = <String, dynamic>{
-          'song_id': songId,
-        };
-        if (fromPlaylistId != null && fromPlaylistId.isNotEmpty) {
-          data['from_folder_id'] = fromPlaylistId;
-        }
-        final response = await _dio.post(
-          '${ApiConstants.folders}/$playlistId/songs',
-          data: data,
-        );
-        return response.statusCode == 200;
-      } catch (_) {}
       return false;
     }
   }
-
-  Future<bool> addSongToFolder(String folderId, String songId, {String? fromFolderId}) =>
-      addSongToPlaylist(folderId, songId, fromPlaylistId: fromFolderId);
 
   Future<bool> removeSongFromPlaylist(String playlistId, String songId) async {
     try {
@@ -352,16 +387,9 @@ class ApiService {
       return response.statusCode == 200;
     } catch (e) {
       _extractError(e);
-      try {
-        final response = await _dio.delete('${ApiConstants.folders}/$playlistId/songs/$songId');
-        return response.statusCode == 200;
-      } catch (_) {}
       return false;
     }
   }
-
-  Future<bool> removeSongFromFolder(String folderId, String songId) =>
-      removeSongFromPlaylist(folderId, songId);
 
 }
 

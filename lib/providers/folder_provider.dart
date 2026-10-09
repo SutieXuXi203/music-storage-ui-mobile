@@ -40,7 +40,7 @@ class FolderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _folders = await apiService.getPlaylists();
+      _folders = await apiService.getFolders();
     } catch (e) {
       _errorMessage = 'Không thể tải danh sách thư mục: ${apiService.lastErrorMessage ?? e}';
     } finally {
@@ -51,10 +51,10 @@ class FolderProvider extends ChangeNotifier {
 
   Future<void> fetchPlaylists() => fetchFolders();
 
-  Future<Playlist?> createFolder(String name) async {
+  Future<Folder?> createFolder(String name) async {
     _errorMessage = null;
     try {
-      final newFolder = await apiService.createPlaylist(name);
+      final newFolder = await apiService.createFolder(name);
       if (newFolder != null) {
         _folders.insert(0, newFolder);
         notifyListeners();
