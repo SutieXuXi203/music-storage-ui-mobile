@@ -77,21 +77,20 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.18
-          name: Meowsic App Release v1.0.18
+          tag_name: v1.0.19
+          name: Meowsic App Release v1.0.19
           body: |
-            ## Meowsic Music App Android Release v1.0.18
+            ## Meowsic Music App Android Release v1.0.19
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.18** (Build 19)
-            - **Tối ưu hiệu năng 60–120fps siêu mượt mà**:
-              - Tích hợp bộ đệm nén ảnh thu nhỏ theo kích thước khung hình (`AppCoverImage`), giải phóng tối đa RAM và GPU khi cuộn danh sách bài hát lớn.
-              - Phân tách stream thời gian phát nhạc độc lập, triệt tiêu giật khung hình và hiện tượng re-render toàn màn hình khi đang phát nhạc.
-              - Cô lập render bằng `RepaintBoundary` cho Equalizer, sóng nhạc, mini-player và download HUD.
-              - Áp dụng vật lý cuộn nảy `BouncingScrollPhysics` trên toàn bộ danh sách và tab điều hướng.
-            - **Tinh chỉnh giao diện Minimalist Tech cao cấp**:
-              - Nút Play phát nhạc công nghệ với các đường viền vòng cung mượt mà bao quanh (loại bỏ các vạch gai nhô ra ngoài).
-              - Sóng nhạc và Equalizer liên tục mượt mà, hiển thị tinh gọn và thanh lịch.
-              - Khôi phục typography và hình khối bo góc tinh tế `4.0`, loại bỏ mọi chi tiết rườm rà.
+            - Phiên bản: **v1.0.19** (Build 20)
+            - **Đưa khu vực Thư mục lên trên cùng Trang chủ**:
+              - Khu vực thư mục bộ sưu tập được chuyển lên đầu tab Trang chủ (ngay dưới header chào mừng), giúp duyệt và mở các thư mục nhạc nhanh chóng và tiện lợi.
+            - **Việt hóa toàn diện 100% giao diện**:
+              - Toàn bộ giao diện từ các tab điều hướng, tiêu đề màn hình, menu thao tác bài hát, dialog xác nhận đến các thông báo hệ thống đều được bản địa hóa sang Tiếng Việt chuẩn mực và tự nhiên.
+            - **Nâng cấp thanh thông báo (SnackBar) công nghệ cao, độ tương phản sắc nét**:
+              - Khắc phục hoàn toàn lỗi thông báo cập nhật bị tối màu, chìm vào nền đen trong Dark Mode.
+              - Chữ hiển thị màu trắng rõ nét, tích hợp icon trạng thái công nghệ (`check_circle_outline_rounded` / cảnh báo đỏ) và khung viền nổi bật.
+              - Cơ chế tự hủy thông báo cũ tức thì khi xuất hiện thông báo mới, không gây trễ giao diện.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |
