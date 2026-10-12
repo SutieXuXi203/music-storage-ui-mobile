@@ -76,24 +76,24 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.22
-          name: Meowsic App Release v1.0.22
+          tag_name: v1.0.23
+          name: Meowsic App Release v1.0.23
           body: |
-            ## Meowsic Music App Android Release v1.0.22
+            ## Meowsic Music App Android Release v1.0.23
             - Tên hiển thị trên điện thoại: **Meowsic**
-            - Phiên bản: **v1.0.22** (Build 23)
-            - **Lời bài hát đồng bộ công nghệ (TechLyricsView)**:
-              - Giao diện monochrome trắng thuần tối giản, loại bỏ chi tiết thừa.
-              - Vạch sáng công nghệ căn giữa chính xác theo dòng thời gian bài hát.
-              - Nút "Làm mới" đặt góc trên bên phải để tải lại lời bất kỳ lúc nào.
-            - **Khôi phục hiển thị ảnh bìa thumbnail (Cover Art)**:
-              - Tối ưu `AppCoverImage` với cơ chế hiển thị bản địa, loại bỏ lỗi gián đoạn CanvasKit trên Web.
-              - Ưu tiên link ảnh tốc độ cao Google CDN LH3, kèm cơ chế tự động nạp link dự phòng nếu link chính gặp sự cố.
-              - Hỗ trợ hiển thị ảnh bìa thông minh cho Thư mục/Playlist (lấy ảnh bài hát đầu tiên nếu chưa có ảnh riêng).
-            - **Duy trì phiên đăng nhập lâu dài**:
-              - Tự động kiểm tra và phục hồi phiên đăng nhập khi mở app, không bắt đăng nhập lại.
-            - **HUD tiến trình tải nhạc công nghệ**:
-              - Đổi sang tông màu trắng công nghệ, giữ màu xanh lá khi tải hoàn tất.
+            - Phiên bản: **v1.0.23** (Build 24)
+            - **Hệ thống Mobile Motion & Haptic Tactile mượt mà**:
+              - Nâng cấp phản hồi xúc giác cơ học tức thì khi chạm nút (`HapticFeedback.lightImpact()`), chuẩn hóa micro-interactions.
+              - Menu điều hướng đáy chuyển tab mượt qua `IndexedStack` và active indicator có chuyển động êm dịu.
+              - Chuẩn hóa hệ thống bo góc và cấu hình `pageTransitionsTheme` tối ưu theo từng nền tảng (Cupertino cho iOS, Zoom cho Android).
+              - Toast thông báo (SnackBar) dạng floating nổi an toàn, hỗ trợ vuốt gạt bỏ ngang tiện lợi.
+            - **Tối ưu hóa toàn diện Mini Player & Now Playing Screen**:
+              - Mở màn hình Now Playing tức thì 100% không khựng giật với đường cong native `Cubic(0.2, 0.0, 0.0, 1.0)` (280ms).
+              - Chuyển đổi bài hát crossfade ảnh bìa và trượt lướt chữ tinh tế theo bài hát.
+              - Thanh thời lượng phát mini trôi êm 60fps với `TweenAnimationBuilder`.
+              - Lười tải (lazy-mount) lời bài hát đồng bộ, triệt tiêu tải CPU/mạng khi mở màn hình.
+              - Hoãn chuyển động sóng âm và cách ly layer GPU bằng `RepaintBoundary` khi đang trượt trang.
+              - Loại bỏ các lớp filter mờ nền gây nghẽn rasterizer trình duyệt.
             - Ký bằng **Release Keystore cố định** (Hỗ trợ cài đè/cập nhật trực tiếp không cần gỡ app cũ).
             - Tải file `meowsic.apk` bên dưới về điện thoại và cài đặt.
           files: |
