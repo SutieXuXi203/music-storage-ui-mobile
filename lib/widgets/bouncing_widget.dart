@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BouncingWidget extends StatefulWidget {
   final Widget child;
@@ -12,9 +13,9 @@ class BouncingWidget extends StatefulWidget {
     super.key,
     required this.child,
     this.onTap,
-    this.scaleFactor = 0.86,
-    this.duration = const Duration(milliseconds: 80),
-    this.reverseDuration = const Duration(milliseconds: 140),
+    this.scaleFactor = 0.95,
+    this.duration = const Duration(milliseconds: 70),
+    this.reverseDuration = const Duration(milliseconds: 110),
     this.behavior = HitTestBehavior.opaque,
   });
 
@@ -41,8 +42,8 @@ class _BouncingWidgetState extends State<BouncingWidget>
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeInOut,
-        reverseCurve: Curves.easeOutBack,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeOutCubic,
       ),
     );
   }
@@ -58,18 +59,27 @@ class _BouncingWidgetState extends State<BouncingWidget>
     if (widget.onTap == null) {
       return widget.child;
     }
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+
     return GestureDetector(
       behavior: widget.behavior,
-      onTapDown: (_) => _controller.forward(),
+      onTapDown: (_) {
+        if (!reduceMotion) _controller.forward();
+        HapticFeedback.lightImpact();
+      },
       onTapUp: (_) {
-        _controller.reverse();
+        if (!reduceMotion) _controller.reverse();
         widget.onTap?.call();
       },
-      onTapCancel: () => _controller.reverse(),
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
-      ),
+      onTapCancel: () {
+        if (!reduceMotion) _controller.reverse();
+      },
+      child: reduceMotion
+          ? widget.child
+          : ScaleTransition(
+              scale: _scaleAnimation,
+              child: widget.child,
+            ),
     );
   }
 }
@@ -82,6 +92,7 @@ class BouncingIconButton extends StatefulWidget {
   final String? tooltip;
   final EdgeInsetsGeometry padding;
   final BoxConstraints? constraints;
+  final double scaleFactor;
 
   const BouncingIconButton({
     super.key,
@@ -92,6 +103,7 @@ class BouncingIconButton extends StatefulWidget {
     this.tooltip,
     this.padding = const EdgeInsets.all(8.0),
     this.constraints,
+    this.scaleFactor = 0.92,
   });
 
   @override
@@ -108,17 +120,17 @@ class _BouncingIconButtonState extends State<BouncingIconButton>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 80),
-      reverseDuration: const Duration(milliseconds: 140),
+      duration: const Duration(milliseconds: 70),
+      reverseDuration: const Duration(milliseconds: 110),
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 0.82,
+      end: widget.scaleFactor,
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeInOut,
-        reverseCurve: Curves.easeOutBack,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeOutCubic,
       ),
     );
   }
@@ -131,30 +143,49 @@ class _BouncingIconButtonState extends State<BouncingIconButton>
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+
     Widget result = GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTapDown: widget.onPressed != null ? (_) => _controller.forward() : null,
+      onTapDown: widget.onPressed != null
+          ? (_) {
+              if (!reduceMotion) _controller.forward();
+              HapticFeedback.lightImpact();
+            }
+          : null,
       onTapUp: widget.onPressed != null
           ? (_) {
-              _controller.reverse();
+              if (!reduceMotion) _controller.reverse();
               widget.onPressed?.call();
             }
           : null,
-      onTapCancel:
-          widget.onPressed != null ? () => _controller.reverse() : null,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Padding(
-          padding: widget.padding,
-          child: IconTheme(
-            data: IconThemeData(
-              size: widget.iconSize ?? 24.0,
-              color: widget.color ?? IconTheme.of(context).color,
+      onTapCancel: () {
+        if (!reduceMotion && widget.onPressed != null) _controller.reverse();
+      },
+      child: reduceMotion
+          ? Padding(
+              padding: widget.padding,
+              child: IconTheme(
+                data: IconThemeData(
+                  size: widget.iconSize ?? 24.0,
+                  color: widget.color ?? IconTheme.of(context).color,
+                ),
+                child: widget.icon,
+              ),
+            )
+          : ScaleTransition(
+              scale: _scaleAnimation,
+              child: Padding(
+                padding: widget.padding,
+                child: IconTheme(
+                  data: IconThemeData(
+                    size: widget.iconSize ?? 24.0,
+                    color: widget.color ?? IconTheme.of(context).color,
+                  ),
+                  child: widget.icon,
+                ),
+              ),
             ),
-            child: widget.icon,
-          ),
-        ),
-      ),
     );
 
     if (widget.constraints != null) {

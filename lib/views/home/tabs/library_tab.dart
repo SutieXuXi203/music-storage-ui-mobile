@@ -28,6 +28,7 @@ class _LibraryTabState extends State<LibraryTab> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
+      clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
@@ -39,14 +40,16 @@ class _LibraryTabState extends State<LibraryTab> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 32,
-                  height: 3,
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color:
-                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2),
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color:
+                          AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
                 Padding(

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 export '../../widgets/bouncing_widget.dart';
@@ -14,11 +15,11 @@ class AppTheme {
   static const double space32 = 32.0;
 
   static const double radiusXs = 4.0;
-  static const double radiusSm = 4.0;
-  static const double radiusMd = 4.0;
-  static const double radiusLg = 4.0;
-  static const double radiusSheet = 4.0;
-  static const double radiusPill = 4.0;
+  static const double radiusSm = 8.0;
+  static const double radiusMd = 12.0;
+  static const double radiusLg = 16.0;
+  static const double radiusSheet = 20.0;
+  static const double radiusPill = 999.0;
 
   static const Color lightBg = Color(0xFFFFFFFF);
   static const Color lightSurface = Color(0xFFF7F7F7);
@@ -244,10 +245,11 @@ class AppTheme {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: duration,
+        dismissDirection: DismissDirection.horizontal,
         behavior: SnackBarBehavior.floating,
         backgroundColor: bg,
-        elevation: 8,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        elevation: 6,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
@@ -527,6 +529,15 @@ class AppTheme {
         thickness: 1.0,
         space: 1.0,
       ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.windows: ZoomPageTransitionsBuilder(),
+          TargetPlatform.linux: ZoomPageTransitionsBuilder(),
+        },
+      ),
     );
   }
 
@@ -682,6 +693,15 @@ class AppTheme {
         color: darkBorder,
         thickness: 1.0,
         space: 1.0,
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.windows: ZoomPageTransitionsBuilder(),
+          TargetPlatform.linux: ZoomPageTransitionsBuilder(),
+        },
       ),
     );
   }

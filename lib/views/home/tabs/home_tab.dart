@@ -200,12 +200,13 @@ class _HomeTabState extends State<HomeTab> {
                       Stack(
                         children: [
                           BouncingIconButton(
-                            padding: EdgeInsets.zero,
+                            padding: const EdgeInsets.all(6),
                             constraints: const BoxConstraints(
-                                minWidth: 34, minHeight: 34),
+                                minWidth: 40, minHeight: 40),
+                            tooltip: 'Thông báo',
                             icon: Icon(
                               Icons.notifications_none_outlined,
-                              size: 19,
+                              size: 20,
                               color: AppTheme.getText(context),
                             ),
                             onPressed: () {
@@ -217,8 +218,8 @@ class _HomeTabState extends State<HomeTab> {
                             },
                           ),
                           Positioned(
-                            top: 6,
-                            right: 6,
+                            top: 8,
+                            right: 8,
                             child: Container(
                               width: 6,
                               height: 6,
@@ -230,7 +231,7 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                         ],
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 4),
                       BouncingWidget(
                         onTap: () {
                           Navigator.push(
@@ -239,26 +240,29 @@ class _HomeTabState extends State<HomeTab> {
                                 builder: (_) => const SettingsScreen()),
                           );
                         },
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppTheme.getSurfaceElevated(context),
-                            border: Border.all(
-                              color: AppTheme.getBorder(context),
-                              width: 1.0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppTheme.getSurfaceElevated(context),
+                              border: Border.all(
+                                color: AppTheme.getBorder(context),
+                                width: 1.0,
+                              ),
                             ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              userName.isNotEmpty
-                                  ? userName[0].toUpperCase()
-                                  : 'M',
-                              style: TextStyle(
-                                color: AppTheme.getText(context),
-                                fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                            child: Center(
+                              child: Text(
+                                userName.isNotEmpty
+                                    ? userName[0].toUpperCase()
+                                    : 'M',
+                                style: TextStyle(
+                                  color: AppTheme.getText(context),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
                               ),
                             ),
                           ),
@@ -306,11 +310,29 @@ class _HomeTabState extends State<HomeTab> {
                 builder: (context, _) {
                   final playlist = audioPlayerService.playlist;
                   final currentSong = audioPlayerService.currentSong;
-                  if (playlist.isEmpty || currentSong == null) {
-                    return const SizedBox.shrink();
-                  }
-                  return _buildActiveGroupSection(
-                      context, playlist, currentSong);
+                  final bool hasActiveGroup =
+                      playlist.isNotEmpty && currentSong != null;
+                  final bool reduceMotion =
+                      MediaQuery.of(context).disableAnimations;
+
+                  return AnimatedSwitcher(
+                    duration: reduceMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 200),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeOutCubic,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                    child: hasActiveGroup
+                        ? KeyedSubtree(
+                            key: const ValueKey('active_group_section'),
+                            child: _buildActiveGroupSection(
+                                context, playlist, currentSong),
+                          )
+                        : const SizedBox.shrink(
+                            key: ValueKey('empty_active_group')),
+                  );
                 },
               ),
               const SizedBox(height: 18),
@@ -331,9 +353,8 @@ class _HomeTabState extends State<HomeTab> {
                         onPressed: widget.onNavigateToLibrary,
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              horizontal: 14, vertical: 8),
+                          minimumSize: const Size(48, 36),
                         ),
                         child: Text(
                           'Xem thêm ${folders.length - 4} thư mục trong Thư viện →',

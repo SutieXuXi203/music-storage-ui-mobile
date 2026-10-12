@@ -47,10 +47,10 @@ class _SearchTabState extends State<SearchTab> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
           children: [
             Container(
-              height: 42,
+              height: 46,
               decoration: BoxDecoration(
                 color: AppTheme.getSurface(context),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 border:
                     Border.all(color: AppTheme.getBorder(context), width: 1.0),
               ),
@@ -203,26 +203,33 @@ class _SearchTabState extends State<SearchTab> {
               ],
             ),
           ),
-          BouncingWidget(
-            onTap: () {
-              final songProv =
-                  Provider.of<SongProvider>(context, listen: false);
-              final idx = songProv.songs.indexWhere((s) => s.id == song.id);
-              audioPlayerService.setPlaylist(songProv.songs,
-                  initialIndex: idx >= 0 ? idx : 0);
-            },
-            child: Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border:
-                    Border.all(color: AppTheme.getBorder(context), width: 1.0),
-                color: Colors.transparent,
-              ),
-              child: Center(
-                child: Icon(Icons.play_arrow,
-                    size: 16, color: AppTheme.getText(context)),
+          Semantics(
+            button: true,
+            label: 'Phát bài hát ${song.title}',
+            child: BouncingWidget(
+              onTap: () {
+                final songProv =
+                    Provider.of<SongProvider>(context, listen: false);
+                final idx = songProv.songs.indexWhere((s) => s.id == song.id);
+                audioPlayerService.setPlaylist(songProv.songs,
+                    initialIndex: idx >= 0 ? idx : 0);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: AppTheme.getBorder(context), width: 1.0),
+                    color: AppTheme.getSurfaceElevated(context),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.play_arrow,
+                        size: 18, color: AppTheme.getText(context)),
+                  ),
+                ),
               ),
             ),
           ),

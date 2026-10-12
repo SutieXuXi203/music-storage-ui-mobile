@@ -31,11 +31,15 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
       PageRouteBuilder(
         opaque: false,
         barrierColor: Colors.black.withValues(alpha: 0.6),
-        transitionDuration: const Duration(milliseconds: 260),
-        reverseTransitionDuration: const Duration(milliseconds: 220),
+        transitionDuration: const Duration(milliseconds: 240),
+        reverseTransitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (context, anim, secAnim) =>
             NowPlayingScreen(playerService: audioPlayerService),
         transitionsBuilder: (context, anim, secAnim, child) {
+          final reduceMotion = MediaQuery.of(context).disableAnimations;
+          if (reduceMotion) {
+            return FadeTransition(opacity: anim, child: child);
+          }
           final curved =
               CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
           return SlideTransition(
@@ -181,6 +185,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
+      clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
@@ -194,13 +199,13 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
             children: [
               Center(
                 child: Container(
-                  width: 32,
-                  height: 3,
+                  width: 36,
+                  height: 4,
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
                     color:
                         AppTheme.getTextMuted(context).withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
@@ -825,6 +830,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
+      clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
@@ -839,8 +845,8 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
               children: [
                 Center(
                   child: Container(
-                    width: 32,
-                    height: 3,
+                    width: 36,
+                    height: 4,
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
                       color:

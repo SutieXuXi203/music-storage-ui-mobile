@@ -15,11 +15,15 @@ class MiniPlayerWidget extends StatelessWidget {
       PageRouteBuilder(
         opaque: false,
         barrierColor: Colors.black.withValues(alpha: 0.6),
-        transitionDuration: const Duration(milliseconds: 260),
-        reverseTransitionDuration: const Duration(milliseconds: 220),
+        transitionDuration: const Duration(milliseconds: 240),
+        reverseTransitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (context, anim, secAnim) =>
             NowPlayingScreen(playerService: playerService),
         transitionsBuilder: (context, anim, secAnim, child) {
+          final reduceMotion = MediaQuery.of(context).disableAnimations;
+          if (reduceMotion) {
+            return FadeTransition(opacity: anim, child: child);
+          }
           final curved =
               CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
           return SlideTransition(
@@ -86,8 +90,9 @@ class MiniPlayerWidget extends StatelessWidget {
 
                         return LinearProgressIndicator(
                           value: progress,
-                          minHeight: 1.5,
-                          backgroundColor: Colors.transparent,
+                          minHeight: 2.0,
+                          backgroundColor:
+                              AppTheme.getBorder(context).withValues(alpha: 0.35),
                           valueColor: AlwaysStoppedAnimation<Color>(
                             AppTheme.getText(context),
                           ),

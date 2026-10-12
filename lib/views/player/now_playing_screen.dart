@@ -16,8 +16,10 @@ class NowPlayingScreen extends StatefulWidget {
 }
 
 class _NowPlayingScreenState extends State<NowPlayingScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _waveController;
+  late AnimationController _dragSnapController;
+  Animation<double>? _dragSnapAnimation;
   double _dragOffset = 0.0;
   bool _isDraggingSeek = false;
   double _seekPosition = 0.0;
@@ -30,11 +32,17 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
+
+    _dragSnapController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 160),
+    );
   }
 
   @override
   void dispose() {
     _waveController.dispose();
+    _dragSnapController.dispose();
     super.dispose();
   }
 
@@ -46,6 +54,9 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
   }
 
   void _onVerticalDragUpdate(DragUpdateDetails details) {
+    if (_dragSnapController.isAnimating) {
+      _dragSnapController.stop();
+    }
     if (details.delta.dy > 0 || _dragOffset > 0) {
       setState(() {
         _dragOffset = math.max(0.0, _dragOffset + details.delta.dy);
@@ -58,9 +69,25 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
     if (_dragOffset > 120 || velocity > 280) {
       Navigator.of(context).pop();
     } else {
-      setState(() {
-        _dragOffset = 0.0;
-      });
+      final reduceMotion = MediaQuery.of(context).disableAnimations;
+      if (reduceMotion || _dragOffset == 0.0) {
+        setState(() {
+          _dragOffset = 0.0;
+        });
+      } else {
+        _dragSnapAnimation = Tween<double>(
+          begin: _dragOffset,
+          end: 0.0,
+        ).animate(CurvedAnimation(
+          parent: _dragSnapController,
+          curve: Curves.easeOutCubic,
+        ))..addListener(() {
+          setState(() {
+            _dragOffset = _dragSnapAnimation?.value ?? 0.0;
+          });
+        });
+        _dragSnapController.forward(from: 0.0);
+      }
     }
   }
 
@@ -68,6 +95,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
+      clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
@@ -78,13 +106,16 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 32,
-                height: 3,
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: AppTheme.getTextMuted(context).withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color:
+                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
               ListTile(
@@ -218,7 +249,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                           decoration: BoxDecoration(
                             color: AppTheme.getSurfaceSubtle(context),
                             borderRadius:
-                                BorderRadius.circular(AppTheme.radiusSm),
+                                BorderRadius.circular(AppTheme.radiusLg),
                             border: Border.all(
                                 color: AppTheme.getBorder(context), width: 0.8),
                           ),
@@ -228,7 +259,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                             fallbackUrl: song.fallbackCoverUrl,
                             width: 230,
                             height: 230,
-                            borderRadius: AppTheme.radiusSm,
+                            borderRadius: AppTheme.radiusLg,
                             iconSize: 64,
                           ),
                         ),
@@ -450,19 +481,32 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
   }
 
   Widget _buildNextSongsSection(BuildContext context, List<Song> upcoming) {
-    if (upcoming.isEmpty) return const SizedBox.shrink();
+    final bool reduceMotion = MediaQuery.of(context).disableAnimations;
 
-    return Container(
-      margin: const EdgeInsets.only(top: 18),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.getSurface(context),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(
-          color: AppTheme.getBorder(context),
-          width: 0.8,
-        ),
-      ),
+    return AnimatedSwitcher(
+      duration:
+          reduceMotion ? Duration.zero : const Duration(milliseconds: 200),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeOutCubic,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+      child: upcoming.isEmpty
+          ? const SizedBox.shrink(key: ValueKey('empty_upcoming'))
+          : KeyedSubtree(
+              key: ValueKey(
+                  'upcoming_${upcoming.length}_${upcoming.first.id}'),
+              child: Container(
+                margin: const EdgeInsets.only(top: 18),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.getSurface(context),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: AppTheme.getBorder(context),
+                    width: 0.8,
+                  ),
+                ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -627,8 +671,10 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
           }),
         ],
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   Widget _buildWaveformBar(BuildContext context, double progress) {
     final isPlaying = widget.playerService.isPlaying;

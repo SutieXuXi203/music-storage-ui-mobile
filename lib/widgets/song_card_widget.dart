@@ -38,6 +38,7 @@ class _SongCardWidgetState extends State<SongCardWidget> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.getSurfaceElevated(context),
+      clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(AppTheme.radiusSheet)),
@@ -49,14 +50,16 @@ class _SongCardWidgetState extends State<SongCardWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 32,
-                  height: 3,
-                  margin: const EdgeInsets.only(bottom: 14),
-                  decoration: BoxDecoration(
-                    color:
-                        AppTheme.getTextMuted(context).withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2),
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 14),
+                    decoration: BoxDecoration(
+                      color:
+                          AppTheme.getTextMuted(context).withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
                 Row(
@@ -337,13 +340,15 @@ class _SongCardWidgetState extends State<SongCardWidget> {
         ? AppTheme.getSurfaceSubtle(context)
         : AppTheme.getSurface(context);
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: widget.isCurrent
-              ? AppTheme.getText(context).withValues(alpha: 0.3)
+              ? AppTheme.getText(context).withValues(alpha: 0.35)
               : AppTheme.getBorder(context),
           width: 0.8,
         ),
@@ -398,32 +403,37 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                       ),
                     ),
                     if (widget.isCurrent) ...[
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusSm),
-                        ),
-                        child: Center(
-                          child: widget.isBuffering
-                              ? const SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 1.5, color: Colors.white),
-                                )
-                              : (widget.isPlaying
-                                  ? const MiniEqualizerWidget(
-                                      isPlaying: true,
-                                      height: 12,
-                                      width: 12,
-                                      barCount: 3,
-                                      color: Colors.white,
-                                    )
-                                  : const Icon(Icons.pause,
-                                      color: Colors.white, size: 16)),
+                      AnimatedOpacity(
+                        opacity: widget.isCurrent ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 180),
+                        curve: Curves.easeOutCubic,
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSm),
+                          ),
+                          child: Center(
+                            child: widget.isBuffering
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 1.5, color: Colors.white),
+                                  )
+                                : (widget.isPlaying
+                                    ? const MiniEqualizerWidget(
+                                        isPlaying: true,
+                                        height: 12,
+                                        width: 12,
+                                        barCount: 3,
+                                        color: Colors.white,
+                                      )
+                                    : const Icon(Icons.pause,
+                                        color: Colors.white, size: 16)),
+                          ),
                         ),
                       ),
                     ],
@@ -477,12 +487,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 ),
                 const SizedBox(width: 4),
                 BouncingIconButton(
-                  padding: EdgeInsets.zero,
+                  padding: const EdgeInsets.all(4),
                   constraints:
-                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                      const BoxConstraints(minWidth: 40, minHeight: 40),
+                  tooltip: 'Tùy chọn bài hát',
                   icon: Icon(
                     Icons.more_vert,
-                    size: 18,
+                    size: 19,
                     color: AppTheme.getTextSecondary(context),
                   ),
                   onPressed: () => _showOptionsModal(context),

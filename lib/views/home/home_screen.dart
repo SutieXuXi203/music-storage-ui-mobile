@@ -117,19 +117,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return Scaffold(
       backgroundColor: AppTheme.getBg(context),
       extendBody: true,
-      body: Stack(
-        children: List.generate(_tabs.length, (index) {
-          final isSelected = _currentIndex == index;
-          return IgnorePointer(
-            ignoring: !isSelected,
-            child: AnimatedOpacity(
-              opacity: isSelected ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
-              child: _tabs[index],
-            ),
-          );
-        }),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _tabs,
       ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
@@ -202,29 +192,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final inactiveColor = AppTheme.getTextMuted(context);
 
     return Expanded(
-      child: BouncingWidget(
-        onTap: () => _onTabTapped(index),
-        scaleFactor: 0.90,
-        child: SizedBox(
-          height: 52,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                isSelected ? iconFilled : iconOutline,
-                color: isSelected ? activeColor : inactiveColor,
-                size: 20,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+      child: Semantics(
+        selected: isSelected,
+        button: true,
+        label: label,
+        child: BouncingWidget(
+          onTap: () => _onTabTapped(index),
+          scaleFactor: 0.90,
+          child: SizedBox(
+            height: 52,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isSelected ? iconFilled : iconOutline,
                   color: isSelected ? activeColor : inactiveColor,
+                  size: 21,
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? activeColor : inactiveColor,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
