@@ -122,7 +122,7 @@ class _TechPlayCoreButtonState extends State<TechPlayCoreButton>
 
     return BouncingWidget(
       onTap: widget.onTap,
-      scaleFactor: 0.88,
+      scaleFactor: 0.92,
       child: AnimatedBuilder(
         animation: _rotationController,
         builder: (context, _) {

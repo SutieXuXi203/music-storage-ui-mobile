@@ -125,16 +125,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         mainAxisSize: MainAxisSize.min,
         children: [
           const RepaintBoundary(child: TechDownloadHud()),
-          ListenableBuilder(
-            listenable: audioPlayerService,
-            builder: (context, _) {
-              if (audioPlayerService.currentSong == null) {
-                return const SizedBox.shrink();
-              }
-              return RepaintBoundary(
-                child: MiniPlayerWidget(playerService: audioPlayerService),
-              );
-            },
+          RepaintBoundary(
+            child: MiniPlayerWidget(playerService: audioPlayerService),
           ),
           RepaintBoundary(
             child: ClipRect(

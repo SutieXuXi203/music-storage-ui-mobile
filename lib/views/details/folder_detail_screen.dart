@@ -30,9 +30,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
     Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        barrierColor: Colors.black.withValues(alpha: 0.6),
-        transitionDuration: const Duration(milliseconds: 240),
-        reverseTransitionDuration: const Duration(milliseconds: 200),
+        barrierColor: Colors.black.withValues(alpha: 0.54),
+        transitionDuration: const Duration(milliseconds: 280),
+        reverseTransitionDuration: const Duration(milliseconds: 240),
         pageBuilder: (context, anim, secAnim) =>
             NowPlayingScreen(playerService: audioPlayerService),
         transitionsBuilder: (context, anim, secAnim, child) {
@@ -40,8 +40,11 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
           if (reduceMotion) {
             return FadeTransition(opacity: anim, child: child);
           }
-          final curved =
-              CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+          final curved = CurvedAnimation(
+            parent: anim,
+            curve: const Cubic(0.2, 0.0, 0.0, 1.0),
+            reverseCurve: Curves.easeInCubic,
+          );
           return SlideTransition(
             position: Tween<Offset>(
               begin: const Offset(0, 1.0),

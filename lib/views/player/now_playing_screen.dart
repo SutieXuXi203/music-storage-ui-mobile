@@ -31,12 +31,29 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
     _waveController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
+    );
 
     _dragSnapController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 160),
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final routeAnim = ModalRoute.of(context)?.animation;
+      if (routeAnim != null && !routeAnim.isCompleted) {
+        void onStatus(AnimationStatus status) {
+          if (status == AnimationStatus.completed) {
+            routeAnim.removeStatusListener(onStatus);
+            if (mounted) _waveController.repeat(reverse: true);
+          }
+        }
+
+        routeAnim.addStatusListener(onStatus);
+      } else {
+        _waveController.repeat(reverse: true);
+      }
+    });
   }
 
   @override
@@ -181,8 +198,9 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
 
         return Transform.translate(
           offset: Offset(0, _dragOffset),
-          child: Scaffold(
-            backgroundColor: AppTheme.getBg(context),
+          child: RepaintBoundary(
+            child: Scaffold(
+              backgroundColor: AppTheme.getBg(context),
             appBar: AppBar(
               backgroundColor: AppTheme.getBg(context),
               elevation: 0,
@@ -237,50 +255,55 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                 child: Column(
                   children: [
                     const SizedBox(height: 12),
-                    AnimatedCrossFade(
-                      duration: const Duration(milliseconds: 250),
-                      crossFadeState: _showLyrics
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
-                      firstChild: Center(
-                        child: Container(
-                          width: 230,
-                          height: 230,
-                          decoration: BoxDecoration(
-                            color: AppTheme.getSurfaceSubtle(context),
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusLg),
-                            border: Border.all(
-                                color: AppTheme.getBorder(context), width: 0.8),
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: AppCoverImage(
-                            url: song.coverUrl,
-                            fallbackUrl: song.fallbackCoverUrl,
-                            width: 230,
-                            height: 230,
-                            borderRadius: AppTheme.radiusLg,
-                            iconSize: 64,
-                          ),
-                        ),
-                      ),
-                      secondChild: SizedBox(
-                        height: 290,
-                        width: double.infinity,
-                        child: TechLyricsView(
-                          playerService: widget.playerService,
-                          song: song,
-                          onClose: () {
-                            setState(() {
-                              _showLyrics = false;
-                            });
-                          },
-                          onSongUpdated: (updated) {
-                            widget.playerService
-                                .updateCurrentSongMetadata(updated);
-                          },
-                        ),
-                      ),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 220),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeOutCubic,
+                      transitionBuilder: (child, anim) =>
+                          FadeTransition(opacity: anim, child: child),
+                      child: _showLyrics
+                          ? SizedBox(
+                              key: const ValueKey('lyrics_view_mounted'),
+                              height: 290,
+                              width: double.infinity,
+                              child: TechLyricsView(
+                                playerService: widget.playerService,
+                                song: song,
+                                onClose: () {
+                                  setState(() {
+                                    _showLyrics = false;
+                                  });
+                                },
+                                onSongUpdated: (updated) {
+                                  widget.playerService
+                                      .updateCurrentSongMetadata(updated);
+                                },
+                              ),
+                            )
+                          : Center(
+                              key: const ValueKey('cover_view_mounted'),
+                              child: Container(
+                                width: 230,
+                                height: 230,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.getSurfaceSubtle(context),
+                                  borderRadius:
+                                      BorderRadius.circular(AppTheme.radiusLg),
+                                  border: Border.all(
+                                      color: AppTheme.getBorder(context),
+                                      width: 0.8),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: AppCoverImage(
+                                  url: song.coverUrl,
+                                  fallbackUrl: song.fallbackCoverUrl,
+                                  width: 230,
+                                  height: 230,
+                                  borderRadius: AppTheme.radiusLg,
+                                  iconSize: 64,
+                                ),
+                              ),
+                            ),
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -463,9 +486,10 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
             ),
           ),
         ),
-      );
-    },
-  );
+      ),
+    );
+  },
+);
 }
 
   String _calculateTotalDuration(List<Song> songs) {
